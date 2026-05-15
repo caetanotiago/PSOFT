@@ -2,7 +2,7 @@
 
 > **Project:** AISafe Flight Management System
 > **Client:** Nuno Pereira NAP
-> **Last updated:** 2026-04-23
+> **Last updated:** 2026-04-27
 
 ---
 
@@ -26,6 +26,7 @@
 | [014](#conversation-014) | 2026-04-01 | US208 - Update Airport details and contact information | Resolved | SILVA 1241131 |
 | [015](#conversation-015) | 2026-04-01 | US226 - Maintenance Part relationships | Resolved | Diogo Nogueira 1241692 |
 | [016](#conversation-016) | 2026-04-08 | US222 - Scheduled maintenance triggers and intervals | Resolved | Diogo Nogueira 1241692 |
+| [017](#conversation-017) | 2026-04-26 | US101 - Aircraft manufacturer details | Resolved | Diogo Nogueira 1241692 |
 
 ---
 
@@ -558,6 +559,44 @@
 
 ---
 
+## Conversation 017
+
+**Date:** 2026-04-26
+**Topic:** US101 - Aircraft manufacturer details
+**Status:** `Resolved`
+**Owner:** Diogo Nogueira 1241692
+**Tags:** `#aircraft` `#manufacturer` `#US101`
+
+### Question
+
+> Regarding the registration of an aircraft model (US101), we need to specify its manufacturer.
+>
+> Could you clarify how these manufacturers should be handled?
+>
+> 1. Are the manufacturers just simple text names that the Backoffice Operator types in when creating the model?
+> 2. Does AISafe need to maintain a separate, controlled list of manufacturers in the system, storing extra details about them (such as contact information, origin, or a unique identifier) before an aircraft model can be linked to them?
+> 3. Are there specific pre-defined manufacturers that exist in this system, or is this list completely open-ended and created on the fly?
+
+### Client Response
+
+> We will not manage different manufacturers in the application. Manufacturers should come from a fixed list, either by configuration or in each version of the application.
+
+**Received on:** 2026-04-27
+**Responded by:** Nuno Pereira NAP
+
+### Notes & Clarifications
+
+- Manufacturers are **not** a managed entity in the system — no CRUD for manufacturers.
+- The manufacturer list is **fixed**, defined by configuration or hardcoded per application version.
+- AircraftModel references a manufacturer from this fixed list (no separate Manufacturer entity needed).
+
+### Action Items
+
+- [x] Define manufacturer as a fixed enum/config list, not a managed entity
+- [x] AircraftModel references manufacturer from the fixed list
+
+---
+
 <!-- 
   HOW TO ADD A NEW CONVERSATION
   1. Add a new row to the Index table above.
@@ -572,22 +611,22 @@
 **Owner:**   
 **Tags:**  
 
-### Question
+Question
 
 >  
 
-### Client Response
+Client Response
 
 >  
 
 **Received on:**  
 **Responded by:**  
 
-### Notes & Clarifications
+Notes & Clarifications
 
 - 
 
-### Action Items
+Action Items
 
 - [ ] 
 
