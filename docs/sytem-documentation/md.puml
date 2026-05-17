@@ -8,6 +8,7 @@ package "Airport Aggregate" {
         - iataCode : IATACode
         - details : AirportDetails
         - status : AirportStatus
+        - runways : List<Runway>
         - facilities : List<Facility>
         - contacts : List<AirportContact>
     }
@@ -20,6 +21,11 @@ package "Airport Aggregate" {
         - country : String
         - region : String
         - timezone : String
+    }
+    class Runway <<Value Object>> {
+        - name : String
+        - length : Double
+        - orientation : String
     }
     class AirportContact <<Value Object>> {
         - type : String
@@ -37,13 +43,33 @@ package "Airport Aggregate" {
     
     Airport *-- IATACode
     Airport *-- AirportDetails
+    Airport *-- Runway
     Airport *-- AirportContact
     Airport *-- Facility
     Airport *-- AirportStatus
 }
 
-package "Aircraft Model Aggregate" {
-    class AircraftModel <<Entity>> <<Root>> {
+package "Aircraft Aggregate" {
+    class Aircraft <<Entity>> <<Root>> {
+        - registrationNumber : RegistrationNumber
+        - status : AircraftStatus
+        - seatingCapacity : SeatingCapacity
+        - manufacturingDate : ManufacturingDate
+        - model : AircraftModel
+    }
+    class RegistrationNumber <<Value Object>> {
+        - number : String
+    }
+    class AircraftStatus <<Value Object>> {
+        - state : String
+    }
+    class SeatingCapacity <<Value Object>> {
+        - totalSeats : Integer
+    }
+    class ManufacturingDate <<Value Object>> {
+        - date : LocalDate
+    }
+    class AircraftModel <<Entity>> {
         - designation : ModelDesignation
         - specifications : ModelSpecifications
         - features : List<Feature>
@@ -62,44 +88,37 @@ package "Aircraft Model Aggregate" {
         - description : String
     }
     
+    Aircraft *-- RegistrationNumber
+    Aircraft *-- AircraftStatus
+    Aircraft *-- SeatingCapacity
+    Aircraft *-- ManufacturingDate
+    Aircraft *-- AircraftModel
     AircraftModel *-- ModelDesignation
     AircraftModel *-- ModelSpecifications
     AircraftModel *-- Feature
 }
 
-package "Aircraft Aggregate" {
-    class Aircraft <<Entity>> <<Root>> {
-        - registrationNumber : RegistrationNumber
-        - status : AircraftStatus
-        - seatingCapacity : SeatingCapacity
-        - manufacturingDate : ManufacturingDate
+package "Flight Route & Schedule Aggregate" {
+    class ScheduledFlight <<Entity>> <<Root>> {
+        - flightSchedule : FlightSchedule
+        - flightStatus : FlightStatus
+        - realDeparture : LocalDateTime
+        - realArrival : LocalDateTime
+        - route : FlightRoute
     }
-    class RegistrationNumber <<Value Object>> {
-        - number : String
+    class FlightSchedule <<Value Object>> {
+        - date : LocalDate
+        - time : LocalTime
     }
-    class AircraftStatus <<Value Object>> {
+    class FlightStatus <<Value Object>> {
         - state : String
     }
-    class SeatingCapacity <<Value Object>> {
-        - totalSeats : Integer
-    }
-    class ManufacturingDate <<Value Object>> {
-        - date : LocalDate
-    }
-    
-    Aircraft *-- RegistrationNumber
-    Aircraft *-- AircraftStatus
-    Aircraft *-- SeatingCapacity
-    Aircraft *-- ManufacturingDate
-    Aircraft --> AircraftModel : refers to >
-}
-
-package "Flight Route Aggregate" {
-    class FlightRoute <<Entity>> <<Root>> {
+    class FlightRoute <<Entity>> {
         - routeID : RouteID
         - distance : RouteDistance
         - requirements : RouteRequirements
         - estimatedFlightTime : EstimatedFlightTime
+        - historyLog : List<RouteHistory>
     }
     class RouteID <<Value Object>> {
         - id : String
@@ -114,36 +133,45 @@ package "Flight Route Aggregate" {
     class EstimatedFlightTime <<Value Object>> {
         - durationMinutes : Integer
     }
-    
-    FlightRoute *-- RouteID
-    FlightRoute *-- RouteDistance
-    FlightRoute *-- RouteRequirements
-    FlightRoute *-- EstimatedFlightTime
-    FlightRoute --> Airport : origin >
-    FlightRoute --> Airport : destination >
-}
-
-package "Scheduled Flight Aggregate" {
-    class ScheduledFlight <<Entity>> <<Root>> {
-        - flightSchedule : FlightSchedule
-        - flightStatus : FlightStatus
-    }
-    class FlightSchedule <<Value Object>> {
-        - date : LocalDate
-        - time : LocalTime
-    }
-    class FlightStatus <<Value Object>> {
-        - state : String
+    class RouteHistory <<Value Object>> {
+        - changeDate : LocalDateTime
+        - description : String
+        - previousDistance : Double
     }
     
     ScheduledFlight *-- FlightSchedule
     ScheduledFlight *-- FlightStatus
-    ScheduledFlight --> FlightRoute : follows >
+    ScheduledFlight *-- FlightRoute
+    FlightRoute *-- RouteID
+    FlightRoute *-- RouteDistance
+    FlightRoute *-- RouteRequirements
+    FlightRoute *-- EstimatedFlightTime
+    FlightRoute *-- RouteHistory
+    
     ScheduledFlight --> Aircraft : uses >
+    FlightRoute --> Airport : origin >
+    FlightRoute --> Airport : destination >
 }
 
-package "Maintenance Template Aggregate" {
-    class MaintenanceTemplate <<Entity>> <<Root>> {
+package "Maintenance Aggregate" {
+    class MaintenanceRecord <<Entity>> <<Root>> {
+        - recordDetails : RecordDetails
+        - component : MaintenanceComponent
+        - completionNotes : CompletionNotes
+        - template : MaintenanceTemplate
+    }
+    class RecordDetails <<Value Object>> {
+        - description : String
+        - startDate : LocalDate
+        - expectedDurationMinutes : Integer
+    }
+    class MaintenanceComponent <<Value Object>> {
+        - category : String
+    }
+    class CompletionNotes <<Value Object>> {
+        - notes : String
+    }
+    class MaintenanceTemplate <<Entity>> {
         - templateName : TemplateName
         - templateType : TemplateType
         - interval : MaintenanceInterval
@@ -163,11 +191,16 @@ package "Maintenance Template Aggregate" {
         - tasks : List<String>
     }
     
+    MaintenanceRecord *-- RecordDetails
+    MaintenanceRecord *-- MaintenanceComponent
+    MaintenanceRecord *-- CompletionNotes
+    MaintenanceRecord *-- MaintenanceTemplate
     MaintenanceTemplate *-- TemplateName
     MaintenanceTemplate *-- TemplateType
     MaintenanceTemplate *-- MaintenanceInterval
     MaintenanceTemplate *-- Checklist
-    MaintenanceTemplate --> AircraftModel : applies to >
+    
+    MaintenanceRecord --> Aircraft : maintains >
 }
 
 package "Inventory Aggregate" {
@@ -189,32 +222,7 @@ package "Inventory Aggregate" {
     MaintenancePart *-- StockLevel
 }
 
-package "Maintenance Record Aggregate" {
-    class MaintenanceRecord <<Entity>> <<Root>> {
-        - recordDetails : RecordDetails
-        - component : MaintenanceComponent
-        - completionNotes : CompletionNotes
-    }
-    class RecordDetails <<Value Object>> {
-        - description : String
-        - startDate : LocalDate
-        - expectedDurationMinutes : Integer
-    }
-    class MaintenanceComponent <<Value Object>> {
-        - category : String
-    }
-    class CompletionNotes <<Value Object>> {
-        - notes : String
-    }
-    
-    MaintenanceRecord *-- RecordDetails
-    MaintenanceRecord *-- MaintenanceComponent
-    MaintenanceRecord *-- CompletionNotes
-    MaintenanceRecord --> Aircraft : maintains >
-    MaintenanceRecord --> MaintenanceTemplate : based on >
-}
-
-' Airport Certification Relationship
+' Relacionamento de Certificação entre Agregados
 Airport --> AircraftModel : certified for >
 
 @enduml
