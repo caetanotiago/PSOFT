@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AisafeApplication<aisafe>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "isep.psoft.aisafe.AisafeApplication",
+            "projectName": "aisafe",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
