@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Example of a System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":System" as System
+
+activate User
+
+User -> System: Authentication request
+System --> User: Authentication response
+
+User -> System: Another authentication request
+User <-- System: Another authentication response
+@enduml

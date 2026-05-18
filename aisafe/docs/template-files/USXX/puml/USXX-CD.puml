@@ -1,0 +1,35 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+skinparam classAttributeIconSize 0
+
+title Example of a Class Diagram
+
+class xxxxView {
+
+}
+
+class xxxxController {
+    +authenticate(string userId, string pwd): bool
+}
+
+class Class1 {
+    -designation
+    +doLogin(string userId, string pwd): UserToken
+}
+
+class Class2 {
+    -id
+    -name
+    -address
+    -password
+}
+
+xxxxView ..> xxxxController
+
+xxxxController ..> Class1
+
+Class1 "1" -> "0..*" Class2: knows
+
+@enduml

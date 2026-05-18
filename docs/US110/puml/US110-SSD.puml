@@ -1,0 +1,13 @@
+@startuml US110 SSD
+autonumber
+actor "ATCC" as ATCC
+participant "System" as SYS
+
+activate ATCC
+ATCC -> SYS : POST /api/routes (originIATA, destIATA, estFlightTime, minRange, minCapacity)
+activate SYS
+
+SYS --> ATCC : 201 Created (RouteID, Distance, Origin, Destination, etc.)
+deactivate SYS
+deactivate ATCC
+@enduml

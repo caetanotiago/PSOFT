@@ -1,0 +1,61 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": FlightRouteRestController" as Ctrl <<Controller>>
+participant ": CreateFlightRouteService" as Service <<Service>>
+participant "airportRepo : AirportRepository" as AirRepo <<Repository>>
+participant ": DistanceCalculatorService" as DistCalc <<Domain Service>>
+participant "newRoute : FlightRoute" as Route <<Entity>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant ": FlightRouteAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : POST /api/routes (CreateRouteDTO)
+activate Ctrl
+
+Ctrl -> Service : createRoute(CreateRouteDTO)
+activate Service
+
+' Validate Origin Airport
+Service -> AirRepo : findById(CreateRouteDTO.originIATA)
+activate AirRepo
+AirRepo --> Service : originAirport
+deactivate AirRepo
+
+' Validate Destination Airport
+Service -> AirRepo : findById(CreateRouteDTO.destIATA)
+activate AirRepo
+AirRepo --> Service : destAirport
+deactivate AirRepo
+
+' Calculate Distance (Domain Logic)
+Service -> DistCalc : calculateDistance(originAirport.coordinates, destAirport.coordinates)
+activate DistCalc
+DistCalc --> Service : routeDistance
+deactivate DistCalc
+
+' Create Entity
+Service -> Route ** : create(originIATA, destIATA, routeDistance, estFlightTime, minRange, minCapacity)
+
+' Persist Entity
+Service -> RouteRepo : save(newRoute)
+activate RouteRepo
+RouteRepo --> Service : savedRoute
+deactivate RouteRepo
+
+Service --> Ctrl : savedRoute
+deactivate Service
+
+' Convert to DTO
+Ctrl -> Assembler : toDTO(savedRoute)
+activate Assembler
+Assembler --> Ctrl : RouteDTO
+deactivate Assembler
+
+Ctrl --> ATCC : 201 Created (RouteDTO)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

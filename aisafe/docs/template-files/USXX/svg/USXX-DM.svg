@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="126px" preserveAspectRatio="none" style="width:306px;height:126px;background:#FFFFFF;" version="1.1" viewBox="0 0 306 126" width="306px" zoomAndPan="magnify"><defs><filter height="300%" id="fatge7p9bxxmt" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="303" x="2" y="17.4023">Example of a Domain Model excerpt</text><!--MD5=[db8947410cfcb5febdf8f8cf27669db4]
+class Concept1--><rect codeLine="8" fill="#FEFECE" filter="url(#fatge7p9bxxmt)" height="45.0879" id="Concept1" style="stroke:#A80036;stroke-width:1.5;" width="81" x="39.25" y="47.6992"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="58" x="50.75" y="64.3008">Concept1</text><line style="stroke:#A80036;stroke-width:1.5;" x1="40.25" x2="119.25" y1="71.832" y2="71.832"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="69" x="45.25" y="86.4668">-designation</text><!--MD5=[097cec2c4502543b4bc821e1e2f7ea8d]
+class Concept2--><rect codeLine="12" fill="#FEFECE" filter="url(#fatge7p9bxxmt)" height="83.9531" id="Concept2" style="stroke:#A80036;stroke-width:1.5;" width="70" x="197.75" y="28.1992"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="58" x="203.75" y="44.8008">Concept2</text><line style="stroke:#A80036;stroke-width:1.5;" x1="198.75" x2="266.75" y1="52.332" y2="52.332"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="16" x="203.75" y="66.9668">-id</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="35" x="203.75" y="79.9219">-name</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="49" x="203.75" y="92.877">-address</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="58" x="203.75" y="105.832">-password</text><!--MD5=[5c217e4aeb1e3cff88f818337409e90f]
+link Concept1 to Concept2--><path codeLine="19" d="M120.35,70.1992 C142.64,70.1992 170.2,70.1992 192.44,70.1992 " fill="none" id="Concept1-to-Concept2" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="197.68,70.1992,188.68,66.1992,192.68,70.1992,188.68,74.1992,197.68,70.1992" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="41" x="138.5" y="63.7676">knows</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="128.2944" y="66.4515">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="22" x="167.7617" y="84.0874">0..*</text><!--MD5=[d502fdf215377dd94170c0d9c6e9464b]
+@startuml
+'https://plantuml.com/class-diagram
+hide circle
+skinparam classAttributeIconSize 0
+hide methods
+
+title Example of Domain Model excerpt
+
+class Concept1 {
+    -designation
+}
+
+class Concept2 {
+    -id
+    -name
+    -address
+    -password
+}
+
+Concept1 "1" -> "0..*" Concept2: knows
+
+@enduml
+
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+hide methods
+
+title Example of Domain Model excerpt
+
+class Concept1 {
+    -designation
+}
+
+class Concept2 {
+    -id
+    -name
+    -address
+    -password
+}
+
+Concept1 "1" -> "0..*" Concept2: knows
+
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 13:40:07 WEST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: PT
+--></g></svg>
