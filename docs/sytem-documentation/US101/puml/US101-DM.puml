@@ -1,0 +1,22 @@
+@startuml US101-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class AircraftModel <<Entity>> <<Root>> {
+}
+
+class ModelDesignation <<Value Object>> {
+    - manufacturer : String
+    - modelName : String
+}
+
+class ModelSpecifications <<Value Object>> {
+    - standardCapacity : Integer
+    - fuelCapacity : Double
+    - maximumRange : Double
+    - cruisingSpeed : Double
+}
+
+AircraftModel *-- ModelDesignation
+AircraftModel *-- ModelSpecifications
+@enduml

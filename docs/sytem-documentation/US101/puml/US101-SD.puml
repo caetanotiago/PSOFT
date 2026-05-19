@@ -1,0 +1,40 @@
+@startuml US101-SD
+autonumber
+actor "Backoffice Operator" as BO
+
+participant ": AircraftModelRestController" as Ctrl <<Controller>>
+participant ": CreateAircraftModelService" as Service <<Service>>
+participant "newModel : AircraftModel" as Model <<Entity>>
+participant "modelRepo : AircraftModelRepository" as Repo <<Repository>>
+participant ": AircraftModelAssembler" as Assembler <<Component>>
+
+activate BO
+
+BO -> Ctrl : POST /api/aircraft-models (CreateAircraftModelDTO)
+activate Ctrl
+
+Ctrl -> Service : createAircraftModel(CreateAircraftModelDTO)
+activate Service
+
+' Create Entity (Value Objects are implicitly created inside or just before)
+Service -> Model ** : create(manufacturer, modelName, stdCapacity, fuelCapacity, maxRange, cruisingSpeed)
+
+' Persist Entity
+Service -> Repo : save(newModel)
+activate Repo
+Repo --> Service : savedModel
+deactivate Repo
+
+Service --> Ctrl : savedModel
+deactivate Service
+
+' Convert to DTO
+Ctrl -> Assembler : toDTO(savedModel)
+activate Assembler
+Assembler --> Ctrl : AircraftModelDTO
+deactivate Assembler
+
+Ctrl --> BO : 201 Created (AircraftModelDTO)
+deactivate Ctrl
+deactivate BO
+@enduml

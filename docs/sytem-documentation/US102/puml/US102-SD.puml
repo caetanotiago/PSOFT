@@ -1,0 +1,53 @@
+@startuml US102-SD
+autonumber
+actor "ATCC" as ATCC
+
+participant ": AircraftRestController" as Ctrl <<Controller>>
+participant ": CreateAircraftService" as Service <<Service>>
+participant "modelRepo : AircraftModelRepository" as ModelRepo <<Repository>>
+participant "aircraftRepo : AircraftRepository" as Repo <<Repository>>
+participant "newAircraft : Aircraft" as Aircraft <<Entity>>
+participant ": AircraftAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : POST /api/aircrafts (CreateAircraftDTO)
+activate Ctrl
+
+Ctrl -> Service : createAircraft(CreateAircraftDTO)
+activate Service
+
+' Validate Model Existence
+Service -> ModelRepo : findByDesignationModelName(CreateAircraftDTO.modelName)
+activate ModelRepo
+ModelRepo --> Service : aircraftModel
+deactivate ModelRepo
+
+' Validate Uniqueness of Registration Number
+Service -> Repo : findById(CreateAircraftDTO.registrationNumber)
+activate Repo
+Repo --> Service : optionalEmpty
+deactivate Repo
+
+' Create Entity with specific Seating Capacity
+Service -> Aircraft ** : create(registrationNumber, aircraftModel, manufacturingDate, seatingCapacity, status)
+
+' Persist Entity
+Service -> Repo : save(newAircraft)
+activate Repo
+Repo --> Service : savedAircraft
+deactivate Repo
+
+Service --> Ctrl : savedAircraft
+deactivate Service
+
+' Convert to DTO
+Ctrl -> Assembler : toDTO(savedAircraft)
+activate Assembler
+Assembler --> Ctrl : AircraftDTO
+deactivate Assembler
+
+Ctrl --> ATCC : 201 Created (AircraftDTO)
+deactivate Ctrl
+deactivate ATCC
+@enduml

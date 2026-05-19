@@ -1,0 +1,30 @@
+@startuml US101-CD
+skinparam classAttributeIconSize 0
+
+class AircraftModelRestController {
+  + createAircraftModel(dto: CreateAircraftModelDTO): ResponseEntity<AircraftModelDTO>
+}
+
+class CreateAircraftModelService {
+  + createAircraftModel(dto: CreateAircraftModelDTO): AircraftModel
+}
+
+interface AircraftModelRepository <<Repository>> {
+  + save(model: AircraftModel): AircraftModel
+}
+
+class AircraftModel <<Entity>> {
+  - designation: ModelDesignation
+  - specifications: ModelSpecifications
+  + AircraftModel(...)
+}
+
+class AircraftModelAssembler {
+  + toDTO(model: AircraftModel): AircraftModelDTO
+}
+
+AircraftModelRestController ..> CreateAircraftModelService
+AircraftModelRestController ..> AircraftModelAssembler
+CreateAircraftModelService ..> AircraftModel
+CreateAircraftModelService ..> AircraftModelRepository
+@enduml

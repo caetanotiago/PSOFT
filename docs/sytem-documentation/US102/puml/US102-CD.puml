@@ -1,0 +1,39 @@
+@startuml US102-CD
+skinparam classAttributeIconSize 0
+
+class AircraftRestController {
+  + createAircraft(dto: CreateAircraftDTO): ResponseEntity<AircraftDTO>
+}
+
+class CreateAircraftService {
+  + createAircraft(dto: CreateAircraftDTO): Aircraft
+}
+
+interface AircraftRepository <<Repository>> {
+  + save(aircraft: Aircraft): Aircraft
+  + findById(regNum: RegistrationNumber): Optional<Aircraft>
+}
+
+interface AircraftModelRepository <<Repository>> {
+  + findByDesignationModelName(modelName: String): Optional<AircraftModel>
+}
+
+class Aircraft <<Entity>> <<Root>> {
+  - registrationNumber: RegistrationNumber
+  - status: AircraftStatus
+  - seatingCapacity: SeatingCapacity
+  - manufacturingDate: ManufacturingDate
+  - model: AircraftModel
+  + Aircraft(...)
+}
+
+class AircraftAssembler {
+  + toDTO(aircraft: Aircraft): AircraftDTO
+}
+
+AircraftRestController ..> CreateAircraftService
+AircraftRestController ..> AircraftAssembler
+CreateAircraftService ..> Aircraft
+CreateAircraftService ..> AircraftRepository
+CreateAircraftService ..> AircraftModelRepository
+@enduml

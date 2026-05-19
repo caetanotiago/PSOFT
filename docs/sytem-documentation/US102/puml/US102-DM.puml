@@ -1,0 +1,33 @@
+@startuml US102-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class Aircraft <<Entity>> <<Root>> {
+}
+
+class RegistrationNumber <<Value Object>> {
+    - number : String
+}
+
+class AircraftStatus <<Value Object>> {
+    - state : String
+}
+
+class SeatingCapacity <<Value Object>> {
+    - totalSeats : Integer
+}
+
+class ManufacturingDate <<Value Object>> {
+    - date : LocalDate
+}
+
+class AircraftModel <<Entity>> {
+}
+
+Aircraft *-- RegistrationNumber
+Aircraft *-- AircraftStatus
+Aircraft *-- SeatingCapacity
+Aircraft *-- ManufacturingDate
+Aircraft --> AircraftModel : based on >
+
+@enduml

@@ -1,0 +1,13 @@
+@startuml US101-SSD
+autonumber
+actor "Backoffice Operator" as BO
+participant "System" as SYS
+
+activate BO
+BO -> SYS : POST /api/aircraft-models (manufacturer, modelName, standardCapacity, fuelCapacity, maxRange, cruisingSpeed)
+activate SYS
+
+SYS --> BO : 201 Created (Aircraft Model Details)
+deactivate SYS
+deactivate BO
+@enduml

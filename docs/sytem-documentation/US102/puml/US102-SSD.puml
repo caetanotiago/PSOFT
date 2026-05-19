@@ -1,0 +1,13 @@
+@startuml US102-SSD
+autonumber
+actor "ATCC" as ATCC
+participant "System" as SYS
+
+activate ATCC
+ATCC -> SYS : POST /api/aircrafts (registrationNumber, modelName, manufacturingDate, seatingCapacity, status)
+activate SYS
+
+SYS --> ATCC : 201 Created (Aircraft Details)
+deactivate SYS
+deactivate ATCC
+@enduml
