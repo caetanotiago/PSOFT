@@ -1,0 +1,18 @@
+@startuml US105-SSD
+autonumber
+actor "ATCC" as User
+participant "System" as SYS
+
+activate User
+User -> SYS : PATCH /api/aircrafts/{regNumber}/status (newStatus, currentVersion)
+activate SYS
+
+alt success
+    SYS --> User : 200 OK (Updated Aircraft Details DTO)
+else version conflict
+    SYS --> User : 409 Conflict (Data was modified by another user)
+end
+
+deactivate SYS
+deactivate User
+@enduml

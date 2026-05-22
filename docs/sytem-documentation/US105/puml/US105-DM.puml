@@ -1,0 +1,14 @@
+@startuml US105-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class Aircraft <<Entity>> <<Root>> {
+    - version : Long
+}
+
+class AircraftStatus <<Value Object>> {
+    - state : String
+}
+
+Aircraft *-- AircraftStatus
+@enduml

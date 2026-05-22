@@ -1,0 +1,26 @@
+@startuml US105-CD
+skinparam classAttributeIconSize 0
+
+class AircraftRestController {
+  + updateAircraftStatus(reg: String, dto: UpdateAircraftStatusDTO): ResponseEntity<EntityModel<AircraftDTO>>
+}
+
+class UpdateAircraftStatusService {
+  + updateStatus(reg: String, newStatus: String, expectedVersion: Long): Aircraft
+}
+
+interface AircraftRepository <<Repository>> {
+  + save(aircraft: Aircraft): Aircraft
+  + findById(regNum: RegistrationNumber): Optional<Aircraft>
+}
+
+class Aircraft <<Entity>> <<Root>> {
+  - version: Long
+  - status: AircraftStatus
+  + updateStatus(newStatus: AircraftStatus)
+}
+
+AircraftRestController ..> UpdateAircraftStatusService
+UpdateAircraftStatusService ..> AircraftRepository
+UpdateAircraftStatusService ..> Aircraft
+@enduml

@@ -1,0 +1,46 @@
+@startuml US105-SD
+autonumber
+actor "ATCC" as User
+
+participant ": AircraftRestController" as Ctrl <<Controller>>
+participant ": UpdateAircraftStatusService" as Service <<Service>>
+participant "aircraftRepo : AircraftRepository" as Repo <<Repository>>
+participant "aircraft : Aircraft" as Aircraft <<Entity>>
+participant ": AircraftAssembler" as Assembler <<Component>>
+
+activate User
+
+User -> Ctrl : PATCH /api/aircrafts/{reg}/status (UpdateAircraftStatusDTO)
+activate Ctrl
+
+Ctrl -> Service : updateStatus(reg, dto.status, dto.version)
+activate Service
+
+Service -> Repo : findById(reg)
+activate Repo
+Repo --> Service : Optional<Aircraft>
+deactivate Repo
+
+Service -> Aircraft : updateStatus(dto.status)
+activate Aircraft
+Aircraft --> Service : ok
+deactivate Aircraft
+
+Service -> Repo : save(aircraft)
+activate Repo
+note right of Repo: Optimistic locking validation occurs here.\nThrows exception if version mismatch.
+Repo --> Service : updatedAircraft
+deactivate Repo
+
+Service --> Ctrl : updatedAircraft
+deactivate Service
+
+Ctrl -> Assembler : toModel(updatedAircraft)
+activate Assembler
+Assembler --> Ctrl : EntityModel<AircraftDTO>
+deactivate Assembler
+
+Ctrl --> User : 200 OK (EntityModel)
+deactivate Ctrl
+deactivate User
+@enduml

@@ -1,0 +1,17 @@
+@startuml US103-SSD
+autonumber
+actor "ATCC / Backoffice Op." as User
+participant "System" as SYS
+
+activate User
+User -> SYS : GET /api/aircrafts/{registrationNumber}
+activate SYS
+
+alt aircraft exists
+    SYS --> User : 200 OK (Aircraft Details DTO)
+else aircraft not found
+    SYS --> User : 404 Not Found
+end
+deactivate SYS
+deactivate User
+@enduml

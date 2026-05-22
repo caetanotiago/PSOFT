@@ -1,0 +1,32 @@
+@startuml US103-CD
+skinparam classAttributeIconSize 0
+
+class AircraftRestController {
+  + getAircraft(registrationNumber: String): ResponseEntity<EntityModel<AircraftDTO>>
+}
+
+class ViewAircraftService {
+  + getAircraftByRegistrationNumber(registrationNumber: String): Aircraft
+}
+
+interface AircraftRepository <<Repository>> {
+  + findById(regNum: RegistrationNumber): Optional<Aircraft>
+}
+
+class Aircraft <<Entity>> <<Root>> {
+  - registrationNumber: RegistrationNumber
+  - status: AircraftStatus
+  - seatingCapacity: SeatingCapacity
+  - manufacturingDate: ManufacturingDate
+  - model: AircraftModel
+}
+
+class AircraftAssembler {
+  + toModel(aircraft: Aircraft): EntityModel<AircraftDTO>
+}
+
+AircraftRestController ..> ViewAircraftService
+AircraftRestController ..> AircraftAssembler
+ViewAircraftService ..> AircraftRepository
+ViewAircraftService ..> Aircraft
+@enduml

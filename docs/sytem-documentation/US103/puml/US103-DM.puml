@@ -1,0 +1,18 @@
+@startuml US103-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class Aircraft <<Entity>> <<Root>> {
+}
+
+class RegistrationNumber <<Value Object>> {
+    - number : String
+}
+
+class AircraftModel <<Entity>> {
+}
+
+Aircraft *-- RegistrationNumber
+Aircraft --> AircraftModel : based on >
+
+@enduml

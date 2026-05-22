@@ -1,0 +1,28 @@
+@startuml US104-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class Aircraft <<Entity>> <<Root>> {
+}
+
+class AircraftStatus <<Value Object>> {
+    - state : String
+}
+
+class ManufacturingDate <<Value Object>> {
+    - date : LocalDate
+}
+
+class AircraftModel <<Entity>> {
+}
+
+class ModelDesignation <<Value Object>> {
+    - modelName : String
+}
+
+Aircraft *-- AircraftStatus
+Aircraft *-- ManufacturingDate
+Aircraft --> AircraftModel : based on >
+AircraftModel *-- ModelDesignation
+
+@enduml

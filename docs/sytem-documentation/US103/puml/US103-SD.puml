@@ -1,0 +1,40 @@
+@startuml US103-SD
+autonumber
+actor "ATCC / Backoffice Op." as User
+
+participant ": AircraftRestController" as Ctrl <<Controller>>
+participant ": ViewAircraftService" as Service <<Service>>
+participant "aircraftRepo : AircraftRepository" as Repo <<Repository>>
+participant ": AircraftAssembler" as Assembler <<Component>>
+
+activate User
+
+User -> Ctrl : GET /api/aircrafts/{registrationNumber}
+activate Ctrl
+
+Ctrl -> Service : getAircraftByRegistrationNumber(registrationNumber)
+activate Service
+
+Service -> Repo : findById(registrationNumber)
+activate Repo
+Repo --> Service : Optional<Aircraft>
+deactivate Repo
+
+alt aircraft found
+    Service --> Ctrl : aircraft
+    
+    Ctrl -> Assembler : toModel(aircraft)
+    activate Assembler
+    Assembler --> Ctrl : EntityModel<AircraftDTO>
+    deactivate Assembler
+    
+    Ctrl --> User : 200 OK (EntityModel<AircraftDTO>)
+else aircraft not found
+    Service --> Ctrl : throw NotFoundException
+    Ctrl --> User : 404 Not Found
+end
+
+deactivate Service
+deactivate Ctrl
+deactivate User
+@enduml
