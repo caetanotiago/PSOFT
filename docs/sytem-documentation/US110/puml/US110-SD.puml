@@ -6,6 +6,7 @@ participant ": FlightRouteRestController" as Ctrl <<Controller>>
 participant ": CreateFlightRouteService" as Service <<Service>>
 participant "airportRepo : AirportRepository" as AirRepo <<Repository>>
 participant ": DistanceCalculatorService" as DistCalc <<Domain Service>>
+participant ": FlightRouteFactory" as Factory <<Factory>>
 participant "newRoute : FlightRoute" as Route <<Entity>>
 participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
 participant ": FlightRouteAssembler" as Assembler <<Component>>
@@ -36,8 +37,12 @@ activate DistCalc
 DistCalc --> Service : routeDistance
 deactivate DistCalc
 
-' Create Entity
-Service -> Route ** : create(originIATA, destIATA, routeDistance, estFlightTime, minRange, minCapacity)
+' Create Entity via Factory
+Service -> Factory : createRoute(originIATA, destIATA, routeDistance, estFlightTime, minRange, minCapacity)
+activate Factory
+Factory -> Route ** : create(originIATA, destIATA, routeDistance, estFlightTime, minRange, minCapacity)
+Factory --> Service : newRoute
+deactivate Factory
 
 ' Persist Entity
 Service -> RouteRepo : save(newRoute)

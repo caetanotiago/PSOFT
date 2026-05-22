@@ -1,0 +1,80 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' --- PRESENTATION LAYER ---
+package "Presentation" {
+    class FlightRouteRestController <<Controller>> {
+        + createRoute(dto : CreateRouteDTO) : ResponseEntity<FlightRouteDTO>
+    }
+    class FlightRouteDTO <<DTO>> {
+        + originIATA : String
+        + destIATA : String
+        + estFlightTime : int
+        + minRange : double
+        + minCapacity : int
+    }
+    class FlightRouteAssembler <<Component>> {
+        + toDTO(route : FlightRoute) : FlightRouteDTO
+    }
+}
+
+' --- APPLICATION LAYER ---
+package "Application" {
+    class CreateFlightRouteService <<Service>> {
+        + createRoute(dto : CreateRouteDTO) : FlightRoute
+    }
+}
+
+' --- DOMAIN LAYER ---
+package "Domain" {
+    class FlightRouteFactory <<Factory>> {
+        + createRoute(origin : Airport, dest : Airport, dist : Double, time : int, range : Double, cap : int) : FlightRoute
+    }
+    
+    class DistanceCalculatorService <<Domain Service>> {
+        + calculateDistance(c1 : Coordinates, c2 : Coordinates) : Double
+    }
+    
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - distance : RouteDistance
+        - requirements : RouteRequirements
+        - estimatedFlightTime : EstimatedFlightTime
+        + FlightRoute(id, origin, dest, dist, req, time)
+    }
+    
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+        - coordinates : Coordinates
+        + getCoordinates() : Coordinates
+    }
+}
+
+' --- PERSISTENCE LAYER ---
+package "Persistence" {
+    interface FlightRouteRepository <<Repository>> {
+        + save(route : FlightRoute) : FlightRoute
+    }
+    
+    interface AirportRepository <<Repository>> {
+        + findById(iata : String) : Optional<Airport>
+    }
+}
+
+' --- RELATIONSHIPS ---
+FlightRouteRestController ..> CreateRouteDTO : receives
+FlightRouteRestController ..> FlightRouteDTO : returns
+FlightRouteRestController --> CreateFlightRouteService : uses
+FlightRouteRestController --> FlightRouteAssembler : uses
+
+CreateFlightRouteService --> AirportRepository : uses
+CreateFlightRouteService --> DistanceCalculatorService : uses
+CreateFlightRouteService --> FlightRouteFactory : uses
+CreateFlightRouteService --> FlightRouteRepository : uses
+
+FlightRouteFactory ..> FlightRoute : creates
+DistanceCalculatorService ..> Airport : reads coordinates from
+FlightRouteRepository ..> FlightRoute : persists
+
+@enduml

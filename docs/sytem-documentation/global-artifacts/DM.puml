@@ -136,7 +136,9 @@ package "Flight Route & Schedule Aggregate" {
     class RouteHistory <<Value Object>> {
         - changeDate : LocalDateTime
         - description : String
-        - previousDistance : Double
+    }
+    class RouteStatus <<Value Object>> {
+        - state: 
     }
     
     ScheduledFlight *-- FlightSchedule
@@ -147,7 +149,8 @@ package "Flight Route & Schedule Aggregate" {
     FlightRoute *-- RouteRequirements
     FlightRoute *-- EstimatedFlightTime
     FlightRoute *-- RouteHistory
-    
+    FlightRoute *-- RouteState
+
     ScheduledFlight --> Aircraft : uses >
     FlightRoute --> Airport : origin >
     FlightRoute --> Airport : destination >

@@ -1,0 +1,13 @@
+@startuml
+autonumber
+actor "ATCC / Backoffice" as User
+participant "System" as SYS
+
+activate User
+User -> SYS : PATCH /api/routes/{id} (Update details or Deactivate)
+activate SYS
+
+SYS --> User : 200 OK (Updated Route details)
+deactivate SYS
+deactivate User
+@enduml

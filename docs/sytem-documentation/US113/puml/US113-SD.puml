@@ -1,0 +1,35 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": FlightRouteRestController" as Ctrl <<Controller>>
+participant ": GetFlightRouteService" as Service <<Service>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant ": FlightRouteAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : GET /api/routes/{id}
+activate Ctrl
+
+Ctrl -> Service : getRouteById(id)
+activate Service
+
+Service -> RouteRepo : findById(id)
+activate RouteRepo
+RouteRepo --> Service : route (Optional)
+deactivate RouteRepo
+
+Service --> Ctrl : route
+deactivate Service
+
+Ctrl -> Assembler : toDTO(route)
+activate Assembler
+Assembler --> Ctrl : routeDTO
+deactivate Assembler
+
+Ctrl --> ATCC : 200 OK (routeDTO)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

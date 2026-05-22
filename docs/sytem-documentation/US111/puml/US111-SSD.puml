@@ -1,0 +1,13 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+participant "System" as SYS
+
+activate ATCC
+ATCC -> SYS : GET /api/routes/{routeID}/history
+activate SYS
+
+SYS --> ATCC : 200 OK (List of Route History details)
+deactivate SYS
+deactivate ATCC
+@enduml

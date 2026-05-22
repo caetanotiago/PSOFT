@@ -1,0 +1,54 @@
+@startuml
+autonumber
+actor "ATCC / Backoffice" as User
+
+participant ": FlightRouteRestController" as Ctrl <<Controller>>
+participant ": UpdateFlightRouteService" as Service <<Service>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant "route : FlightRoute" as Route <<Entity>>
+participant "history : RouteHistory" as History <<Value Object>>
+participant ": FlightRouteAssembler" as Assembler <<Component>>
+
+activate User
+
+User -> Ctrl : PATCH /api/routes/{id} (UpdateRouteDTO)
+activate Ctrl
+
+Ctrl -> Service : updateRoute(id, UpdateRouteDTO)
+activate Service
+
+Service -> RouteRepo : findById(id)
+activate RouteRepo
+RouteRepo --> Service : route
+deactivate RouteRepo
+
+' Domain Logic executing inside the Entity
+Service -> Route : updateDetails(UpdateRouteDTO)
+activate Route
+
+' Entity creates its own history record (Information Expert / Creator)
+Route -> History ** : create(changeDate, description, previousValues)
+Route -> Route : historyLog.add(history)
+
+Route --> Service : 
+deactivate Route 
+
+' Persist the changes (JPA handles Optimistic Locking implicitly via @Version)
+Service -> RouteRepo : save(route)
+activate RouteRepo
+RouteRepo --> Service : updatedRoute
+deactivate RouteRepo
+
+Service --> Ctrl : updatedRoute
+deactivate Service
+
+Ctrl -> Assembler : toDTO(updatedRoute)
+activate Assembler
+Assembler --> Ctrl : RouteDTO
+deactivate Assembler
+
+Ctrl --> User : 200 OK (RouteDTO)
+deactivate Ctrl
+deactivate User
+
+@enduml

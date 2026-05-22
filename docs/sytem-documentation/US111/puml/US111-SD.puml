@@ -1,0 +1,41 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": FlightRouteRestController" as Ctrl <<Controller>>
+participant ": GetRouteHistoryService" as Service <<Service>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant "route : FlightRoute" as Route <<Entity>>
+participant ": RouteHistoryAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : GET /api/routes/{routeID}/history
+activate Ctrl
+
+Ctrl -> Service : getRouteHistory(routeID)
+activate Service
+
+Service -> RouteRepo : findById(routeID)
+activate RouteRepo
+RouteRepo --> Service : route (Optional)
+deactivate RouteRepo
+
+Service -> Route : getHistoryLog()
+activate Route
+Route --> Service : historyLog (List<RouteHistory>)
+deactivate Route
+
+Service --> Ctrl : historyLog
+deactivate Service
+
+Ctrl -> Assembler : toDTOList(historyLog)
+activate Assembler
+Assembler --> Ctrl : historyDTOList
+deactivate Assembler
+
+Ctrl --> ATCC : 200 OK (historyDTOList)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

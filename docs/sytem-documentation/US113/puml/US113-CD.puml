@@ -1,0 +1,56 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class FlightRouteRestController <<Controller>> {
+        + getRouteById(id : String) : ResponseEntity<FlightRouteDTO>
+    }
+    class FlightRouteDTO <<DTO>> {
+        + routeID : String
+        + originIATA : String
+        + destIATA : String
+        + distance : Double
+        + minRange : Double
+        + minCapacity : Integer
+        + estimatedFlightTime : Integer
+        + status : String
+    }
+    class FlightRouteAssembler <<Component>> {
+        + toDTO(route : FlightRoute) : FlightRouteDTO
+    }
+}
+
+package "Application" {
+    class GetFlightRouteService <<Service>> {
+        + getRouteById(id : String) : FlightRoute
+    }
+}
+
+package "Domain" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - distance : RouteDistance
+        - requirements : RouteRequirements
+        - estimatedFlightTime : EstimatedFlightTime
+    }
+}
+
+package "Persistence" {
+    interface FlightRouteRepository <<Repository>> {
+        + findById(id : String) : Optional<FlightRoute>
+    }
+}
+
+' Relationships
+FlightRouteRestController ..> FlightRouteDTO : returns
+FlightRouteRestController --> GetFlightRouteService : uses
+FlightRouteRestController --> FlightRouteAssembler : uses
+
+GetFlightRouteService --> FlightRouteRepository : uses
+GetFlightRouteService ..> FlightRoute : retrieves
+
+FlightRouteRepository ..> FlightRoute : persists/loads
+FlightRouteAssembler ..> FlightRouteDTO : creates
+
+@enduml

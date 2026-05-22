@@ -1,0 +1,22 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam hide empty members
+skinparam classAttributeIconSize 0
+
+package "Flight Route & Schedule Aggregate" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - distance : RouteDistance
+        - historyLog : List<RouteHistory>
+        + getHistoryLog() : List<RouteHistory>
+    }
+    
+    class RouteHistory <<Value Object>> {
+        - changeDate : LocalDateTime
+        - description : String
+        - previousDistance : Double
+    }
+    
+    FlightRoute *-- RouteHistory
+}
+@enduml

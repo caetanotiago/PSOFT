@@ -7,3 +7,5 @@
     - Juntou-se o FlightRoute e o ScheduledFlight no Flight Route & Schedule Aggregate, onde o ScheduledFlight (a execução do voo) assume o papel de Root.
 
 3. **Histórico da Rota e tempos reais:** Adicionou-se os atributos - realDeparture : LocalDateTime e - realArrival : LocalDateTime à classe ScheduledFlight para monitorizar a operação real face ao tempo estimado. Para cumprir a regra de guardar a informação e permitir "voltar atrás" (histórico), adicionou-se o Value Object RouteHistory como uma lista dentro de FlightRoute.
+4. **Adição do atributo RouteStatus:** O atributo RouteStatus foi introduzido ao agregado FlighRoute para permitir o gerenciamento do seu estado (ativado/desativado).  
+

@@ -1,0 +1,27 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam hide empty members
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+    }
+}
+
+package "Flight Route & Schedule Aggregate" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - distance : RouteDistance
+        - requirements : RouteRequirements
+        - estimatedFlightTime : EstimatedFlightTime
+    }
+    class RouteID <<Value Object>> {
+        - id : String
+    }
+    
+    FlightRoute *-- RouteID
+    FlightRoute --> Airport : origin >
+    FlightRoute --> Airport : destination >
+}
+@enduml

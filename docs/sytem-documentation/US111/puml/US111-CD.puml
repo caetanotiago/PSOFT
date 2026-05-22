@@ -1,0 +1,57 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class FlightRouteRestController <<Controller>> {
+        + getRouteHistory(id : String) : ResponseEntity<List<RouteHistoryDTO>>
+    }
+    class RouteHistoryDTO <<DTO>> {
+        + changeDate : String
+        + description : String
+        + previousDistance : Double
+    }
+    class RouteHistoryAssembler <<Component>> {
+        + toDTOList(history : List<RouteHistory>) : List<RouteHistoryDTO>
+    }
+}
+
+package "Application" {
+    class GetRouteHistoryService <<Service>> {
+        + getRouteHistory(routeID : String) : List<RouteHistory>
+    }
+}
+
+package "Domain" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - historyLog : List<RouteHistory>
+        + getHistoryLog() : List<RouteHistory>
+    }
+    
+    class RouteHistory <<Value Object>> {
+        - changeDate : LocalDateTime
+        - description : String
+        - previousDistance : Double
+    }
+    
+    FlightRoute *-- RouteHistory
+}
+
+package "Persistence" {
+    interface FlightRouteRepository <<Repository>> {
+        + findById(id : String) : Optional<FlightRoute>
+    }
+}
+
+' Relationships
+FlightRouteRestController ..> RouteHistoryDTO : returns
+FlightRouteRestController --> GetRouteHistoryService : uses
+FlightRouteRestController --> RouteHistoryAssembler : uses
+
+GetRouteHistoryService --> FlightRouteRepository : uses
+GetRouteHistoryService ..> FlightRoute : retrieves
+
+FlightRouteRepository ..> FlightRoute : persists/loads
+
+@enduml

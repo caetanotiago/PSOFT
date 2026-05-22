@@ -1,0 +1,13 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+participant "System" as SYS
+
+activate ATCC
+ATCC -> SYS : GET /api/routes/search?origin={iata}&destination={iata}
+activate SYS
+
+SYS --> ATCC : 200 OK (List of matching Route Details)
+deactivate SYS
+deactivate ATCC
+@enduml

@@ -1,0 +1,71 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class FlightRouteRestController <<Controller>> {
+        + updateRoute(id : String, dto : UpdateRouteDTO) : ResponseEntity<FlightRouteDTO>
+    }
+    class UpdateRouteDTO <<DTO>> {
+        + minRange : Double
+        + minCapacity : Integer
+        + status : String
+    }
+    class FlightRouteDTO <<DTO>> {
+    }
+    class FlightRouteAssembler <<Component>> {
+        + toDTO(route : FlightRoute) : FlightRouteDTO
+    }
+}
+
+package "Application" {
+    class UpdateFlightRouteService <<Service>> {
+        + updateRoute(id : String, dto : UpdateRouteDTO) : FlightRoute
+    }
+}
+
+package "Domain" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - status : RouteStatus
+        - requirements : RouteRequirements
+        - version : Long
+        - historyLog : List<RouteHistory>
+        + updateDetails(dto : UpdateRouteDTO)
+        + deactivate()
+        - createHistoryRecord(desc : String)
+    }
+    
+    class RouteHistory <<Value Object>> {
+        - changeDate : LocalDateTime
+        - description : String
+    }
+    
+    class RouteStatus <<Value Object>> {
+        - state : String
+    }
+    
+    FlightRoute *-- RouteHistory
+    FlightRoute *-- RouteStatus
+}
+
+package "Persistence" {
+    interface FlightRouteRepository <<Repository>> {
+        + findById(id : String) : Optional<FlightRoute>
+        + save(route : FlightRoute) : FlightRoute
+    }
+}
+
+' Relationships
+FlightRouteRestController ..> UpdateRouteDTO : receives
+FlightRouteRestController ..> FlightRouteDTO : returns
+FlightRouteRestController --> UpdateFlightRouteService : uses
+FlightRouteRestController --> FlightRouteAssembler : uses
+
+UpdateFlightRouteService --> FlightRouteRepository : uses
+UpdateFlightRouteService ..> FlightRoute : updates
+
+FlightRouteRepository ..> FlightRoute : persists/loads
+FlightRoute ..> RouteHistory : creates
+
+@enduml

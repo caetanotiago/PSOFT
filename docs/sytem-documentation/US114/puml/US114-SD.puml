@@ -1,0 +1,47 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": FlightRouteRestController" as Ctrl <<Controller>>
+participant ": SearchFlightRoutesService" as Service <<Service>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant ": FlightRouteAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : GET /api/routes/search?origin=X&dest=Y
+activate Ctrl
+
+Ctrl -> Service : searchRoutes(origin, dest)
+activate Service
+
+alt origin is provided AND dest is provided
+    Service -> RouteRepo : findByOriginAndDestination(origin, dest)
+    activate RouteRepo
+    RouteRepo --> Service : routeList
+    deactivate RouteRepo
+else only origin is provided
+    Service -> RouteRepo : findByOrigin(origin)
+    activate RouteRepo
+    RouteRepo --> Service : routeList
+    deactivate RouteRepo
+else only dest is provided
+    Service -> RouteRepo : findByDestination(dest)
+    activate RouteRepo
+    RouteRepo --> Service : routeList
+    deactivate RouteRepo
+end
+
+Service --> Ctrl : routeList
+deactivate Service
+
+Ctrl -> Assembler : toDTOList(routeList)
+activate Assembler
+Assembler --> Ctrl : routeDTOList
+deactivate Assembler
+
+Ctrl --> ATCC : 200 OK (routeDTOList)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml
