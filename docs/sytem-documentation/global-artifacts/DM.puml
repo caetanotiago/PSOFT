@@ -149,7 +149,7 @@ package "Flight Route & Schedule Aggregate" {
     FlightRoute *-- RouteRequirements
     FlightRoute *-- EstimatedFlightTime
     FlightRoute *-- RouteHistory
-    FlightRoute *-- RouteState
+    FlightRoute *-- RouteStatus
 
     ScheduledFlight --> Aircraft : uses >
     FlightRoute --> Airport : origin >

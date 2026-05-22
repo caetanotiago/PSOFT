@@ -1,0 +1,47 @@
+package isep.psoft.aisafe.flightroutes.assemblers;
+
+import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
+import isep.psoft.aisafe.flightroutes.domain.RouteHistory;
+import isep.psoft.aisafe.flightroutes.dto.FlightRouteDTO;
+import isep.psoft.aisafe.flightroutes.dto.RouteHistoryDTO;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+public class FlightRouteAssembler {
+
+    public FlightRouteDTO toDTO(FlightRoute route) {
+        FlightRouteDTO dto = new FlightRouteDTO();
+        dto.setId(route.getId());
+        
+        // Adaptar consoante código de Airports ainda não implementado
+        dto.setOriginIATA(route.getOrigin().getIataCode().getCode());
+        dto.setDestIATA(route.getDestination().getIataCode().getCode());
+        
+        dto.setDistance(route.getDistance().getDistance());
+        dto.setMinRange(route.getRequirements().getMinRange());
+        dto.setMinCapacity(route.getRequirements().getMinCapacity());
+        dto.setEstimatedFlightTime(route.getEstimatedFlightTime().getDurationMinutes());
+        dto.setStatus(route.getStatus().getState());
+        
+        return dto;
+    }
+
+    public List<FlightRouteDTO> toDTOList(List<FlightRoute> routes) {
+        return routes.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public RouteHistoryDTO toHistoryDTO(RouteHistory history) {
+        RouteHistoryDTO dto = new RouteHistoryDTO();
+        dto.setChangeDate(history.getChangeDate().toString());
+        dto.setDescription(history.getDescription());
+        dto.setPreviousDistance(history.getPreviousDistance());
+        return dto;
+    }
+
+    public List<RouteHistoryDTO> toHistoryDTOList(List<RouteHistory> historyLog) {
+        return historyLog.stream().map(this::toHistoryDTO).collect(Collectors.toList());
+    }
+}
