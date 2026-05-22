@@ -2,6 +2,7 @@ package isep.psoft.aisafe.maintenance.assemblers;
 
 import isep.psoft.aisafe.maintenance.controllers.MaintenanceController;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceRecord;
+import isep.psoft.aisafe.maintenance.dto.CompleteRecordInputDto;
 import isep.psoft.aisafe.maintenance.dto.MaintenanceRecordOutputDto;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,13 @@ public class MaintenanceRecordAssembler extends RepresentationModelAssemblerSupp
 
         // Link to complete the record (US119), only if not already completed
         if (entity.getCompletionNotes() == null) {
-            dto.add(linkTo(methodOn(MaintenanceController.class).completeMaintenanceRecord(entity.getId(), null, entity.getVersion().toString())).withRel("complete"));
+            // Solução Definitiva: Fornecer um valor não-nulo e do tipo correto para TODOS os argumentos
+            // para que o Spring HATEOAS possa encontrar o método sem qualquer ambiguidade.
+            String dummyVersion = entity.getVersion() != null ? entity.getVersion().toString() : "0";
+
+            dto.add(linkTo(methodOn(MaintenanceController.class)
+                    .completeMaintenanceRecord(entity.getId(), new CompleteRecordInputDto(), dummyVersion))
+                    .withRel("complete"));
         }
 
         return dto;

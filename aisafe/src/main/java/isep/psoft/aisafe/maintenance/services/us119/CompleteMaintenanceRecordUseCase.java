@@ -41,6 +41,9 @@ public class CompleteMaintenanceRecordUseCase {
                 .orElseThrow(() -> new RuntimeException("Maintenance Record not found with id: " + recordId));
 
         // 3. Verificar a versão (Optimistic Locking)
+        if (record.getVersion() == null) {
+             throw new IllegalStateException("The record to be updated must have a version.");
+        }
         if (record.getVersion() != clientVersion) {
             throw new OptimisticLockException("The resource was modified by another user. Please refresh and try again.");
         }

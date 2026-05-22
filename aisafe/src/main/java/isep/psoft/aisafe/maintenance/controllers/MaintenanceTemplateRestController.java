@@ -4,7 +4,8 @@ import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
 import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
 import isep.psoft.aisafe.maintenance.dto.TemplateDTO;
 import isep.psoft.aisafe.maintenance.dto.TemplateAssembler;
-import isep.psoft.aisafe.maintenance.services.MaintenanceTemplateService;
+import isep.psoft.aisafe.maintenance.services.us115.CreateMaintenanceTemplateUseCase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize; // Descomenta quando a equipa configurar a Segurança JWT
@@ -14,20 +15,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/maintenance-templates")
 public class MaintenanceTemplateRestController {
 
-    private final MaintenanceTemplateService service;
-    private final TemplateAssembler assembler;
+    @Autowired
+    private CreateMaintenanceTemplateUseCase useCase;
 
-    public MaintenanceTemplateRestController(MaintenanceTemplateService service, TemplateAssembler assembler) {
-        this.service = service;
-        this.assembler = assembler;
-    }
+    @Autowired
+    private TemplateAssembler assembler;
 
     @PostMapping
     // @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')") // Exigência da US (AC4)
     public ResponseEntity<TemplateDTO> createTemplate(@RequestBody CreateTemplateDTO createDto) {
 
-        // 1. O Serviço cria e guarda o template
-        MaintenanceTemplate savedTemplate = service.createTemplate(createDto);
+        // 1. O Caso de Uso cria e guarda o template
+        MaintenanceTemplate savedTemplate = useCase.execute(createDto);
 
         // 2. O Assembler converte para DTO
         TemplateDTO responseDto = assembler.toDTO(savedTemplate);

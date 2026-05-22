@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.WP#4A.dto;
+package isep.psoft.aisafe.maintenance.dto;
 
 import java.util.List;
 

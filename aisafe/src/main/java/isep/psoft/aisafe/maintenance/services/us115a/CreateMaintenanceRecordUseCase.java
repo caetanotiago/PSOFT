@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.maintenance.services;
+package isep.psoft.aisafe.maintenance.services.us115a;
 
 import isep.psoft.aisafe.maintenance.domain.MaintenanceComponent;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceRecord;
@@ -6,28 +6,29 @@ import isep.psoft.aisafe.maintenance.domain.RecordDetails;
 import isep.psoft.aisafe.maintenance.dto.CreateRecordDTO;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceRecordRepository;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
-// import isep.psoft.aisafe.aircraft.repositories.AircraftRepository; // Descomenta quando tiveres o repositório do teu colega
+// import isep.psoft.aisafe.aircraft.repositories.AircraftRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
-public class MaintenanceRecordService {
+@Service("CreateMaintenanceRecordUseCase")
+public class CreateMaintenanceRecordUseCase {
 
-    private final MaintenanceRecordRepository recordRepository;
-    private final MaintenanceTemplateRepository templateRepository;
-    // private final AircraftRepository aircraftRepository;
+    @Autowired
+    private MaintenanceRecordRepository recordRepository;
 
-    public MaintenanceRecordService(MaintenanceRecordRepository recordRepository,
-                                    MaintenanceTemplateRepository templateRepository) {
-        // , AircraftRepository aircraftRepository) {
-        this.recordRepository = recordRepository;
-        this.templateRepository = templateRepository;
-        // this.aircraftRepository = aircraftRepository;
-    }
+    @Autowired
+    private MaintenanceTemplateRepository templateRepository;
+    
+    // @Autowired
+    // private AircraftRepository aircraftRepository;
 
-    public MaintenanceRecord createRecord(CreateRecordDTO dto) {
+    @Transactional
+    public MaintenanceRecord execute(CreateRecordDTO dto) {
 
-        // 1. Verificar se a Aeronave existe pela matrícula
-        /* boolean aircraftExists = aircraftRepository.existsByRegistrationNumber(dto.getAircraftRegistration());
+        // 1. Verificar se a Aeronave existe pela matrícula (atualmente comentado)
+        /* 
+        boolean aircraftExists = aircraftRepository.existsByRegistrationNumber(dto.getAircraftRegistration());
         if (!aircraftExists) {
             throw new IllegalArgumentException("Aircraft with the provided registration does not exist.");
         }

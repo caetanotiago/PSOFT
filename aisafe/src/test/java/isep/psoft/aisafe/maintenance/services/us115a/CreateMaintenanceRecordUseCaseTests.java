@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.maintenance.services;
+package isep.psoft.aisafe.maintenance.services.us115a;
 
 import isep.psoft.aisafe.maintenance.domain.MaintenanceRecord;
 import isep.psoft.aisafe.maintenance.dto.CreateRecordDTO;
@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class MaintenanceRecordServiceTests {
+class CreateMaintenanceRecordUseCaseTests {
 
     @Mock
     private MaintenanceRecordRepository recordRepository;
@@ -27,45 +27,41 @@ class MaintenanceRecordServiceTests {
     private MaintenanceTemplateRepository templateRepository;
 
     @InjectMocks
-    private MaintenanceRecordService service;
+    private CreateMaintenanceRecordUseCase useCase;
 
     @Test
-    void whenTemplateExists_shouldCreateRecord() {
+    void whenTemplateExists_shouldCreateAndSaveRecord() {
         // Arrange
-        CreateRecordDTO dto = mock(CreateRecordDTO.class);
-        when(dto.getAircraftRegistration()).thenReturn("CS-TWB");
-        when(dto.getTemplateId()).thenReturn(1L);
-        when(dto.getDescription()).thenReturn("Annual inspection");
-        when(dto.getStartDate()).thenReturn(LocalDate.now());
-        when(dto.getExpectedDurationMinutes()).thenReturn(480);
-        when(dto.getComponentCategory()).thenReturn("ENGINE");
+        CreateRecordDTO dto = new CreateRecordDTO("CS-TWB", 1L, "Annual inspection", LocalDate.now(), 480, "ENGINE");
+        MaintenanceRecord savedRecord = mock(MaintenanceRecord.class);
 
-        MaintenanceRecord savedRecord = new MaintenanceRecord("CS-TWB", 1L, null, null);
-
+        // Mocking the dependencies' behavior
         when(templateRepository.existsById(dto.getTemplateId())).thenReturn(true);
         when(recordRepository.save(any(MaintenanceRecord.class))).thenReturn(savedRecord);
 
         // Act
-        MaintenanceRecord result = service.createRecord(dto);
+        MaintenanceRecord result = useCase.execute(dto);
 
         // Assert
         assertThat(result).isEqualTo(savedRecord);
-        verify(recordRepository).save(any(MaintenanceRecord.class));
+        verify(templateRepository, times(1)).existsById(dto.getTemplateId());
+        verify(recordRepository, times(1)).save(any(MaintenanceRecord.class));
     }
 
     @Test
     void whenTemplateDoesNotExist_shouldThrowException() {
         // Arrange
-        CreateRecordDTO dto = mock(CreateRecordDTO.class);
-        when(dto.getTemplateId()).thenReturn(99L);
-
+        CreateRecordDTO dto = new CreateRecordDTO("CS-TWB", 99L, "Non-existent template test", LocalDate.now(), 60, "AVIONICS");
+        
+        // Mocking the dependency to simulate the failure condition
         when(templateRepository.existsById(dto.getTemplateId())).thenReturn(false);
 
         // Act & Assert
-        assertThatThrownBy(() -> service.createRecord(dto))
+        assertThatThrownBy(() -> useCase.execute(dto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Maintenance Template does not exist.");
 
+        // Ensure we never tried to save if validation failed
         verify(recordRepository, never()).save(any());
     }
 }

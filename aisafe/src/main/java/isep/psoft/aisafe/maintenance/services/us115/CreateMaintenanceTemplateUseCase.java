@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.maintenance.services;
+package isep.psoft.aisafe.maintenance.services.us115;
 
 import isep.psoft.aisafe.aircraft.domain.AircraftModel;
 import isep.psoft.aisafe.aircraft.repositories.AircraftModelRepository;
@@ -7,25 +7,23 @@ import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
 import isep.psoft.aisafe.maintenance.domain.TemplateType;
 import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class MaintenanceTemplateService {
+@Service("CreateMaintenanceTemplateUseCase")
+public class CreateMaintenanceTemplateUseCase {
 
-    private final MaintenanceTemplateRepository templateRepository;
-    private final AircraftModelRepository aircraftModelRepository;
+    @Autowired
+    private MaintenanceTemplateRepository templateRepository;
+    @Autowired
+    private AircraftModelRepository aircraftModelRepository;
 
-    // Injeção de dependências do Spring Boot
-    public MaintenanceTemplateService(MaintenanceTemplateRepository templateRepository,
-                                      AircraftModelRepository aircraftModelRepository) {
-        this.templateRepository = templateRepository;
-        this.aircraftModelRepository = aircraftModelRepository;
-    }
-
-    public MaintenanceTemplate createTemplate(CreateTemplateDTO dto) {
+    @Transactional
+    public MaintenanceTemplate execute(CreateTemplateDTO dto) {
         // 1. Validar se o nome já existe
         Optional<MaintenanceTemplate> existing = templateRepository.findByTemplateName(dto.getTemplateName());
         if (existing.isPresent()) {

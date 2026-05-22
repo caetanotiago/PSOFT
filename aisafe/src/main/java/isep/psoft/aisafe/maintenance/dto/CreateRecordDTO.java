@@ -10,6 +10,20 @@ public class CreateRecordDTO {
     private Integer expectedDurationMinutes;
     private String componentCategory;
 
+    // Construtor vazio para o Jackson (JSON para Objeto)
+    public CreateRecordDTO() {
+    }
+
+    // Construtor completo para facilitar a criação em testes
+    public CreateRecordDTO(String aircraftRegistration, Long templateId, String description, LocalDate startDate, Integer expectedDurationMinutes, String componentCategory) {
+        this.aircraftRegistration = aircraftRegistration;
+        this.templateId = templateId;
+        this.description = description;
+        this.startDate = startDate;
+        this.expectedDurationMinutes = expectedDurationMinutes;
+        this.componentCategory = componentCategory;
+    }
+
     // Getters
     public String getAircraftRegistration() { return aircraftRegistration; }
     public Long getTemplateId() { return templateId; }

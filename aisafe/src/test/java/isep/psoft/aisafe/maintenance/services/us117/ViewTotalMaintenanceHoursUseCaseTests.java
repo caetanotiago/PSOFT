@@ -2,15 +2,16 @@ package isep.psoft.aisafe.maintenance.services.us117;
 
 import isep.psoft.aisafe.maintenance.dto.TotalMaintenanceHoursDto;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceRecordRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class) // Updated to the modern approach for consistency
 class ViewTotalMaintenanceHoursUseCaseTests {
 
     @Mock
@@ -18,11 +19,6 @@ class ViewTotalMaintenanceHoursUseCaseTests {
 
     @InjectMocks
     private ViewTotalMaintenanceHoursUseCase useCase;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void whenRepositoryReturnsMinutes_shouldConvertAndReturnHours() {
