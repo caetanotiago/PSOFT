@@ -1,0 +1,33 @@
+@startuml US115-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class MaintenanceTemplate <<Entity>> <<Root>> {
+}
+
+class TemplateName <<Value Object>> {
+    - name : String
+}
+
+class TemplateType <<Value Object>> {
+    - type : String
+}
+
+class MaintenanceInterval <<Value Object>> {
+    - flightHours : Integer
+    - calendarDays : Integer
+}
+
+class Checklist <<Value Object>> {
+    - tasks : List<String>
+}
+
+class AircraftModel <<Entity>> {
+}
+
+MaintenanceTemplate *-- TemplateName
+MaintenanceTemplate *-- TemplateType
+MaintenanceTemplate *-- MaintenanceInterval
+MaintenanceTemplate *-- Checklist
+MaintenanceTemplate --> AircraftModel : applies to >
+@enduml

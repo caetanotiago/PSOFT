@@ -1,0 +1,42 @@
+@startuml US115b-CD
+skinparam classAttributeIconSize 0
+
+class MaintenanceRecordRestController {
+  + createRecord(dto: CreateRecordDTO): ResponseEntity<RecordDTO>
+}
+
+class CreateRecordService {
+  + createRecord(dto: CreateRecordDTO): MaintenanceRecord
+}
+
+interface MaintenanceRecordRepository <<Repository>> {
+  + save(record: MaintenanceRecord): MaintenanceRecord
+}
+
+interface AircraftRepository <<Repository>> {
+  + findById(registration: String): Optional<Aircraft>
+}
+
+interface MaintenanceTemplateRepository <<Repository>> {
+  + findById(id: Long): Optional<MaintenanceTemplate>
+}
+
+class MaintenanceRecord <<Entity>> <<Root>> {
+  - recordDetails: RecordDetails
+  - component: MaintenanceComponent
+  - aircraftRegistration: String
+  - maintenanceTemplateId: Long
+  + MaintenanceRecord(...)
+}
+
+class RecordAssembler {
+  + toDTO(record: MaintenanceRecord): RecordDTO
+}
+
+MaintenanceRecordRestController ..> CreateRecordService
+MaintenanceRecordRestController ..> RecordAssembler
+CreateRecordService ..> MaintenanceRecord
+CreateRecordService ..> MaintenanceRecordRepository
+CreateRecordService ..> AircraftRepository
+CreateRecordService ..> MaintenanceTemplateRepository
+@enduml

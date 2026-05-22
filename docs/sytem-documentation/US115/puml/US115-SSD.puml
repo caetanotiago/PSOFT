@@ -1,0 +1,13 @@
+@startuml US115-SSD
+autonumber
+actor "Maintenance Technician" as MT
+participant "System" as SYS
+
+activate MT
+MT -> SYS : POST /api/maintenance-templates (name, type, intervals, checklist, aircraftModels)
+activate SYS
+
+SYS --> MT : 201 Created (Template Details)
+deactivate SYS
+deactivate MT
+@enduml
