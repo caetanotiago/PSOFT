@@ -1,0 +1,25 @@
+@startuml US115b-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class MaintenanceRecord <<Entity>> <<Root>> {}
+class RecordDetails <<Value Object>> {
+    - description : String
+    - startDate : LocalDate
+    - expectedDurationMinutes : Integer
+}
+class MaintenanceComponent <<Value Object>> {
+    - category : String
+}
+class CompletionNotes <<Value Object>> {
+    - notes : String
+}
+class Aircraft <<Entity>> {}
+class MaintenanceTemplate <<Entity>> <<Root>> {}
+
+MaintenanceRecord *-- RecordDetails
+MaintenanceRecord *-- MaintenanceComponent
+MaintenanceRecord *-- CompletionNotes
+MaintenanceRecord --> Aircraft : maintains >
+MaintenanceRecord --> MaintenanceTemplate : based on >
+@enduml

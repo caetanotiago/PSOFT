@@ -1,0 +1,48 @@
+@startuml US115b-SD
+autonumber
+actor "Maintenance Technician" as MT
+
+participant ": RecordRestController" as Ctrl <<Controller>>
+participant ": CreateRecordService" as Service <<Service>>
+participant "aircraftRepo : AircraftRepository" as AircraftRepo <<Repository>>
+participant "templateRepo : TemplateRepository" as TemplateRepo <<Repository>>
+participant "newRecord : MaintenanceRecord" as Record <<Entity>>
+participant "recordRepo : RecordRepository" as Repo <<Repository>>
+participant ": RecordAssembler" as Assembler <<Component>>
+
+activate MT
+MT -> Ctrl : POST /api/maintenance-records (CreateRecordDTO)
+activate Ctrl
+
+Ctrl -> Service : createRecord(CreateRecordDTO)
+activate Service
+
+Service -> AircraftRepo : findById(dto.aircraftRegistration)
+activate AircraftRepo
+AircraftRepo --> Service : aircraft (or throws error)
+deactivate AircraftRepo
+
+Service -> TemplateRepo : findById(dto.templateId)
+activate TemplateRepo
+TemplateRepo --> Service : template (or throws error)
+deactivate TemplateRepo
+
+Service -> Record ** : create(aircraftReg, templateId, details, component)
+
+Service -> Repo : save(newRecord)
+activate Repo
+Repo --> Service : savedRecord
+deactivate Repo
+
+Service --> Ctrl : savedRecord
+deactivate Service
+
+Ctrl -> Assembler : toDTO(savedRecord)
+activate Assembler
+Assembler --> Ctrl : RecordDTO
+deactivate Assembler
+
+Ctrl --> MT : 201 Created (RecordDTO)
+deactivate Ctrl
+deactivate MT
+@enduml

@@ -1,0 +1,13 @@
+@startuml US115b-SSD
+autonumber
+actor "Maintenance Technician" as MT
+participant "System" as SYS
+
+activate MT
+MT -> SYS : POST /api/maintenance-records (aircraftReg, templateId, details, component)
+activate SYS
+
+SYS --> MT : 201 Created (Record Details)
+deactivate SYS
+deactivate MT
+@enduml
