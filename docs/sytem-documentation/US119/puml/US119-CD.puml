@@ -1,0 +1,30 @@
+@startuml US119-CD
+skinparam classAttributeIconSize 0
+
+class MaintenanceRecordRestController {
+  + completeRecord(id: Long, dto: CompleteRecordDTO): ResponseEntity
+}
+
+class CompleteRecordService {
+  + completeRecord(id: Long, notes: String): MaintenanceRecord
+}
+
+interface MaintenanceRecordRepository <<Repository>> {
+  + findById(id: Long): Optional
+  + save(record: MaintenanceRecord): MaintenanceRecord
+}
+
+class MaintenanceRecord <<Entity>> <<Root>> {
+  - completionNotes: CompletionNotes
+  + completeMaintenance(notes: String)
+}
+
+class CompleteRecordDTO {
+  - notes: String
+}
+
+MaintenanceRecordRestController ..> CompleteRecordService
+MaintenanceRecordRestController ..> CompleteRecordDTO
+CompleteRecordService ..> MaintenanceRecordRepository
+CompleteRecordService ..> MaintenanceRecord
+@enduml

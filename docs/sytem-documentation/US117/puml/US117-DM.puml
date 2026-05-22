@@ -1,0 +1,14 @@
+@startuml US117-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class MaintenanceRecord <<Entity>> <<Root>> {}
+
+class RecordDetails <<Value Object>> {
+    - description : String
+    - startDate : LocalDate
+    - expectedDurationMinutes : Integer
+}
+
+MaintenanceRecord *-- RecordDetails
+@enduml

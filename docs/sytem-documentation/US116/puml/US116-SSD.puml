@@ -1,0 +1,13 @@
+@startuml US116-SSD
+autonumber
+actor "Maintenance Technician" as User
+participant "System" as SYS
+
+activate User
+User -> SYS : GET /api/maintenance-records/aircraft/{registrationNumber}
+activate SYS
+
+SYS --> User : 200 OK (List of Maintenance Records)
+deactivate SYS
+deactivate User
+@enduml

@@ -1,0 +1,28 @@
+@startuml US116-CD
+skinparam classAttributeIconSize 0
+
+class MaintenanceRecordRestController {
+  + getRecordsByAircraft(registrationNumber: String): ResponseEntity
+}
+
+class ViewMaintenanceRecordsService {
+  + getRecordsByAircraft(registrationNumber: String): List
+}
+
+interface MaintenanceRecordRepository <<Repository>> {
+  + findByAircraftRegistration(registrationNumber: String): List
+}
+
+class MaintenanceRecord <<Entity>> <<Root>> {
+  - aircraftRegistration: String
+}
+
+class RecordAssembler {
+  + toDTOList(records: List): List
+}
+
+MaintenanceRecordRestController ..> ViewMaintenanceRecordsService
+MaintenanceRecordRestController ..> RecordAssembler
+ViewMaintenanceRecordsService ..> MaintenanceRecordRepository
+ViewMaintenanceRecordsService ..> MaintenanceRecord
+@enduml

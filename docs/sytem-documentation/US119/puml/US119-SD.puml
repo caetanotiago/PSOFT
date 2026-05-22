@@ -1,0 +1,40 @@
+@startuml US119-SD
+autonumber
+actor "Maintenance Technician" as MT
+
+participant ": MaintenanceRecordRestController" as Ctrl <<Controller>>
+participant ": CompleteRecordService" as Service <<Service>>
+participant "recordRepo : MaintenanceRecordRepository" as Repo <<Repository>>
+participant "record : MaintenanceRecord" as Record <<Entity>>
+
+activate MT
+MT -> Ctrl : PATCH /api/maintenance-records/{id}/complete (CompleteRecordDTO)
+activate Ctrl
+
+Ctrl -> Service : completeRecord(id, dto.notes)
+activate Service
+
+Service -> Repo : findById(id)
+activate Repo
+Repo --> Service : record
+deactivate Repo
+
+Service -> Record : completeMaintenance(dto.notes)
+activate Record
+note right: Creates CompletionNotes\nValue Object internally
+Record --> Service
+deactivate Record
+
+Service -> Repo : save(record)
+activate Repo
+note right: Optimistic Locking (@Version)\nchecks for concurrent updates
+Repo --> Service : savedRecord
+deactivate Repo
+
+Service --> Ctrl : savedRecord
+deactivate Service
+
+Ctrl --> MT : 200 OK
+deactivate Ctrl
+deactivate MT
+@enduml

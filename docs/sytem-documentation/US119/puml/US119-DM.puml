@@ -1,0 +1,12 @@
+@startuml US119-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class MaintenanceRecord <<Entity>> <<Root>> {}
+
+class CompletionNotes <<Value Object>> {
+    - notes : String
+}
+
+MaintenanceRecord *-- CompletionNotes
+@enduml

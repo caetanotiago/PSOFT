@@ -1,0 +1,26 @@
+@startuml US116-DM
+skinparam classAttributeIconSize 0
+hide empty members
+
+class MaintenanceRecord <<Entity>> <<Root>> {
+    - aircraftRegistration : String
+}
+
+class RecordDetails <<Value Object>> {
+    - description : String
+    - startDate : LocalDate
+    - expectedDurationMinutes : Integer
+}
+
+class MaintenanceComponent <<Value Object>> {
+    - category : String
+}
+
+class CompletionNotes <<Value Object>> {
+    - notes : String
+}
+
+MaintenanceRecord *-- RecordDetails
+MaintenanceRecord *-- MaintenanceComponent
+MaintenanceRecord *-- CompletionNotes
+@enduml

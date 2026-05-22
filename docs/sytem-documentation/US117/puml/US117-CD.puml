@@ -1,0 +1,18 @@
+@startuml US117-CD
+skinparam classAttributeIconSize 0
+
+class MaintenanceRecordRestController {
+  + getTotalMaintenanceHours(): ResponseEntity
+}
+
+class ViewTotalHoursService {
+  + getTotalMaintenanceHours(): Double
+}
+
+interface MaintenanceRecordRepository <<Repository>> {
+  + sumTotalMaintenanceMinutes(): Integer
+}
+
+MaintenanceRecordRestController ..> ViewTotalHoursService
+ViewTotalHoursService ..> MaintenanceRecordRepository
+@enduml

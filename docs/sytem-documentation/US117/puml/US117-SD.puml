@@ -1,0 +1,28 @@
+@startuml US117-SD
+autonumber
+actor "Fleet Manager" as FM
+
+participant ": MaintenanceRecordRestController" as Ctrl <<Controller>>
+participant ": ViewTotalHoursService" as Service <<Service>>
+participant "recordRepo : MaintenanceRecordRepository" as Repo <<Repository>>
+
+activate FM
+FM -> Ctrl : GET /api/maintenance-records/fleet/maintenance-hours
+activate Ctrl
+
+Ctrl -> Service : getTotalMaintenanceHours()
+activate Service
+
+Service -> Repo : sumTotalMaintenanceMinutes()
+activate Repo
+note right: Executes an optimized DB query\ne.g., SELECT SUM(expectedDurationMinutes)
+Repo --> Service : totalMinutes
+deactivate Repo
+
+Service --> Ctrl : totalHours (totalMinutes / 60.0)
+deactivate Service
+
+Ctrl --> FM : 200 OK ({ "totalHours": value })
+deactivate Ctrl
+deactivate FM
+@enduml

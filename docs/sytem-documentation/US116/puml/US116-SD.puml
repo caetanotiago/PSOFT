@@ -1,0 +1,33 @@
+@startuml US116-SD
+autonumber
+actor "Maintenance Technician" as User
+
+participant ": MaintenanceRecordRestController" as Ctrl <<Controller>>
+participant ": ViewMaintenanceRecordsService" as Service <<Service>>
+participant "recordRepo : MaintenanceRecordRepository" as Repo <<Repository>>
+participant ": RecordAssembler" as Assembler <<Component>>
+
+activate User
+User -> Ctrl : GET /api/maintenance-records/aircraft/{registrationNumber}
+activate Ctrl
+
+Ctrl -> Service : getRecordsByAircraft(registrationNumber)
+activate Service
+
+Service -> Repo : findByAircraftRegistration(registrationNumber)
+activate Repo
+Repo --> Service : List<MaintenanceRecord>
+deactivate Repo
+
+Service --> Ctrl : List<MaintenanceRecord>
+deactivate Service
+
+Ctrl -> Assembler : toDTOList(List<MaintenanceRecord>)
+activate Assembler
+Assembler --> Ctrl : List<RecordDTO>
+deactivate Assembler
+
+Ctrl --> User : 200 OK (List<RecordDTO>)
+deactivate Ctrl
+deactivate User
+@enduml
