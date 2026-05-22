@@ -1,0 +1,42 @@
+@startuml US115a-SD
+autonumber
+actor "Maintenance Technician" as MT
+
+participant ": MaintenanceTemplateRestController" as Ctrl <<Controller>>
+participant ": CreateTemplateService" as Service <<Service>>
+participant "modelRepo : AircraftModelRepository" as ModelRepo <<Repository>>
+participant "newTemplate : MaintenanceTemplate" as Template <<Entity>>
+participant "templateRepo : MaintenanceTemplateRepository" as Repo <<Repository>>
+participant ": TemplateAssembler" as Assembler <<Component>>
+
+activate MT
+MT -> Ctrl : POST /api/maintenance-templates (CreateTemplateDTO)
+activate Ctrl
+
+Ctrl -> Service : createTemplate(CreateTemplateDTO)
+activate Service
+
+Service -> ModelRepo : findByDesignation(CreateTemplateDTO.aircraftModels)
+activate ModelRepo
+ModelRepo --> Service : aircraftModelsList
+deactivate ModelRepo
+
+Service -> Template ** : create(name, type, intervals, checklist, aircraftModelsList)
+
+Service -> Repo : save(newTemplate)
+activate Repo
+Repo --> Service : savedTemplate
+deactivate Repo
+
+Service --> Ctrl : savedTemplate
+deactivate Service
+
+Ctrl -> Assembler : toDTO(savedTemplate)
+activate Assembler
+Assembler --> Ctrl : TemplateDTO
+deactivate Assembler
+
+Ctrl --> MT : 201 Created (TemplateDTO)
+deactivate Ctrl
+deactivate MT
+@enduml

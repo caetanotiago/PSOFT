@@ -1,0 +1,38 @@
+@startuml US115-CD
+skinparam classAttributeIconSize 0
+
+class MaintenanceTemplateRestController {
+  + createTemplate(dto: CreateTemplateDTO): ResponseEntity<TemplateDTO>
+}
+
+class CreateTemplateService {
+  + createTemplate(dto: CreateTemplateDTO): MaintenanceTemplate
+}
+
+interface MaintenanceTemplateRepository <<Repository>> {
+  + save(template: MaintenanceTemplate): MaintenanceTemplate
+}
+
+interface AircraftModelRepository <<Repository>> {
+  + findByDesignation(modelNames: List<String>): List<AircraftModel>
+}
+
+class MaintenanceTemplate <<Entity>> <<Root>> {
+  - templateName: TemplateName
+  - templateType: TemplateType
+  - interval: MaintenanceInterval
+  - checklist: Checklist
+  - applicableModels: List<AircraftModel>
+  + MaintenanceTemplate(...)
+}
+
+class TemplateAssembler {
+  + toDTO(template: MaintenanceTemplate): TemplateDTO
+}
+
+MaintenanceTemplateRestController ..> CreateTemplateService
+MaintenanceTemplateRestController ..> TemplateAssembler
+CreateTemplateService ..> MaintenanceTemplate
+CreateTemplateService ..> MaintenanceTemplateRepository
+CreateTemplateService ..> AircraftModelRepository
+@enduml
