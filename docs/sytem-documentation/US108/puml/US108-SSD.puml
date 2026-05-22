@@ -1,0 +1,21 @@
+@startuml US108-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator / ATCC" as Actor
+participant ":System" as SYS
+
+autonumber
+
+Actor -> SYS : searchAirports(\n  city?  = "...",\n  country? = "...",\n  name?  = "..." )
+
+SYS --> Actor : 200 OK\n( list of Airport summaries + HATEOAS links )
+
+note over SYS
+  [All criteria optional; absent criteria are treated as pass-all (returns all airports)]
+  [Applies case-insensitive filter on AirportDetails attributes]
+  [Returns matching airports; empty list if none match]
+  [Each entry includes a link to full details — US107]
+end note
+
+@enduml

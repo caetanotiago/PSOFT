@@ -1,0 +1,21 @@
+@startuml US107-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator / ATCC" as Actor
+participant ":System" as SYS
+
+autonumber
+
+Actor -> SYS : viewAirportDetails( iataCode )
+
+SYS --> Actor : 200 OK\n( full Airport representation + HATEOAS links )
+
+note over SYS
+  [Validates iataCode format — 3 uppercase letters]
+  [Looks up Airport aggregate by IATACode]
+  [Returns: iataCode, name, city, country, region,
+   timezone, coordinates, status, runways[], certifiedModels[]]
+end note
+
+@enduml

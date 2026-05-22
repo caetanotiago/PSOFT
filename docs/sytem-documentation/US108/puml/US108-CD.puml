@@ -1,0 +1,85 @@
+@startuml US108-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +searchAirports(name: String, city: String, country: String): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class AirportSummaryResponseDTO <<record>> {
+        +iataCode: String
+        +name: String
+        +city: String
+        +country: String
+        +status: String
+        +{static} from(airport: Airport): AirportSummaryResponseDTO
+    }
+}
+
+package "Application Layer" {
+    interface SearchAirportsUseCase {
+        +searchAirports(name: String, city: String, country: String): List<Airport>
+    }
+    class SearchAirportsUseCaseImpl {
+        +searchAirports(name: String, city: String, country: String): List<Airport>
+    }
+    SearchAirportsUseCaseImpl ..|> SearchAirportsUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -details: AirportDetails
+        -status: AirportState
+    }
+    note top of Airport
+      Aggregate Root.
+      Value Objects are shown in full —
+      they are atomic and owned exclusively
+      by this aggregate.
+    end note
+    class IATACode <<Value Object>> {
+        -code: String
+    }
+    class AirportDetails <<Value Object>> {
+        -name: String
+        -city: String
+        -country: String
+        -region: String
+        -timezone: String
+        -coordinates: Coordinates
+    }
+    class Coordinates <<Value Object>> {
+        -latitude: Double
+        -longitude: Double
+    }
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+    }
+    interface AirportRepository {
+        +searchByCriteria(name: String, city: String, country: String): List<Airport>
+    }
+    note bottom of AirportRepository
+      Case-insensitive JPQL LIKE on
+      AirportDetails fields (name, city, country).
+      NULL criteria → pass-all (returns all airports).
+    end note
+}
+
+AirportController ..> SearchAirportsUseCase
+AirportController ..> AirportSummaryResponseDTO
+
+SearchAirportsUseCaseImpl ..> AirportRepository
+
+Airport *-- "1" IATACode
+Airport *-- "1" AirportDetails
+Airport --> "1" AirportState
+AirportDetails *-- "1" Coordinates
+
+@enduml

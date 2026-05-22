@@ -1,0 +1,81 @@
+@startuml US106a-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +addCertification(iataCode: String, request: AddCertificationRequest): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class AddCertificationRequest <<record>> {
+        +manufacturer: String
+        +modelName: String
+    }
+    class AirportDetailsResponseDTO <<record>> {
+        +iataCode: String
+        +certifiedModels: Set<ModelDesignationDTO>
+        +{static} from(airport: Airport): AirportDetailsResponseDTO
+    }
+    class ModelDesignationDTO <<record>> {
+        +manufacturer: String
+        +modelName: String
+        +{static} from(md: ModelDesignation): ModelDesignationDTO
+    }
+}
+
+package "Application Layer" {
+    interface AddCertificationUseCase {
+        +addCertification(iataCode: String, manufacturer: String, modelName: String): Airport
+    }
+    class AddCertificationUseCaseImpl {
+        +addCertification(iataCode: String, manufacturer: String, modelName: String): Airport
+    }
+    AddCertificationUseCaseImpl ..|> AddCertificationUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -certifiedModels: Set<ModelDesignation>
+        +addCertification(md: ModelDesignation)
+    }
+    note top of Airport
+      Aggregate Root.
+      addCertification enforces no-duplicate invariant.
+      Phase 1: no cross-aggregate AircraftModel
+      existence check (deferred to US201).
+    end note
+    class IATACode <<Value Object>> {
+        -code: String
+    }
+    class ModelDesignation <<Value Object>> {
+        -manufacturer: String
+        -modelName: String
+    }
+    interface AirportRepository {
+        +findById(id: IATACode): Optional<Airport>
+        +save(airport: Airport): Airport
+    }
+    class AirportNotFoundException <<exception>>
+    class ModelAlreadyCertifiedException <<exception>>
+}
+
+AirportController ..> AddCertificationUseCase
+AirportController ..> AddCertificationRequest
+AirportController ..> AirportDetailsResponseDTO
+
+AirportDetailsResponseDTO ..> ModelDesignationDTO
+
+AddCertificationUseCaseImpl ..> AirportRepository
+AddCertificationUseCaseImpl ..> Airport
+AddCertificationUseCaseImpl ..> AirportNotFoundException
+AddCertificationUseCaseImpl ..> ModelAlreadyCertifiedException
+
+Airport *-- "1" IATACode
+Airport *-- "0..*" ModelDesignation
+Airport ..> ModelAlreadyCertifiedException
+
+@enduml

@@ -1,0 +1,52 @@
+@startuml US107-SD
+skinparam sequenceMessageAlign center
+
+actor "Backoffice Operator / ATCC" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "ViewAirportDetailsUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+
+Actor -> Filter : GET /airports/{iataCode}\nAccept: application/hal+json
+activate Filter
+
+note right of Filter
+  See security/SD-AuthFilter.puml
+  Required role(s) for this US: BACKOFFICE_OPERATOR, ATCC
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : getAirportByIataCode(iataCode)
+activate UseCase
+
+note right of UseCase
+  code = new IATACode(iataCode.toUpperCase())
+end note
+
+UseCase -> Repo : findById(code)
+activate Repo
+Repo --> UseCase : Optional<Airport>
+deactivate Repo
+
+alt Airport not found
+    UseCase --> Controller : throw AirportNotFoundException
+    Controller --> Actor : 404 Not Found\n{ ProblemDetail }
+else Airport found
+    UseCase --> Controller : Airport
+    deactivate UseCase
+
+    note right of Controller
+      Maps Airport → AirportDetailsResponseDTO.
+      Builds HATEOAS links: self, update-status,
+      add-certification, search.
+      See CD for DTO structure.
+    end note
+
+    Controller --> Actor : 200 OK\n{ "iataCode": "LIS", "name": "...", "status": "OPERATIONAL",\n  "runways": [...], "certifiedModels": [...], "_links": {...} }
+end
+
+deactivate Controller
+@enduml

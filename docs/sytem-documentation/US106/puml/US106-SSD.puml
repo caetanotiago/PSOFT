@@ -1,0 +1,14 @@
+@startuml US106-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as BO
+participant ":System" as SYS
+
+autonumber
+
+BO -> SYS : registerAirport(\n  iataCode, name, city, country,\n  region, timezone,\n  latitude, longitude,\n  runways[ ] )
+
+SYS --> BO : 201 Created\n( Airport resource + HATEOAS links )
+
+@enduml

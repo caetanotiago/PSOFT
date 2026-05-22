@@ -1,0 +1,80 @@
+@startuml US106a-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "AddCertificationUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+participant "Airport" as Airport
+
+Actor -> Filter : POST /airports/{iataCode}/certifications\n{ "manufacturer": "Boeing", "modelName": "737-800" }
+activate Filter
+
+note right of Filter
+  See security/SD-AuthFilter.puml
+  Required role(s) for this US: BACKOFFICE_OPERATOR
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : addCertification(iataCode, manufacturer, modelName)
+activate UseCase
+
+note right of UseCase
+  code = new IATACode(iataCode.toUpperCase())
+  md   = new ModelDesignation(manufacturer, modelName)
+  Phase 1: no cross-aggregate AircraftModel existence check.
+  (Deferred to Phase 2 — US201.)
+end note
+
+UseCase -> Repo : findById(code)
+activate Repo
+Repo --> UseCase : Optional<Airport>
+deactivate Repo
+
+alt Airport not found
+    UseCase --> Controller : throw AirportNotFoundException
+    Controller --> Actor : 404 Not Found\n{ ProblemDetail }
+else Airport exists
+    UseCase -> Airport : addCertification(md)
+    activate Airport
+
+    note over Airport
+      Checks certifiedModels.contains(md).
+      Throws ModelAlreadyCertifiedException if already present.
+      Otherwise adds md to the set (no-duplicate invariant).
+    end note
+
+    alt Model already certified
+        Airport --> UseCase : throw ModelAlreadyCertifiedException
+        UseCase --> Controller : throw ModelAlreadyCertifiedException
+        Controller --> Actor : 409 Conflict\n{ ProblemDetail }
+    else Certification is new
+        Airport --> UseCase : (set updated in memory)
+        deactivate Airport
+
+        UseCase -> Repo : save(airport)
+        activate Repo
+        Repo --> UseCase : Airport (persisted)
+        deactivate Repo
+
+        UseCase --> Controller : Airport
+        deactivate UseCase
+
+        note right of Controller
+          Maps Airport aggregate → AirportDetailsResponseDTO
+          (includes updated certifiedModels set).
+          Returns 200 OK — the Airport is the modified resource;
+          no new sub-resource URL is minted. See CD for DTO structure.
+        end note
+
+        Controller --> Actor : 200 OK\n{ "iataCode": "LIS",\n  "certifiedModels": [ { "manufacturer": "Boeing", "modelName": "737-800" } ],\n  "_links": { "self": "...", "add-certification": "..." } }
+    end
+end
+
+deactivate Controller
+@enduml

@@ -1,0 +1,35 @@
+@startuml US108-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+        - details  : AirportDetails
+        - status   : AirportStatus
+    }
+    class IATACode <<Value Object>> {
+        - code : String
+        ' Returned in each search result
+    }
+    class AirportDetails <<Value Object>> {
+        - name    : String
+        - city    : String
+        - country : String
+        - region  : String
+        - timezone : String
+        ' name, city, country are the searchable attributes in US108
+    }
+    class AirportStatus <<Value Object>> {
+        - state : String
+        ' Included in result; may act as implicit filter (OQ-108-02)
+    }
+
+    Airport *-- IATACode
+    Airport *-- AirportDetails
+    Airport *-- AirportStatus
+}
+
+note "Multi-aggregate query.\nFiltering on AirportDetails.name,\nAirportDetails.city, AirportDetails.country.\nFilter logic belongs in AirportRepository,\nnot in the domain entity." as N1
+
+@enduml

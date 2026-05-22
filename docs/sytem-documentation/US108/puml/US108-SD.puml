@@ -1,0 +1,52 @@
+@startuml US108-SD
+skinparam sequenceMessageAlign center
+
+actor "Backoffice Operator / ATCC" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "SearchAirportsUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+
+Actor -> Filter : GET /airports?city=Lisbon&country=Portugal\nAccept: application/hal+json
+activate Filter
+
+note right of Filter
+  See security/SD-AuthFilter.puml
+  Required role(s) for this US: BACKOFFICE_OPERATOR, ATCC
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : searchAirports(name, city, country)
+activate UseCase
+
+UseCase -> Repo : searchByCriteria(name, city, country)
+activate Repo
+
+note right of Repo
+  JPQL LIKE query, case-insensitive substring match.
+  NULL params = pass-all (all airports returned if no criteria).
+  Filter logic in repository to avoid loading full aggregates.
+end note
+
+Repo --> UseCase : List<Airport>
+deactivate Repo
+
+UseCase --> Controller : List<Airport>
+deactivate UseCase
+
+note right of Controller
+  Maps each Airport → AirportSummaryResponseDTO
+  (iataCode, name, city, country, status).
+  Wraps in CollectionModel.of(items, self-link).
+  Each item gets a self link → GET /airports/{iataCode}.
+  Empty list → 200 OK (never 404 on a search).
+  See CD for DTO structure.
+end note
+
+Controller --> Actor : 200 OK\n{ "_embedded": { "airports": [...] },\n  "_links": { "self": "..." } }
+
+deactivate Controller
+@enduml

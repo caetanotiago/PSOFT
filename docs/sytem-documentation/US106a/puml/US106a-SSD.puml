@@ -1,0 +1,23 @@
+@startuml US106a-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant ":System" as SYS
+
+autonumber
+
+Actor -> SYS : addCertification(\n  iataCode,\n  manufacturer, modelName )
+
+SYS --> Actor : 200 OK\n( updated Airport resource + HATEOAS links )
+
+note over SYS
+  [Verifies Airport exists — identified by iataCode]
+  [Identifies AircraftModel by manufacturer + modelName (ModelDesignation VO)]
+  [Phase 1: AircraftModel cross-aggregate existence check deferred to Phase 2 — see US201]
+  [Checks for duplicate certification on this airport]
+  [Adds ModelDesignation to Airport's certified-models set]
+  [Persists updated Airport aggregate]
+end note
+
+@enduml

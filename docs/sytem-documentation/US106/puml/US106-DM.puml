@@ -1,0 +1,58 @@
+@startuml US106-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam hide empty members false
+
+package "Airport Aggregate" {
+
+    class Airport <<Entity>> <<Root>> {
+        - iataCode      : IATACode
+        - details       : AirportDetails
+        - status        : AirportStatus
+        - runways       : List<Runway>
+    }
+
+    class IATACode <<Value Object>> {
+        - code : String
+        ' Invariant: exactly 3 uppercase letters
+    }
+
+    class AirportDetails <<Value Object>> {
+        - name        : String
+        - city        : String
+        - country     : String
+        - region      : String
+        - timezone    : String
+        - coordinates : Coordinates
+    }
+
+    class Coordinates <<Value Object>> {
+        - latitude  : Double
+        - longitude : Double
+    }
+
+    class Runway <<Value Object>> {
+        - name        : String
+        - length      : Double
+        - orientation : String
+    }
+
+    class AirportStatus <<Value Object>> {
+        - state : AirportState
+    }
+
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+    }
+
+    Airport        *-- IATACode
+    Airport        *-- AirportDetails
+    Airport        *-- AirportStatus
+    Airport        *-- "0..*" Runway
+    AirportDetails *-- Coordinates
+    AirportStatus  --> AirportState
+}
+
+@enduml

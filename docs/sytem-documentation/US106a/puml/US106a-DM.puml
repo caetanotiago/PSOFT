@@ -1,0 +1,43 @@
+@startuml US106a-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode        : IATACode
+        - certifiedModels : Set<ModelDesignation>
+        + addCertification(modelDesignation : ModelDesignation) : void
+    }
+    class IATACode <<Value Object>> {
+        - code : String
+    }
+    Airport *-- IATACode
+    Airport *-- "0..*" ModelDesignation
+}
+
+package "Aircraft Aggregate" {
+    class Aircraft <<Entity>> <<Root>> {
+        - model : AircraftModel
+    }
+    class AircraftModel <<Entity>> {
+        - designation : ModelDesignation
+    }
+    class ModelDesignation <<Value Object>> {
+        - manufacturer : String
+        - modelName    : String
+    }
+    Aircraft      *-- AircraftModel
+    AircraftModel *-- ModelDesignation
+}
+
+Airport ..> AircraftModel : certified for >\n(by ModelDesignation identity only — cross-aggregate reference)
+
+note as N1
+  <b>Cross-aggregate reference rule (DDD):</b>
+  Airport stores <i>ModelDesignation</i> (identity value object),
+  not a direct reference to the AircraftModel entity.
+  Existence of the AircraftModel is verified by the
+  AddAirportCertificationUseCase before modifying the aggregate.
+end note
+
+@enduml

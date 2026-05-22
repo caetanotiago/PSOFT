@@ -1,0 +1,26 @@
+@startuml US109-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as BO
+participant ":System" as SYS
+
+autonumber
+
+BO -> SYS : updateAirportStatus(\n  iataCode,\n  newStatus )
+
+SYS --> BO : 200 OK\n( updated Airport resource + HATEOAS links )
+
+note over SYS
+  [Validates iataCode format — 3 uppercase letters]
+  [Looks up Airport aggregate by IATACode]
+  [Validates newStatus is a legal value:
+   Operational | Closed | Under Maintenance]
+  [Enforces state transition rules: all transitions between distinct states allowed;
+   same-state transitions rejected with 409 Conflict]
+  [Replaces AirportStatus on Airport entity]
+  [Detects concurrent modification via optimistic locking (@Version)]
+  [Persists updated Airport aggregate]
+end note
+
+@enduml

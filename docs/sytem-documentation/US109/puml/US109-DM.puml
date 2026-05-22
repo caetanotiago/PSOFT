@@ -1,0 +1,33 @@
+@startuml US109-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+        - status   : AirportStatus
+        + changeStatus(newStatus : AirportStatus) : void
+    }
+    class IATACode <<Value Object>> {
+        - code : String
+    }
+    class AirportStatus <<Value Object>> {
+        - state : AirportState
+        ' Immutable — status update = replace this VO instance
+    }
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+    }
+
+    Airport     *-- IATACode
+    Airport     *-- AirportStatus
+    AirportStatus --> AirportState
+}
+
+note "AirportStatus is a Value Object.\nUpdating the status = creating a new AirportStatus\ninstance and assigning it to Airport.\n\nState transition model (pending OQ-109-01):\nIf constrained, Airport.changeStatus() enforces\nvalid transitions in the domain layer.\n\nOptimistic locking: Airport.version field\nprevents concurrent status-update conflicts." as N1
+
+note "Confirmed (Conversation 002):\nChanging AirportStatus does NOT\naffect FlightRoute aggregates." as N2
+
+@enduml

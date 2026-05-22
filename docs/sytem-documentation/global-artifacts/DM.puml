@@ -7,10 +7,14 @@ package "Airport Aggregate" {
     class Airport <<Entity>> <<Root>> {
         - iataCode : IATACode
         - details : AirportDetails
-        - status : AirportStatus
+        - status : AirportState
         - runways : List<Runway>
+        - certifiedModels : Set<ModelDesignation>
         - facilities : List<Facility>
         - contacts : List<AirportContact>
+        - version : Long
+        +addCertification(md: ModelDesignation)
+        +changeStatus(newState: AirportState)
     }
     class IATACode <<Value Object>> {
         - code : String
@@ -21,6 +25,11 @@ package "Airport Aggregate" {
         - country : String
         - region : String
         - timezone : String
+        - coordinates : Coordinates
+    }
+    class Coordinates <<Value Object>> {
+        - latitude : Double
+        - longitude : Double
     }
     class Runway <<Value Object>> {
         - name : String
@@ -37,16 +46,20 @@ package "Airport Aggregate" {
         - identifier : String
         - description : String
     }
-    class AirportStatus <<Value Object>> {
-        - state : String
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+        +canTransitionTo(target: AirportState): boolean
     }
     
-    Airport *-- IATACode
-    Airport *-- AirportDetails
-    Airport *-- Runway
-    Airport *-- AirportContact
-    Airport *-- Facility
-    Airport *-- AirportStatus
+    Airport *-- "1" IATACode
+    Airport *-- "1" AirportDetails
+    Airport *-- "0..*" Runway
+    Airport *-- "0..*" AirportContact
+    Airport *-- "0..*" Facility
+    Airport --> "1" AirportState
+    AirportDetails *-- "1" Coordinates
 }
 
 package "Aircraft Aggregate" {
@@ -225,7 +238,14 @@ package "Inventory Aggregate" {
     MaintenancePart *-- StockLevel
 }
 
-' Relacionamento de Certificação entre Agregados
-Airport --> AircraftModel : certified for >
+' Relacionamento de Certificação entre Agregados (cross-aggregate, por identidade)
+Airport --> AircraftModel : certified for > \n«Phase 2: existence check via US201»
+
+package "Domain Exceptions (WP#2A)" {
+    class AirportNotFoundException <<exception>>
+    class DuplicateIATACodeException <<exception>>
+    class ModelAlreadyCertifiedException <<exception>>
+    class InvalidStatusTransitionException <<exception>>
+}
 
 @enduml

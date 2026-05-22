@@ -1,0 +1,76 @@
+@startuml US106-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "RegisterAirportUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+participant "Airport" as Airport
+
+Actor -> Filter : POST /airports\n{ "iataCode": "LIS", "name": "Lisbon Airport",\n  "city": "Lisbon", "country": "Portugal",\n  "latitude": 38.77, "longitude": -9.13,\n  "runways": [ { "name": "03/21", "length": 3805, "orientation": "030°" } ] }
+activate Filter
+
+note right of Filter
+  See security/SD-AuthFilter.puml
+  Required role(s) for this US: BACKOFFICE_OPERATOR
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : registerAirport(iataCode, name, city, country,\n  region, timezone, latitude, longitude, runways)
+activate UseCase
+
+note right of UseCase
+  code = new IATACode(iataCode.toUpperCase())
+  Validates format before hitting the repository.
+end note
+
+UseCase -> Repo : existsById(code)
+activate Repo
+Repo --> UseCase : boolean
+deactivate Repo
+
+alt IATA code already registered
+    UseCase --> Controller : throw DuplicateIATACodeException
+    Controller --> Actor : 409 Conflict\n{ ProblemDetail }
+else IATA code is available
+    UseCase -> Airport : new Airport(code, details, OPERATIONAL, runways)
+    activate Airport
+
+    note over Airport
+      Constructor enforces invariants (fail-fast):
+      - IATACode: exactly 3 uppercase letters
+      - AirportDetails: name, city, country, timezone non-blank
+      - Coordinates: lat ∈ [-90,90], lon ∈ [-180,180]
+      - List<Runway>: each length > 0, name non-blank
+      Initial status = OPERATIONAL (system default, OQ-106-01 resolved).
+      Throws IllegalArgumentException on any violation.
+    end note
+
+    Airport --> UseCase : airport
+    deactivate Airport
+
+    UseCase -> Repo : save(airport)
+    activate Repo
+    Repo --> UseCase : Airport (persisted)
+    deactivate Repo
+
+    UseCase --> Controller : Airport
+    deactivate UseCase
+
+    note right of Controller
+      Maps Airport aggregate → AirportDetailsResponseDTO.
+      Builds HATEOAS links via linkTo(methodOn(...)).
+      Sets Location header: /airports/{iataCode}.
+      See CD for DTO structure.
+    end note
+
+    Controller --> Actor : 201 Created\nLocation: /airports/LIS\n{ "iataCode": "LIS", "name": "Lisbon Airport",\n  "status": "OPERATIONAL", "runways": [...], "_links": { "self": "..." } }
+end
+
+deactivate Controller
+@enduml
