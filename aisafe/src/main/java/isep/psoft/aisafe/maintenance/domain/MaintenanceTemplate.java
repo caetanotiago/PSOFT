@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.maintenance.domain;
+package isep.psoft.aisafe.Maintenance.domain;
 
 import isep.psoft.aisafe.aircraft.domain.AircraftModel; // Importa do mano que está a fazer os aviões
 import jakarta.persistence.*;

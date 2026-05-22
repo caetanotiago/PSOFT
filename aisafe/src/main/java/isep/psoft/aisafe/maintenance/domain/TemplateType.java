@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.maintenance.domain;
+package isep.psoft.aisafe.Maintenance.domain;
 
 public enum TemplateType {
     INSPECTION,

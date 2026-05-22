@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.aircraft.repositories;
+package isep.psoft.aisafe.Maintenance.repositories;
 
 import isep.psoft.aisafe.aircraft.domain.AircraftModel;
 import org.springframework.data.jpa.repository.JpaRepository;

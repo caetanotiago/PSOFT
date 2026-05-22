@@ -1,12 +1,13 @@
-package isep.psoft.aisafe.maintenance.services;
+package isep.psoft.aisafe.Maintenance.services;
 
+import isep.psoft.aisafe.Maintenance.domain.MaintenanceInterval;
+import isep.psoft.aisafe.Maintenance.domain.MaintenanceTemplate;
+import isep.psoft.aisafe.Maintenance.domain.TemplateType;
+import isep.psoft.aisafe.Maintenance.dto.CreateTemplateDTO;
+import isep.psoft.aisafe.Maintenance.repositories.MaintenanceTemplateRepository;
 import isep.psoft.aisafe.aircraft.domain.AircraftModel;
 import isep.psoft.aisafe.aircraft.repositories.AircraftModelRepository;
-import isep.psoft.aisafe.maintenance.domain.MaintenanceInterval;
-import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
-import isep.psoft.aisafe.maintenance.domain.TemplateType;
-import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
-import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,8 +1,9 @@
-package isep.psoft.aisafe.maintenance.repositories;
+package isep.psoft.aisafe.Maintenance.repositories;
 
-import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import isep.psoft.aisafe.Maintenance.domain.MaintenanceTemplate;
 
 import java.util.Optional;
 

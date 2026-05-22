@@ -1,14 +1,15 @@
-package isep.psoft.aisafe.maintenance.controllers;
+package isep.psoft.aisafe.Maintenance.controllers;
 
-import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
-import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
-import isep.psoft.aisafe.maintenance.dto.TemplateDTO;
-import isep.psoft.aisafe.maintenance.dto.TemplateAssembler;
-import isep.psoft.aisafe.maintenance.services.MaintenanceTemplateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize; // Descomenta quando a equipa configurar a Segurança JWT
 import org.springframework.web.bind.annotation.*;
+
+import isep.psoft.aisafe.Maintenance.domain.MaintenanceTemplate;
+import isep.psoft.aisafe.Maintenance.dto.CreateTemplateDTO;
+import isep.psoft.aisafe.Maintenance.dto.TemplateAssembler;
+import isep.psoft.aisafe.Maintenance.dto.TemplateDTO;
+import isep.psoft.aisafe.Maintenance.services.MaintenanceTemplateService;
 
 @RestController
 @RequestMapping("/api/maintenance-templates")
