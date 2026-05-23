@@ -4,7 +4,7 @@ import isep.psoft.aisafe.aircraftmanagement.domain.Aircraft;
 import isep.psoft.aisafe.aircraftmanagement.domain.AircraftStatus;
 import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
-import isep.psoft.aisafe.exceptions.NotFoundException;
+import isep.psoft.aisafe.exceptions;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

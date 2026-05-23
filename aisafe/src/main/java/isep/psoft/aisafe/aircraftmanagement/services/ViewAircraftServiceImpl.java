@@ -3,7 +3,7 @@ package isep.psoft.aisafe.aircraftmanagement.services;
 import isep.psoft.aisafe.aircraftmanagement.domain.Aircraft;
 import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
-import isep.psoft.aisafe.exceptions.NotFoundException;
+import isep.psoft.aisafe.exceptions;
 import org.springframework.stereotype.Service;
 
 @Service
