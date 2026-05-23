@@ -1,7 +1,9 @@
-package isep.psoft.aisafe.maintenance.dto;
+package isep.psoft.aisafe.maintenance.assemblers;
 
-import isep.psoft.aisafe.aircraft.domain.AircraftModel;
+// 1. IMPORT CORRIGIDO: Agora aponta para a pasta do teu colega (aircraftmanagement)
+import isep.psoft.aisafe.aircraftmanagement.domain.AircraftModel;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
+import isep.psoft.aisafe.maintenance.dto.TemplateDTO; // Import adicionado porque mudámos a package
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +15,7 @@ public class TemplateAssembler {
     public TemplateDTO toDTO(MaintenanceTemplate template) {
         // Extrai apenas as designações (nomes) dos modelos de avião para enviar na resposta
         List<String> modelDesignations = template.getApplicableModels().stream()
-                // Nota: O getDesignation() tem de existir na classe AircraftModel do teu colega!
+                // Como o teu colega já adicionou o getDesignation() na classe dele, isto vai funcionar na perfeição!
                 .map(AircraftModel::getDesignation)
                 .collect(Collectors.toList());
 

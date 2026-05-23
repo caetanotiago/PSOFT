@@ -3,7 +3,7 @@ package isep.psoft.aisafe.maintenance.controllers;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
 import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
 import isep.psoft.aisafe.maintenance.dto.TemplateDTO;
-import isep.psoft.aisafe.maintenance.dto.TemplateAssembler;
+import isep.psoft.aisafe.maintenance.assemblers.TemplateAssembler;
 import isep.psoft.aisafe.maintenance.services.us115.CreateMaintenanceTemplateUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
 package isep.psoft.aisafe.maintenance.domain;
 
-import isep.psoft.aisafe.aircraft.domain.AircraftModel; // Importa do mano que está a fazer os aviões
+import isep.psoft.aisafe.aircraftmanagement.domain.AircraftModel; // Importa do mano que está a fazer os aviões
 import jakarta.persistence.*;
 import java.util.List;
 

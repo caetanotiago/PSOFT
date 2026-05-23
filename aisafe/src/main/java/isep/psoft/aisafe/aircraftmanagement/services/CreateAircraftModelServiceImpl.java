@@ -4,7 +4,6 @@ import isep.psoft.aisafe.aircraftmanagement.domain.AircraftModel;
 import isep.psoft.aisafe.aircraftmanagement.domain.ModelDesignation;
 import isep.psoft.aisafe.aircraftmanagement.domain.ModelSpecifications;
 import isep.psoft.aisafe.aircraftmanagement.dto.CreateAircraftModelDTO;
-import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftModelRepository;
 import org.springframework.stereotype.Service;
 
 @Service
