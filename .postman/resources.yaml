@@ -1,0 +1,9 @@
+# Use this workspace to collaborate
+workspace:
+  id: 714c85cf-f570-4679-8a9f-80b472997552
+
+localResources:
+  collections:
+    - ..\docs\postman\AISafe.postman_collection.json
+  environments:
+    - ..\docs\postman\AISafe.postman_environment.json
