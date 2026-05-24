@@ -1,0 +1,89 @@
+@startuml US109-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +updateStatus(iataCode: String, request: UpdateAirportStatusRequest): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class UpdateAirportStatusRequest <<record>> {
+        +state: String
+    }
+    class AirportDetailsResponseDTO <<record>> {
+        +iataCode: String
+        +status: String
+        +runways: List<RunwayDTO>
+        +certifiedModels: Set<ModelDesignationDTO>
+        +{static} from(airport: Airport): AirportDetailsResponseDTO
+    }
+}
+
+package "Application Layer" {
+    interface UpdateAirportStatusUseCase {
+        +updateStatus(iataCode: String, newStateStr: String): Airport
+    }
+    class UpdateAirportStatusUseCaseImpl {
+        +updateStatus(iataCode: String, newStateStr: String): Airport
+    }
+    UpdateAirportStatusUseCaseImpl ..|> UpdateAirportStatusUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -status: AirportState
+        -version: Long
+        +changeStatus(newState: AirportState)
+    }
+    note top of Airport
+      Aggregate Root.
+      @Version ensures optimistic locking:
+      concurrent PATCH on the same airport
+      → ObjectOptimisticLockingFailureException → 409.
+    end note
+    class IATACode <<Value Object>> {
+        -code: String
+    }
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+        +canTransitionTo(target: AirportState): boolean
+    }
+    interface AirportRepository {
+        +findById(id: IATACode): Optional<Airport>
+        +save(airport: Airport): Airport
+    }
+    class AirportNotFoundException <<exception>>
+    class InvalidStatusTransitionException <<exception>>
+}
+
+note as ExceptionHandlerNote
+  Exceptions are intercepted by
+  @RestControllerAdvice (api.GlobalExceptionHandler)
+  and mapped to ProblemDetail (RFC 9457) responses.
+  Not shown as a participant — it is a cross-cutting concern.
+  IllegalArgumentException → 400
+  AirportNotFoundException → 404
+  InvalidStatusTransitionException → 409
+  ObjectOptimisticLockingFailureException → 409
+end note
+
+AirportController ..> UpdateAirportStatusUseCase
+AirportController ..> UpdateAirportStatusRequest
+AirportController ..> AirportDetailsResponseDTO
+
+UpdateAirportStatusUseCaseImpl ..> AirportRepository
+UpdateAirportStatusUseCaseImpl ..> AirportState : valueOf()
+UpdateAirportStatusUseCaseImpl ..> AirportNotFoundException
+UpdateAirportStatusUseCaseImpl ..> InvalidStatusTransitionException
+
+Airport *-- "1" IATACode
+Airport --> "1" AirportState
+Airport ..> InvalidStatusTransitionException
+
+@enduml

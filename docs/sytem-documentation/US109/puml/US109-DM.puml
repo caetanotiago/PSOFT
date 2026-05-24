@@ -1,0 +1,25 @@
+@startuml US109-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+        - status   : AirportState
+        - version  : Long
+        + changeStatus(newState : AirportState) : void
+    }
+    class IATACode <<Value Object>> {
+        - code : String
+    }
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+        + canTransitionTo(target : AirportState) : boolean
+    }
+
+    Airport *-- IATACode
+    Airport --> AirportState
+}
+@enduml

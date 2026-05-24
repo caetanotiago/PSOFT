@@ -1,0 +1,117 @@
+@startuml US107-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +getAirportDetails(iataCode: String): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class AirportDetailsResponseDTO <<record>> {
+        +iataCode: String
+        +name: String
+        +city: String
+        +country: String
+        +region: String
+        +timezone: String
+        +latitude: Double
+        +longitude: Double
+        +status: String
+        +runways: List<RunwayDTO>
+        +certifiedModels: Set<ModelDesignationDTO>
+        +{static} from(airport: Airport): AirportDetailsResponseDTO
+    }
+    class RunwayDTO <<record>> {
+        +name: String
+        +length: Double
+        +orientation: String
+    }
+    class ModelDesignationDTO <<record>> {
+        +manufacturer: String
+        +modelName: String
+    }
+}
+
+package "Application Layer" {
+    interface ViewAirportDetailsUseCase {
+        +getAirportByIataCode(iataCode: String): Airport
+    }
+    class ViewAirportDetailsUseCaseImpl {
+        +getAirportByIataCode(iataCode: String): Airport
+    }
+    ViewAirportDetailsUseCaseImpl ..|> ViewAirportDetailsUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -details: AirportDetails
+        -status: AirportState
+        -runways: List<Runway>
+        -certifiedModels: Set<ModelDesignation>
+        +iataCode(): IATACode
+        +details(): AirportDetails
+        +status(): AirportState
+        +runways(): List<Runway>
+        +certifiedModels(): Set<ModelDesignation>
+    }
+    note top of Airport
+      Aggregate Root.
+      Accessor names follow record-style convention
+      (no "get" prefix) — see diagram-conventions.md.
+    end note
+    class IATACode <<Value Object>> {
+        -code: String
+    }
+    class AirportDetails <<Value Object>> {
+        -name: String
+        -city: String
+        -country: String
+        -region: String
+        -timezone: String
+        -coordinates: Coordinates
+    }
+    class Coordinates <<Value Object>> {
+        -latitude: Double
+        -longitude: Double
+    }
+    class Runway <<Value Object>> {
+        -name: String
+        -length: Double
+        -orientation: String
+    }
+    class ModelDesignation <<Value Object>> {
+        -manufacturer: String
+        -modelName: String
+    }
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+    }
+    interface AirportRepository {
+        +findById(id: IATACode): Optional<Airport>
+    }
+    class AirportNotFoundException <<exception>>
+}
+
+AirportController ..> ViewAirportDetailsUseCase
+AirportController ..> AirportDetailsResponseDTO
+
+AirportDetailsResponseDTO ..> RunwayDTO
+AirportDetailsResponseDTO ..> ModelDesignationDTO
+
+ViewAirportDetailsUseCaseImpl ..> AirportRepository
+ViewAirportDetailsUseCaseImpl ..> AirportNotFoundException
+
+Airport *-- "1" IATACode
+Airport *-- "1" AirportDetails
+Airport *-- "0..*" Runway
+Airport *-- "0..*" ModelDesignation
+Airport --> "1" AirportState
+AirportDetails *-- "1" Coordinates
+
+@enduml

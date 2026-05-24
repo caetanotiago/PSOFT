@@ -1,0 +1,121 @@
+@startuml US106-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +registerAirport(request: RegisterAirportRequest): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class RegisterAirportRequest <<record>> {
+        +iataCode: String
+        +name: String
+        +city: String
+        +country: String
+        +region: String
+        +timezone: String
+        +latitude: Double
+        +longitude: Double
+        +runways: List<RunwayRequest>
+    }
+    class RunwayRequest <<record>> {
+        +name: String
+        +length: Double
+        +orientation: String
+    }
+    class AirportDetailsResponseDTO <<record>> {
+        +iataCode: String
+        +name: String
+        +city: String
+        +country: String
+        +status: String
+        +runways: List<RunwayDTO>
+        +certifiedModels: Set<ModelDesignationDTO>
+        +{static} from(airport: Airport): AirportDetailsResponseDTO
+    }
+    class RunwayDTO <<record>> {
+        +name: String
+        +length: Double
+        +orientation: String
+    }
+}
+
+package "Application Layer" {
+    interface RegisterAirportUseCase {
+        +registerAirport(iataCode: String, name: String, city: String, country: String, region: String, timezone: String, latitude: Double, longitude: Double, runways: List<RunwayRequest>): Airport
+    }
+    class RegisterAirportUseCaseImpl {
+        +registerAirport(iataCode: String, name: String, city: String, country: String, region: String, timezone: String, latitude: Double, longitude: Double, runways: List<RunwayRequest>): Airport
+    }
+    RegisterAirportUseCaseImpl ..|> RegisterAirportUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -details: AirportDetails
+        -status: AirportState
+        -runways: List<Runway>
+        -certifiedModels: Set<ModelDesignation>
+        -version: Long
+        +changeStatus(newState: AirportState)
+    }
+    note top of Airport
+      Aggregate Root.
+      Constructor enforces invariants (fail-fast):
+      IATACode format, non-blank fields,
+      valid coordinates, runway length > 0.
+      Initial status = OPERATIONAL.
+    end note
+    class IATACode <<Value Object>> {
+        -code: String
+    }
+    class AirportDetails <<Value Object>> {
+        -name: String
+        -city: String
+        -country: String
+        -region: String
+        -timezone: String
+        -coordinates: Coordinates
+    }
+    class Coordinates <<Value Object>> {
+        -latitude: Double
+        -longitude: Double
+    }
+    class Runway <<Value Object>> {
+        -name: String
+        -length: Double
+        -orientation: String
+    }
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+    }
+    interface AirportRepository {
+        +save(airport: Airport): Airport
+        +existsById(id: IATACode): boolean
+    }
+    class DuplicateIATACodeException <<exception>>
+}
+
+AirportController ..> RegisterAirportUseCase
+AirportController ..> RegisterAirportRequest
+AirportController ..> AirportDetailsResponseDTO
+
+RegisterAirportRequest *-- "0..*" RunwayRequest
+
+RegisterAirportUseCaseImpl ..> AirportRepository
+RegisterAirportUseCaseImpl ..> Airport
+RegisterAirportUseCaseImpl ..> DuplicateIATACodeException
+
+Airport *-- "1" IATACode
+Airport *-- "1" AirportDetails
+Airport *-- "0..*" Runway
+Airport --> "1" AirportState
+AirportDetails *-- "1" Coordinates
+
+@enduml

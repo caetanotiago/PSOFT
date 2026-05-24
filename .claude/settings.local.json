@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"c:/Users/Utilizador\" -name \"plantuml*.jar\" 2>/dev/null | head -5; ls \"c:/Program Files\" | grep -i plant 2>/dev/null || echo \"not-installed\")",
+      "Read(//c/Users/Utilizador/**)",
+      "Read(//c/Program Files/**)",
+      "Bash(java -version)",
+      "Bash(mvn -version)",
+      "Bash(where java *)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Eclipse Adoptium/temurin-21.0.9\" mvn test)",
+      "PowerShell(Get-Command java -ErrorAction SilentlyContinue | Select-Object Source; $env:JAVA_HOME; [System.Environment]::GetEnvironmentVariable\\(\"JAVA_HOME\", \"Machine\"\\))",
+      "PowerShell(where.exe java 2>$null; $env:JAVA_HOME; [System.Environment]::GetEnvironmentVariable\\(\"JAVA_HOME\",\"Machine\"\\))",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Utilizador\\\\.jdks\" -ErrorAction SilentlyContinue | Select-Object FullName; Get-ChildItem \"C:\\\\Users\\\\Utilizador\\\\AppData\\\\Local\\\\Programs\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"java|jdk|temurin\" } | Select-Object FullName)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Utilizador\" -Recurse -Depth 3 -Filter \"java.exe\" -ErrorAction SilentlyContinue | Select-Object FullName | Where-Object { $_.FullName -match \"21\" })",
+      "Bash(JAVA_HOME=\"/c/Users/Utilizador/.jdks/temurin-21.0.9\" \"/c/Users/Utilizador/Downloads/apache-maven-3.9.13-bin/apache-maven-3.9.13/bin/mvn\" -f \"c:/Users/Utilizador/Desktop/Faculdade/2ano/2 semestre/PSOFT/Repo/aisafe/pom.xml\" test)",
+      "Bash(jar tf *)",
+      "Bash(JAVA_HOME=\"/c/Users/Utilizador/.jdks/temurin-21.0.9\" \"/c/Users/Utilizador/.jdks/temurin-21.0.9/bin/jar\" tf \"/c/Users/Utilizador/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/4.0.6/spring-boot-test-autoconfigure-4.0.6.jar\")",
+      "Bash(JAVA_HOME=\"/c/Users/Utilizador/.jdks/temurin-21.0.9\" \"/c/Users/Utilizador/.jdks/temurin-21.0.9/bin/jar\" tf \"/c/Users/Utilizador/.m2/repository/org/springframework/boot/spring-boot-webmvc-test/4.0.6/spring-boot-webmvc-test-4.0.6.jar\")",
+      "Bash(\"/c/Users/Utilizador/.jdks/temurin-21.0.9/bin/jar\" tf *)",
+      "Bash(grep -v \"\\\\$\")",
+      "Bash(grep \"\\\\.class$\")",
+      "Bash(JAVA_HOME=\"/c/Users/Utilizador/.jdks/temurin-21.0.9\" \"/c/Users/Utilizador/Downloads/apache-maven-3.9.13-bin/apache-maven-3.9.13/bin/mvn\" -f \"c:/Users/Utilizador/Desktop/Faculdade/2ano/2 semestre/PSOFT/Repo/aisafe/pom.xml\" test -Dtest=\"AirportControllerTest#post_airport_returns_201_with_location+get_airport_returns_200_with_hateoas_links+get_airport_returns_404_when_not_found+get_airport_returns_403_for_wrong_role\" -pl .)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Utilizador\\\\Desktop\\\\Faculdade\\\\2ano\\\\2 semestre\\\\PSOFT\\\\Repo\" -Directory)",
+      "Bash(Select-Object Name)"
+    ]
+  }
+}

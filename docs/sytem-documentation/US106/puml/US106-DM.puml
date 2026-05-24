@@ -1,0 +1,56 @@
+@startuml US106-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam hide empty members false
+
+package "Airport Aggregate" {
+
+    class Airport <<Entity>> <<Root>> {
+        - iataCode      : IATACode
+        - details       : AirportDetails
+        - status        : AirportState
+        - runways       : List<Runway>
+        - version       : Long
+    }
+
+    class IATACode <<Value Object>> {
+        - code : String
+        ' Invariant: exactly 3 uppercase letters
+    }
+
+    class AirportDetails <<Value Object>> {
+        - name        : String
+        - city        : String
+        - country     : String
+        - region      : String
+        - timezone    : String
+        - coordinates : Coordinates
+    }
+
+    class Coordinates <<Value Object>> {
+        - latitude  : Double
+        - longitude : Double
+    }
+
+    class Runway <<Value Object>> {
+        - name        : String
+        - length      : Double
+        - orientation : String
+    }
+
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+    }
+
+    Airport        *-- IATACode
+    Airport        *-- AirportDetails
+    Airport        --> AirportState
+    Airport        *-- "0..*" Runway
+    AirportDetails *-- Coordinates
+}
+
+note "Initial status = OPERATIONAL (system default,\nOQ-106-01 resolved). Actor does not supply\na status at registration time." as N1
+
+@enduml

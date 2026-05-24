@@ -1,0 +1,14 @@
+@startuml US109-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as BO
+participant ":System" as SYS
+
+autonumber
+
+BO -> SYS : updateAirportStatus(\n  iataCode,\n  newStatus )
+
+SYS --> BO : 200 OK\n( updated Airport resource + HATEOAS links )
+
+@enduml

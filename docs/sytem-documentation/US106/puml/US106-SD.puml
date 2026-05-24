@@ -1,0 +1,52 @@
+@startuml US106-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "RegisterAirportUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+participant "Airport" as Airport
+
+autonumber
+
+Actor -> Filter : POST /airports\n{ "iataCode": "LIS", "name": "Lisbon Airport",\n  "city": "Lisbon", "country": "Portugal",\n  "latitude": 38.77, "longitude": -9.13,\n  "runways": [ { "name": "03/21", "length": 3805, "orientation": "030°" } ] }
+activate Filter
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : registerAirport(iataCode, name, city, country,\n  region, timezone, latitude, longitude, runways)
+activate UseCase
+
+
+UseCase -> Repo : existsById(code)
+activate Repo
+Repo --> UseCase : boolean
+deactivate Repo
+
+alt IATA code already registered
+    UseCase --> Controller : throw DuplicateIATACodeException
+    Controller --> Actor : 409 Conflict\n{ ProblemDetail }
+else IATA code is available
+    UseCase -> Airport : new Airport(code, details, OPERATIONAL, runways)
+    activate Airport
+
+    Airport --> UseCase : airport
+    deactivate Airport
+
+    UseCase -> Repo : save(airport)
+    activate Repo
+    Repo --> UseCase : Airport (persisted)
+    deactivate Repo
+
+    UseCase --> Controller : Airport
+    deactivate UseCase
+
+    Controller --> Actor : 201 Created\nLocation: /airports/LIS\n{ "iataCode": "LIS", "name": "Lisbon Airport",\n  "status": "OPERATIONAL", "runways": [...], "_links": { "self": "..." } }
+end
+
+deactivate Controller
+@enduml

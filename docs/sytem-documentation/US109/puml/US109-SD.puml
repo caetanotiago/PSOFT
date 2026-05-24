@@ -1,0 +1,81 @@
+@startuml US109-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "UpdateAirportStatusUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+participant "Airport" as Airport
+
+autonumber
+
+Actor -> Filter : PATCH /airports/{iataCode}/status\n{ "state": "UNDER_MAINTENANCE" }
+activate Filter
+
+note right of Filter
+  See security/SD-AuthFilter.puml
+  Required role(s) for this US: BACKOFFICE_OPERATOR
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : updateStatus(iataCode, newStateStr)
+activate UseCase
+
+alt Invalid state value (e.g. "FLYING")
+    UseCase --> Controller : throw IllegalArgumentException
+    Controller --> Actor : 400 Bad Request\n{ ProblemDetail }
+else Valid state value
+    UseCase -> Repo : findById(code)
+    activate Repo
+    Repo --> UseCase : Optional<Airport>
+    deactivate Repo
+
+    alt Airport not found
+        UseCase --> Controller : throw AirportNotFoundException
+        Controller --> Actor : 404 Not Found\n{ ProblemDetail }
+    else Airport found
+        UseCase -> Airport : changeStatus(newState)
+        activate Airport
+
+        alt Invalid transition (same state or blocked)
+            Airport --> UseCase : throw InvalidStatusTransitionException
+            UseCase --> Controller : throw InvalidStatusTransitionException
+            Controller --> Actor : 409 Conflict\n{ ProblemDetail }
+        else Valid transition
+            Airport --> UseCase : (status updated in memory)
+            deactivate Airport
+
+            UseCase -> Repo : save(airport)
+            activate Repo
+            note right of Repo
+              JPA checks @Version field.
+              Concurrent write on same row → version mismatch.
+            end note
+
+            alt Concurrent modification (version conflict)
+                Repo --> UseCase : throw ObjectOptimisticLockingFailureException
+                deactivate Repo
+                UseCase --> Controller : throw ObjectOptimisticLockingFailureException
+                Controller --> Actor : 409 Conflict\n{ ProblemDetail }
+            else Save successful
+                Repo --> UseCase : Airport (persisted, version incremented)
+                deactivate Repo
+
+                UseCase --> Controller : Airport
+                deactivate UseCase
+
+                Controller --> Actor : 200 OK\n{ "iataCode": "LIS", "status": "UNDER_MAINTENANCE",\n  "runways": [...], "certifiedModels": [...],\n  "_links": { "self": "...", "update-status": "..." } }
+            end
+        end
+    end
+end
+
+deactivate Controller
+
+
+@enduml

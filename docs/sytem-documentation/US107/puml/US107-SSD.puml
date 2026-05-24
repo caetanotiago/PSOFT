@@ -1,0 +1,15 @@
+@startuml US107-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator / ATCC" as Actor
+participant ":System" as SYS
+
+autonumber
+
+Actor -> SYS : viewAirportDetails( iataCode )
+
+SYS --> Actor : 200 OK\n( full Airport representation + HATEOAS links )
+
+
+@enduml

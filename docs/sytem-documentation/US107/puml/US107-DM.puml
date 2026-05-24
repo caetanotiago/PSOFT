@@ -1,0 +1,55 @@
+@startuml US107-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode        : IATACode
+        - details         : AirportDetails
+        - status          : AirportState
+        - runways         : List<Runway>
+        - certifiedModels : Set<ModelDesignation>
+        - version         : Long
+    }
+    class IATACode <<Value Object>> {
+        - code : String
+    }
+    class AirportDetails <<Value Object>> {
+        - name        : String
+        - city        : String
+        - country     : String
+        - region      : String
+        - timezone    : String
+        - coordinates : Coordinates
+    }
+    class Coordinates <<Value Object>> {
+        - latitude  : Double
+        - longitude : Double
+    }
+    class Runway <<Value Object>> {
+        - name        : String
+        - length      : Double
+        - orientation : String
+    }
+    enum AirportState {
+        OPERATIONAL
+        CLOSED
+        UNDER_MAINTENANCE
+    }
+    class ModelDesignation <<Value Object>> {
+        - manufacturer : String
+        - modelName    : String
+        ' Cross-aggregate identity reference
+    }
+
+    Airport        *-- IATACode
+    Airport        *-- AirportDetails
+    Airport        --> AirportState
+    Airport        *-- "0..*" Runway
+    Airport        *-- "0..*" ModelDesignation
+    AirportDetails *-- Coordinates
+}
+
+note "All attributes of the Airport aggregate\nare returned in the US107 response.\nPhase 2 additions (Facility, AirportContact)\nwill extend the response in US207/US208." as N1
+
+@enduml
