@@ -2,7 +2,6 @@ package isep.psoft.aisafe.aircraftmanagement.services;
 
 import isep.psoft.aisafe.aircraftmanagement.domain.*;
 import isep.psoft.aisafe.aircraftmanagement.dto.CreateAircraftDTO;
-import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftModelRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
