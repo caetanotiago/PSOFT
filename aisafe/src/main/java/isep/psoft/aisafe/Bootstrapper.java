@@ -3,9 +3,14 @@ package isep.psoft.aisafe;
 import isep.psoft.aisafe.aircraftmanagement.domain.*;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftModelRepository;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
+import isep.psoft.aisafe.airports.domain.Airport;
+import isep.psoft.aisafe.airports.repositories.AirportRepository;
 import isep.psoft.aisafe.domain.user.Role;
 import isep.psoft.aisafe.domain.user.SystemUser;
 import isep.psoft.aisafe.domain.user.SystemUserRepository;
+import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
+import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -18,19 +23,25 @@ public class Bootstrapper implements CommandLineRunner {
 
     private final SystemUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    // 1. Declarar os repositórios aqui
+    // Declarar os repositórios aqui
     private final AircraftModelRepository aircraftModelRepository;
     private final AircraftRepository aircraftRepository;
+    private final AirportRepository airportRepository;
+    private final MaintenanceTemplateRepository maintenanceTemplateRepository;
 
-    // 2. Adicionar os repositórios ao construtor para injeção automática
+    // Adicionar os repositórios ao construtor para injeção automática
     public Bootstrapper(SystemUserRepository userRepository, 
                         PasswordEncoder passwordEncoder,
                         AircraftModelRepository aircraftModelRepository,
-                        AircraftRepository aircraftRepository) {
+                        AircraftRepository aircraftRepository,
+                        AirportRepository airportRepository,
+                        MaintenanceTemplateRepository maintenanceTemplateRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.aircraftModelRepository = aircraftModelRepository;
         this.aircraftRepository = aircraftRepository;
+        this.airportRepository = airportRepository;
+        this.maintenanceTemplateRepository = maintenanceTemplateRepository;
     }
 
     @Override
@@ -65,6 +76,7 @@ public class Bootstrapper implements CommandLineRunner {
             System.out.println("Utilizador 'technician' criado com sucesso.");
         }
 
+        // Aircrafts (WP#1A)
         if (aircraftModelRepository.count() == 0) {
             AircraftModel boeing = new AircraftModel(
                     new ModelDesignation("Boeing", "737-800"),
@@ -80,23 +92,28 @@ public class Bootstrapper implements CommandLineRunner {
             System.out.println("WP#1A: Aircraft Models injetados.");
         }
 
-        // B. Injetar Aircrafts
+        
         if (aircraftRepository.count() == 0) {
-            var models = aircraftModelRepository.findAll();
+
             
-            if (!models.isEmpty()) {
-                AircraftModel model = models.get(0);
-                
-                Aircraft aircraft = new Aircraft(
-                        new RegistrationNumber("CS-ABC"),
-                        model,
-                        new ManufacturingDate(LocalDate.of(2020, 1, 15)),
-                        new SeatingCapacity(180),
-                        new AircraftStatus("ACTIVE")
-                );
-                aircraftRepository.save(aircraft);
-                System.out.println("WP#1A: Aircraft 'CS-ABC' injetado.");
-            }
+
+        }
+        
+
+        // Aeroportos (WP#2A) 
+        if (airportRepository.count() == 0) {
+            
+            
+
+            System.out.println("WP#2A: Aeroportos injetados.");
+        } 
+
+        // Manutenção (WP#4A) 
+        if (maintenanceTemplateRepository.count() == 0) {
+
+            
+            
+            System.out.println("WP#4A: Maintenance Templates injetados.");
         }
 
         System.out.println("Bootstrapping concluído com sucesso!");
