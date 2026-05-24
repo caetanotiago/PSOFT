@@ -2,7 +2,6 @@ package isep.psoft.aisafe.airports.controllers;
 
 import isep.psoft.aisafe.airports.dto.*;
 import isep.psoft.aisafe.airports.domain.Airport;
-import isep.psoft.aisafe.airports.domain.Runway;
 import isep.psoft.aisafe.airports.services.AddCertificationUseCase;
 import isep.psoft.aisafe.airports.services.RegisterAirportUseCase;
 import isep.psoft.aisafe.airports.services.SearchAirportsUseCase;
@@ -62,15 +61,11 @@ public class AirportController {
     public ResponseEntity<EntityModel<AirportDetailsResponseDTO>> registerAirport(
             @Valid @RequestBody RegisterAirportRequest request) {
 
-        List<Runway> runways = request.runways().stream()
-                .map(r -> new Runway(r.name(), r.length(), r.orientation()))
-                .collect(Collectors.toList());
-
         Airport airport = registerAirportUseCase.registerAirport(
                 request.iataCode(), request.name(), request.city(), request.country(),
                 request.region(), request.timezone(),
                 request.latitude(), request.longitude(),
-                runways);
+                request.runways());
 
         EntityModel<AirportDetailsResponseDTO> model = buildDetailModel(airport);
 
