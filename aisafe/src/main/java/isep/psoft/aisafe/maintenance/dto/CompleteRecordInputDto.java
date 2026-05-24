@@ -1,15 +1,18 @@
 package isep.psoft.aisafe.maintenance.dto;
 
-import lombok.Getter;
+import jakarta.validation.constraints.NotBlank;
 
-@Getter
 public class CompleteRecordInputDto {
+
+    @NotBlank(message = "Completion notes cannot be empty")
     private String notes;
 
-    // Jackson precisa de um construtor default para deserialização
     public CompleteRecordInputDto() {}
 
     public CompleteRecordInputDto(String notes) {
         this.notes = notes;
     }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 }

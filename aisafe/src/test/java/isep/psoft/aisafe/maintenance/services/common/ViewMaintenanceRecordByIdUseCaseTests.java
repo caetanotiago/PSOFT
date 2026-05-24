@@ -33,7 +33,7 @@ class ViewMaintenanceRecordByIdUseCaseTests {
 
     @Test
     void whenRecordExists_shouldReturnDto() {
-        // Arrange
+
         long recordId = 1L;
         MaintenanceRecord record = mock(MaintenanceRecord.class);
         MaintenanceRecordOutputDto dto = mock(MaintenanceRecordOutputDto.class);
@@ -41,10 +41,8 @@ class ViewMaintenanceRecordByIdUseCaseTests {
         when(repository.findById(recordId)).thenReturn(Optional.of(record));
         when(assembler.toModel(record)).thenReturn(dto);
 
-        // Act
         Optional<MaintenanceRecordOutputDto> result = useCase.execute(recordId);
 
-        // Assert
         assertThat(result).isPresent().contains(dto);
         verify(repository, times(1)).findById(recordId);
         verify(assembler, times(1)).toModel(record);
@@ -52,14 +50,12 @@ class ViewMaintenanceRecordByIdUseCaseTests {
 
     @Test
     void whenRecordDoesNotExist_shouldReturnEmptyOptional() {
-        // Arrange
+
         long recordId = 99L;
         when(repository.findById(recordId)).thenReturn(Optional.empty());
 
-        // Act
         Optional<MaintenanceRecordOutputDto> result = useCase.execute(recordId);
 
-        // Assert
         assertThat(result).isNotPresent();
         verify(repository, times(1)).findById(recordId);
         verify(assembler, never()).toModel(any());

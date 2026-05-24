@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "isep.psoft.aisafe") // Garante que todos os repositórios são encontrados
+@EnableJpaRepositories(basePackages = "isep.psoft.aisafe")
 public class AisafeApplication {
 
 	public static void main(String[] args) {

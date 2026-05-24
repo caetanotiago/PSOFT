@@ -31,7 +31,6 @@ public class TemplateAssembler {
                 modelDesignations
         );
 
-        // Adicionar um link para o próprio recurso (self-link)
         dto.add(linkTo(methodOn(MaintenanceTemplateRestController.class).getTemplateById(template.getId())).withSelfRel());
 
         return dto;

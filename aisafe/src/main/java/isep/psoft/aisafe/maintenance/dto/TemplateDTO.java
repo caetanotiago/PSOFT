@@ -3,7 +3,6 @@ package isep.psoft.aisafe.maintenance.dto;
 import org.springframework.hateoas.RepresentationModel;
 import java.util.List;
 
-// 1. Adicionamos a extensão do RepresentationModel aqui:
 public class TemplateDTO extends RepresentationModel<TemplateDTO> {
 
     private Long id;
@@ -14,7 +13,7 @@ public class TemplateDTO extends RepresentationModel<TemplateDTO> {
     private List<String> checklist;
     private List<String> applicableModels;
 
-    public TemplateDTO() {} // Construtor vazio necessário para o Spring
+    public TemplateDTO() {}
 
     public TemplateDTO(Long id, String templateName, String templateType,
                        Integer flightHours, Integer calendarDays,
@@ -28,7 +27,6 @@ public class TemplateDTO extends RepresentationModel<TemplateDTO> {
         this.applicableModels = applicableModels;
     }
 
-    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

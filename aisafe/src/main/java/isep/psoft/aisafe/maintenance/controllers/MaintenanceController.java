@@ -9,8 +9,10 @@ import isep.psoft.aisafe.maintenance.services.us115a.CreateMaintenanceRecordUseC
 import isep.psoft.aisafe.maintenance.services.us116.ViewAircraftMaintenanceRecordsUseCase;
 import isep.psoft.aisafe.maintenance.services.us117.ViewTotalMaintenanceHoursUseCase;
 import isep.psoft.aisafe.maintenance.services.us119.CompleteMaintenanceRecordUseCase;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -28,17 +30,17 @@ public class MaintenanceController {
     @Autowired private ViewMaintenanceRecordByIdUseCase viewByIdUseCase;
 
     /**
-     * US115a: Create Maintenance Record
+     * US115A: Create a Maintenance Record
      */
     @PostMapping
-    //@PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
-    public ResponseEntity<MaintenanceRecordOutputDto> createRecord(@RequestBody CreateRecordDTO dto) {
-        // CORREÇÃO: O UseCase já devolve o DTO final.
+    @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
+    public ResponseEntity<MaintenanceRecordOutputDto> createRecord(@Valid @RequestBody CreateRecordDTO dto) {
+
         MaintenanceRecordOutputDto outputDto = createRecordUseCase.execute(dto);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(outputDto.getId()) // Usar o ID do DTO
+                .buildAndExpand(outputDto.getId())
                 .toUri();
 
         return ResponseEntity.created(location).body(outputDto);
@@ -48,7 +50,7 @@ public class MaintenanceController {
      * US116: View Maintenance Records of a Specific Aircraft
      */
     @GetMapping("/aircraft/{registration}")
-    //@PreAuthorize("hasRole('MAINTENANCE_MANAGER')")
+    @PreAuthorize("hasRole('MAINTENANCE_MANAGER')")
     public ResponseEntity<List<MaintenanceRecordOutputDto>> getRecordsByAircraft(@PathVariable String registration) {
         List<MaintenanceRecordOutputDto> records = viewRecordsUseCase.execute(registration);
         return ResponseEntity.ok(records);
@@ -58,7 +60,7 @@ public class MaintenanceController {
      * US117: View Total Maintenance Hours for the Fleet
      */
     @GetMapping("/fleet/maintenance-hours")
-    //@PreAuthorize("hasRole('FLEET_MANAGER')")
+    @PreAuthorize("hasRole('ATCC')")
     public ResponseEntity<TotalMaintenanceHoursDto> getTotalMaintenanceHours() {
         TotalMaintenanceHoursDto totalHours = viewTotalHoursUseCase.execute();
         return ResponseEntity.ok(totalHours);
@@ -68,9 +70,9 @@ public class MaintenanceController {
      * US119: Complete a Maintenance Record
      */
     @PatchMapping("/{id}/complete")
-    //@PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
+    @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
     public ResponseEntity<MaintenanceRecordOutputDto> completeMaintenanceRecord(@PathVariable Long id,
-                                                                                @RequestBody CompleteRecordInputDto dto,
+                                                                                @Valid @RequestBody CompleteRecordInputDto dto,
                                                                                 @RequestHeader("If-Match") String ifMatch) {
         MaintenanceRecordOutputDto updatedRecord = completeRecordUseCase.execute(id, dto, ifMatch);
         return ResponseEntity.ok(updatedRecord);
@@ -80,7 +82,7 @@ public class MaintenanceController {
      * Endpoint to get a single maintenance record by its ID.
      */
     @GetMapping("/{id}")
-    //@PreAuthorize("hasRole('MAINTENANCE_MANAGER') or hasRole('MAINTENANCE_TECHNICIAN')")
+    @PreAuthorize("hasRole('MAINTENANCE_MANAGER') or hasRole('MAINTENANCE_TECHNICIAN')")
     public ResponseEntity<MaintenanceRecordOutputDto> getRecordById(@PathVariable Long id) {
         return viewByIdUseCase.execute(id)
                 .map(ResponseEntity::ok)
