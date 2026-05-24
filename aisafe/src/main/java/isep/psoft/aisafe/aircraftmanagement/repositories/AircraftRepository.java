@@ -8,5 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AircraftRepository extends JpaRepository<Aircraft, RegistrationNumber>, JpaSpecificationExecutor<Aircraft> {
-    // O JpaSpecificationExecutor já nos dá os métodos findAll(Specification) para a US104
+    
+    // CORREÇÃO: Adicionar o método que faltava para que o UseCase possa usá-lo.
+    // O Spring Data JPA irá gerar a implementação automaticamente.
+    boolean existsByRegistrationNumber(RegistrationNumber registrationNumber);
 }

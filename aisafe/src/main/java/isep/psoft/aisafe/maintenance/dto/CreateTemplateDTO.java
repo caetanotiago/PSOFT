@@ -10,6 +10,20 @@ public class CreateTemplateDTO {
     private List<String> checklist;
     private List<String> applicableModels;
 
+    // Construtor vazio para o Jackson (JSON para Objeto)
+    public CreateTemplateDTO() {
+    }
+
+    // Construtor completo para facilitar a criação em testes
+    public CreateTemplateDTO(String templateName, String templateType, Integer flightHours, Integer calendarDays, List<String> checklist, List<String> applicableModels) {
+        this.templateName = templateName;
+        this.templateType = templateType;
+        this.flightHours = flightHours;
+        this.calendarDays = calendarDays;
+        this.checklist = checklist;
+        this.applicableModels = applicableModels;
+    }
+
     // Getters
     public String getTemplateName() { return templateName; }
     public String getTemplateType() { return templateType; }

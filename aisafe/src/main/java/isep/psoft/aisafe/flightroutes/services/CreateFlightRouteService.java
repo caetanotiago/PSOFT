@@ -1,6 +1,7 @@
 package isep.psoft.aisafe.flightroutes.services;
 
 import isep.psoft.aisafe.airports.domain.Airport;
+import isep.psoft.aisafe.airports.domain.IATACode;
 import isep.psoft.aisafe.airports.repositories.AirportRepository; 
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
 import isep.psoft.aisafe.flightroutes.dto.CreateRouteDTO;
@@ -22,31 +23,32 @@ public class CreateFlightRouteService {
     @Transactional
     public FlightRoute createRoute(CreateRouteDTO dto) {
         
-        // Validar se a rota já existe 
         if (routeRepository.existsByOriginAndDestination(dto.getOriginIATA(), dto.getDestIATA())) {
             throw new IllegalArgumentException("A route between these airports already exists.");
         }
 
-        // Procurar Aeroportos (lança exceção se não existirem)
-        Airport origin = airportRepository.findById(dto.getOriginIATA())
+        IATACode originIATA = new IATACode(dto.getOriginIATA());
+        IATACode destIATA = new IATACode(dto.getDestIATA());
+
+        Airport origin = airportRepository.findById(originIATA)
                 .orElseThrow(() -> new IllegalArgumentException("Origin airport not found: " + dto.getOriginIATA()));
         
-        Airport dest = airportRepository.findById(dto.getDestIATA())
+        Airport dest = airportRepository.findById(destIATA)
                 .orElseThrow(() -> new IllegalArgumentException("Destination airport not found: " + dto.getDestIATA()));
 
-        // Calcular Distância
+        // CORREÇÃO DEFINITIVA: A latitude e longitude estão dentro de details -> coordinates.
         double distance = distanceCalculator.calculateDistance(
-                origin.getLatitude(), origin.getLongitude(),
-                dest.getLatitude(), dest.getLongitude()
+                origin.getDetails().getCoordinates().getLatitude(), 
+                origin.getDetails().getCoordinates().getLongitude(),
+                dest.getDetails().getCoordinates().getLatitude(),
+                dest.getDetails().getCoordinates().getLongitude()
         );
 
-        // Criar Entidade usando a Factory
         FlightRoute newRoute = routeFactory.createRoute(
                 origin, dest, distance, 
                 dto.getMinRange(), dto.getMinCapacity(), dto.getEstimatedFlightTime()
         );
 
-        // Persistir no Repositório
         return routeRepository.save(newRoute);
     }
 }

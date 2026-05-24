@@ -1,67 +1,61 @@
-package isep.psoft.aisafe.maintenance.services.us115; // Ajustado para a pasta correta da tua estrutura
+package isep.psoft.aisafe.maintenance.services.us115;
 
 import isep.psoft.aisafe.aircraftmanagement.domain.AircraftModel;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftModelRepository;
+import isep.psoft.aisafe.maintenance.assemblers.TemplateAssembler;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceInterval;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
 import isep.psoft.aisafe.maintenance.domain.TemplateType;
 import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
+import isep.psoft.aisafe.maintenance.dto.TemplateDTO;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-@Service
-public class CreateMaintenanceTemplateUseCase { // 1. O nome da classe mudou aqui
+@Service("CreateMaintenanceTemplateUseCase")
+public class CreateMaintenanceTemplateUseCase {
 
-    private final MaintenanceTemplateRepository templateRepository;
-    private final AircraftModelRepository aircraftModelRepository;
+    @Autowired
+    private MaintenanceTemplateRepository templateRepository;
+    @Autowired
+    private AircraftModelRepository aircraftModelRepository;
+    @Autowired
+    private TemplateAssembler assembler;
 
-    // 2. O nome do construtor tem de ser igual ao nome da classe
-    public CreateMaintenanceTemplateUseCase(MaintenanceTemplateRepository templateRepository,
-                                            AircraftModelRepository aircraftModelRepository) {
-        this.templateRepository = templateRepository;
-        this.aircraftModelRepository = aircraftModelRepository;
-    }
-
-    // 3. O método chama-se "execute" para bater certo com o teu Controller
-    public MaintenanceTemplate execute(CreateTemplateDTO dto) {
-        // 1. Validar se o nome já existe
-        Optional<MaintenanceTemplate> existing = templateRepository.findByTemplateName(dto.getTemplateName());
-        if (existing.isPresent()) {
+    @Transactional
+    public TemplateDTO execute(CreateTemplateDTO dto) {
+        if (templateRepository.findByTemplateName(dto.getTemplateName()).isPresent()) {
             throw new IllegalArgumentException("A template with this name already exists.");
         }
 
-        // 2. Converter os valores do DTO
         TemplateType type = TemplateType.valueOf(dto.getTemplateType().toUpperCase());
         MaintenanceInterval interval = new MaintenanceInterval(dto.getFlightHours(), dto.getCalendarDays());
 
-        // 3. Ir buscar os Aircraft Models usando o método do repositório do teu colega
-        List<AircraftModel> models = new ArrayList<>();
-
+        List<AircraftModel> foundModels = new ArrayList<>();
         for (String modelName : dto.getApplicableModels()) {
-            // Usa o método findByDesignationModelName que o teu colega criou
-            Optional<AircraftModel> foundModel = aircraftModelRepository.findByDesignationModelName(modelName);
-
-            // Se encontrar, adiciona à nossa lista
-            foundModel.ifPresent(models::add);
+            AircraftModel model = aircraftModelRepository.findByDesignationModelName(modelName)
+                    .orElseThrow(() -> new IllegalArgumentException("Aircraft Model '" + modelName + "' not found."));
+            foundModels.add(model);
         }
 
-        if (models.isEmpty()) {
-            throw new IllegalArgumentException("None of the provided Aircraft Models exist in the system.");
+        if (foundModels.isEmpty()) {
+            throw new IllegalArgumentException("At least one valid Aircraft Model must be provided.");
         }
 
-        // 4. Criar a nova entidade e guardá-la
         MaintenanceTemplate newTemplate = new MaintenanceTemplate(
                 dto.getTemplateName(),
                 type,
                 interval,
                 dto.getChecklist(),
-                models
+                foundModels
         );
 
-        return templateRepository.save(newTemplate);
+        MaintenanceTemplate savedTemplate = templateRepository.save(newTemplate);
+        
+        return assembler.toDTO(savedTemplate);
     }
 }

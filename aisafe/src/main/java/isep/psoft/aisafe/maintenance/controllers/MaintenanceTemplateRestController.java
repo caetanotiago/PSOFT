@@ -1,37 +1,45 @@
 package isep.psoft.aisafe.maintenance.controllers;
 
-import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
 import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
 import isep.psoft.aisafe.maintenance.dto.TemplateDTO;
-import isep.psoft.aisafe.maintenance.assemblers.TemplateAssembler;
+import isep.psoft.aisafe.maintenance.services.common.ViewMaintenanceTemplateByIdUseCase;
 import isep.psoft.aisafe.maintenance.services.us115.CreateMaintenanceTemplateUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize; // Descomenta quando a equipa configurar a Segurança JWT
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/maintenance-templates")
 public class MaintenanceTemplateRestController {
 
     @Autowired
-    private CreateMaintenanceTemplateUseCase useCase;
+    private CreateMaintenanceTemplateUseCase createUseCase;
 
     @Autowired
-    private TemplateAssembler assembler;
+    private ViewMaintenanceTemplateByIdUseCase viewByIdUseCase;
 
     @PostMapping
-    // @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')") // Exigência da US (AC4)
+    //@PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
     public ResponseEntity<TemplateDTO> createTemplate(@RequestBody CreateTemplateDTO createDto) {
+        // CORREÇÃO: O UseCase agora deve orquestrar tudo, incluindo a conversão para DTO.
+        TemplateDTO responseDto = createUseCase.execute(createDto);
+        
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(responseDto.getId())
+                .toUri();
 
-        // 1. O Caso de Uso cria e guarda o template
-        MaintenanceTemplate savedTemplate = useCase.execute(createDto);
+        return ResponseEntity.created(location).body(responseDto);
+    }
 
-        // 2. O Assembler converte para DTO
-        TemplateDTO responseDto = assembler.toDTO(savedTemplate);
-
-        // 3. Devolvemos HTTP 201 Created com o JSON de resposta (Exigência AC5)
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    @GetMapping("/{id}")
+    //@PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
+    public ResponseEntity<TemplateDTO> getTemplateById(@PathVariable Long id) {
+        return viewByIdUseCase.execute(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

@@ -3,6 +3,7 @@ package isep.psoft.aisafe.maintenance.services.us119;
 import isep.psoft.aisafe.maintenance.assemblers.MaintenanceRecordAssembler;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceRecord;
 import isep.psoft.aisafe.maintenance.dto.CompleteRecordInputDto;
+import isep.psoft.aisafe.maintenance.dto.MaintenanceRecordOutputDto;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceRecordRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,17 +34,25 @@ class CompleteMaintenanceRecordUseCaseTests {
         long version = 0L;
         CompleteRecordInputDto dto = new CompleteRecordInputDto("All tasks done.");
         
-        // Usando um MOCK simples em vez de um SPY para máxima simplicidade
         MaintenanceRecord mockRecord = mock(MaintenanceRecord.class);
+        MaintenanceRecordOutputDto mockOutputDto = mock(MaintenanceRecordOutputDto.class);
 
         when(repository.findById(recordId)).thenReturn(Optional.of(mockRecord));
         when(mockRecord.getVersion()).thenReturn(version);
+        
+        // A SIMULAÇÃO QUE FALTAVA PARA O SAVE
+        when(repository.save(any(MaintenanceRecord.class))).thenReturn(mockRecord);
+        
+        // A SIMULAÇÃO PARA O ASSEMBLER
+        when(assembler.toModel(any(MaintenanceRecord.class))).thenReturn(mockOutputDto);
         
         // Act
         useCase.execute(recordId, dto, "\"" + version + "\"");
 
         // Assert
-        // A verificação mais simples possível: o método save foi chamado?
+        verify(repository, times(1)).findById(recordId);
+        verify(mockRecord, times(1)).complete(any());
         verify(repository, times(1)).save(mockRecord);
+        verify(assembler, times(1)).toModel(mockRecord);
     }
 }

@@ -1,30 +1,44 @@
 package isep.psoft.aisafe.maintenance.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import isep.psoft.aisafe.maintenance.domain.CompletionNotes;
-import isep.psoft.aisafe.maintenance.domain.MaintenanceComponent;
-import isep.psoft.aisafe.maintenance.domain.RecordDetails;
-import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
+import java.time.LocalDate;
 
-@Getter
-@JsonInclude(JsonInclude.Include.NON_NULL) // Não mostra campos nulos (como completionNotes)
+// 1. A classe agora estende RepresentationModel!
 public class MaintenanceRecordOutputDto extends RepresentationModel<MaintenanceRecordOutputDto> {
 
-    private final Long id;
-    private final String aircraftRegistration;
-    private final Long maintenanceTemplateId;
-    private final RecordDetails recordDetails;
-    private final MaintenanceComponent component;
-    private final CompletionNotes completionNotes;
+    private Long id;
+    private String aircraftRegistration;
+    private Long templateId;
+    private String description;
+    private LocalDate startDate;
+    private Integer expectedDurationMinutes;
+    private String componentCategory;
+    private String completionNotes; // Pode ser null se não estiver concluído
 
-    public MaintenanceRecordOutputDto(Long id, String aircraftRegistration, Long maintenanceTemplateId,
-                                      RecordDetails recordDetails, MaintenanceComponent component, CompletionNotes completionNotes) {
-        this.id = id;
-        this.aircraftRegistration = aircraftRegistration;
-        this.maintenanceTemplateId = maintenanceTemplateId;
-        this.recordDetails = recordDetails;
-        this.component = component;
-        this.completionNotes = completionNotes;
-    }
+    public MaintenanceRecordOutputDto() {}
+
+    // Getters e Setters normais
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getAircraftRegistration() { return aircraftRegistration; }
+    public void setAircraftRegistration(String aircraftRegistration) { this.aircraftRegistration = aircraftRegistration; }
+
+    public Long getTemplateId() { return templateId; }
+    public void setTemplateId(Long templateId) { this.templateId = templateId; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+    public Integer getExpectedDurationMinutes() { return expectedDurationMinutes; }
+    public void setExpectedDurationMinutes(Integer expectedDurationMinutes) { this.expectedDurationMinutes = expectedDurationMinutes; }
+
+    public String getComponentCategory() { return componentCategory; }
+    public void setComponentCategory(String componentCategory) { this.componentCategory = componentCategory; }
+
+    public String getCompletionNotes() { return completionNotes; }
+    public void setCompletionNotes(String completionNotes) { this.completionNotes = completionNotes; }
 }

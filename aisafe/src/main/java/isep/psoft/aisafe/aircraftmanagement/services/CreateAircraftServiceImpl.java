@@ -3,15 +3,17 @@ package isep.psoft.aisafe.aircraftmanagement.services;
 import isep.psoft.aisafe.aircraftmanagement.domain.*;
 import isep.psoft.aisafe.aircraftmanagement.dto.CreateAircraftDTO;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
+import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftModelRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CreateAircraftServiceImpl implements CreateAircraftService {
 
-    private final AircraftRepository aircraftRepository;
+    private final JpaRepository<Aircraft, RegistrationNumber> aircraftRepository;
     private final AircraftModelRepository aircraftModelRepository;
 
-    public CreateAircraftServiceImpl(AircraftRepository aircraftRepository, AircraftModelRepository aircraftModelRepository) {
+    public CreateAircraftServiceImpl(JpaRepository<Aircraft, RegistrationNumber> aircraftRepository, AircraftModelRepository aircraftModelRepository) {
         this.aircraftRepository = aircraftRepository;
         this.aircraftModelRepository = aircraftModelRepository;
     }

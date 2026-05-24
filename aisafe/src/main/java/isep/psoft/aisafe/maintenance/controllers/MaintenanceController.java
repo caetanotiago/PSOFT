@@ -1,7 +1,5 @@
 package isep.psoft.aisafe.maintenance.controllers;
 
-import isep.psoft.aisafe.maintenance.assemblers.MaintenanceRecordAssembler;
-import isep.psoft.aisafe.maintenance.domain.MaintenanceRecord;
 import isep.psoft.aisafe.maintenance.dto.CompleteRecordInputDto;
 import isep.psoft.aisafe.maintenance.dto.CreateRecordDTO;
 import isep.psoft.aisafe.maintenance.dto.MaintenanceRecordOutputDto;
@@ -23,15 +21,11 @@ import java.util.List;
 @RequestMapping("/api/maintenance-records")
 public class MaintenanceController {
 
-    // Use Cases for each User Story
     @Autowired private CreateMaintenanceRecordUseCase createRecordUseCase;
     @Autowired private ViewAircraftMaintenanceRecordsUseCase viewRecordsUseCase;
     @Autowired private ViewTotalMaintenanceHoursUseCase viewTotalHoursUseCase;
     @Autowired private CompleteMaintenanceRecordUseCase completeRecordUseCase;
     @Autowired private ViewMaintenanceRecordByIdUseCase viewByIdUseCase;
-
-    // Assembler for DTO conversion
-    @Autowired private MaintenanceRecordAssembler recordAssembler;
 
     /**
      * US115a: Create Maintenance Record
@@ -39,12 +33,12 @@ public class MaintenanceController {
     @PostMapping
     //@PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
     public ResponseEntity<MaintenanceRecordOutputDto> createRecord(@RequestBody CreateRecordDTO dto) {
-        MaintenanceRecord savedRecord = createRecordUseCase.execute(dto);
-        MaintenanceRecordOutputDto outputDto = recordAssembler.toModel(savedRecord);
+        // CORREÇÃO: O UseCase já devolve o DTO final.
+        MaintenanceRecordOutputDto outputDto = createRecordUseCase.execute(dto);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(savedRecord.getId())
+                .buildAndExpand(outputDto.getId()) // Usar o ID do DTO
                 .toUri();
 
         return ResponseEntity.created(location).body(outputDto);

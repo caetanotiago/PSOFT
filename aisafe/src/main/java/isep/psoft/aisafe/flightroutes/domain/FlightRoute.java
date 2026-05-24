@@ -45,8 +45,8 @@ public class FlightRoute {
     @CollectionTable(name = "ROUTE_HISTORY_LOG", joinColumns = @JoinColumn(name = "ROUTE_ID"))
     private List<RouteHistory> historyLog = new ArrayList<>();
 
-    // Construtor completo (usado apenas pela Factory)
-    protected FlightRoute(Airport origin, Airport destination, RouteDistance distance, 
+    // CORREÇÃO: O construtor precisa de ser público para ser chamado pela Factory, que está noutro pacote.
+    public FlightRoute(Airport origin, Airport destination, RouteDistance distance, 
                           RouteRequirements requirements, EstimatedFlightTime estimatedFlightTime) {
         this.origin = origin;
         this.destination = destination;
