@@ -1,6 +1,6 @@
 package isep.psoft.aisafe.maintenance.domain;
 
-import isep.psoft.aisafe.aircraftmanagement.domain.AircraftModel; // Importa do mano que está a fazer os aviões
+import isep.psoft.aisafe.aircraftmanagement.domain.AircraftModel;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -51,7 +51,6 @@ public class MaintenanceTemplate {
         this.applicableModels = applicableModels;
     }
 
-    // Getters
     public Long getId() { return id; }
     public String getTemplateName() { return templateName; }
     public TemplateType getTemplateType() { return templateType; }

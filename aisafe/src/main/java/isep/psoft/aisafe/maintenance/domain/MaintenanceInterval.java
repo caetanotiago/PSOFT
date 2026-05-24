@@ -9,7 +9,7 @@ public class MaintenanceInterval {
     private Integer calendarDays;
 
     protected MaintenanceInterval() {
-        // Construtor vazio exigido pelo JPA/Hibernate
+        // JPA requirement
     }
 
     public MaintenanceInterval(Integer flightHours, Integer calendarDays) {

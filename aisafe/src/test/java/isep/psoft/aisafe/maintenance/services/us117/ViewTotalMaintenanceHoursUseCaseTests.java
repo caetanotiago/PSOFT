@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class) // Updated to the modern approach for consistency
+@ExtendWith(MockitoExtension.class)
 class ViewTotalMaintenanceHoursUseCaseTests {
 
     @Mock
@@ -22,28 +22,24 @@ class ViewTotalMaintenanceHoursUseCaseTests {
 
     @Test
     void whenRepositoryReturnsMinutes_shouldConvertAndReturnHours() {
-        // Arrange
+
         long totalMinutes = 150L;
         when(repository.sumTotalExpectedDurationMinutes()).thenReturn(totalMinutes);
 
-        // Act
         TotalMaintenanceHoursDto result = useCase.execute();
 
-        // Assert
         assertThat(result.getTotalHours()).isEqualTo(2.5);
         verify(repository, times(1)).sumTotalExpectedDurationMinutes();
     }
 
     @Test
     void whenRepositoryReturnsZeroMinutes_shouldReturnZeroHours() {
-        // Arrange
+
         long totalMinutes = 0L;
         when(repository.sumTotalExpectedDurationMinutes()).thenReturn(totalMinutes);
 
-        // Act
         TotalMaintenanceHoursDto result = useCase.execute();
 
-        // Assert
         assertThat(result.getTotalHours()).isEqualTo(0.0);
         verify(repository, times(1)).sumTotalExpectedDurationMinutes();
     }

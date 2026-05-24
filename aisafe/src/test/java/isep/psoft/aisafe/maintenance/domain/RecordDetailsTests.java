@@ -9,7 +9,7 @@ class RecordDetailsTests {
 
     @Test
     void shouldThrowExceptionWhenDescriptionIsNull() {
-        // Act & Assert
+
         var exception = assertThrows(IllegalArgumentException.class, () -> {
             new RecordDetails(null, LocalDate.now(), 60);
         });
@@ -18,7 +18,7 @@ class RecordDetailsTests {
 
     @Test
     void shouldThrowExceptionWhenDescriptionIsBlank() {
-        // Act & Assert
+
         var exception = assertThrows(IllegalArgumentException.class, () -> {
             new RecordDetails("  ", LocalDate.now(), 60);
         });
@@ -27,7 +27,7 @@ class RecordDetailsTests {
 
     @Test
     void shouldThrowExceptionWhenStartDateIsNull() {
-        // Act & Assert
+
         var exception = assertThrows(IllegalArgumentException.class, () -> {
             new RecordDetails("Test Description", null, 60);
         });
@@ -36,7 +36,7 @@ class RecordDetailsTests {
 
     @Test
     void shouldThrowExceptionWhenDurationIsZero() {
-        // Act & Assert
+
         var exception = assertThrows(IllegalArgumentException.class, () -> {
             new RecordDetails("Test Description", LocalDate.now(), 0);
         });
@@ -45,7 +45,7 @@ class RecordDetailsTests {
 
     @Test
     void shouldThrowExceptionWhenDurationIsNegative() {
-        // Act & Assert
+
         var exception = assertThrows(IllegalArgumentException.class, () -> {
             new RecordDetails("Test Description", LocalDate.now(), -10);
         });
@@ -54,15 +54,13 @@ class RecordDetailsTests {
 
     @Test
     void shouldCreateRecordDetailsWithValidData() {
-        // Arrange
+
         String description = "Annual Inspection";
         LocalDate date = LocalDate.now();
         Integer duration = 120;
 
-        // Act
         RecordDetails details = new RecordDetails(description, date, duration);
 
-        // Assert
         assertThat(details.getDescription()).isEqualTo(description);
         assertThat(details.getStartDate()).isEqualTo(date);
         assertThat(details.getExpectedDurationMinutes()).isEqualTo(duration);

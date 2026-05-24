@@ -18,7 +18,7 @@ class CompletionNotesTests {
 
     @Test
     void shouldThrowExceptionWhenNotesAreBlank() {
-        // Act & Assert
+
         var exception = assertThrows(IllegalArgumentException.class, () -> {
             new CompletionNotes("  ", LocalDate.now());
         });
@@ -27,7 +27,7 @@ class CompletionNotesTests {
 
     @Test
     void shouldThrowExceptionWhenCompletionDateIsNull() {
-        // Act & Assert
+
         var exception = assertThrows(IllegalArgumentException.class, () -> {
             new CompletionNotes("All tasks completed.", null);
         });
@@ -36,14 +36,12 @@ class CompletionNotesTests {
 
     @Test
     void shouldCreateCompletionNotesWithValidData() {
-        // Arrange
+
         String notes = "All tasks completed successfully.";
         LocalDate date = LocalDate.now();
 
-        // Act
         CompletionNotes completionNotes = new CompletionNotes(notes, date);
 
-        // Assert
         assertThat(completionNotes.getNotes()).isEqualTo(notes);
         assertThat(completionNotes.getCompletionDate()).isEqualTo(date);
     }

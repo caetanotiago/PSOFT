@@ -9,7 +9,7 @@ public class MaintenanceRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version // AC5: Impede modificações concorrentes (Optimistic Locking)
+    @Version
     private Long version;
 
     @Embedded
@@ -19,7 +19,7 @@ public class MaintenanceRecord {
     private MaintenanceComponent component;
 
     @Embedded
-    private CompletionNotes completionNotes; // Será null até ser concluído
+    private CompletionNotes completionNotes;
 
     @Column(nullable = false)
     private String aircraftRegistration;
@@ -35,7 +35,7 @@ public class MaintenanceRecord {
         this.maintenanceTemplateId = maintenanceTemplateId;
         this.recordDetails = recordDetails;
         this.component = component;
-        this.completionNotes = null; // Garante que começa como não concluído
+        this.completionNotes = null;
     }
 
     // Lógica de negócio para concluir o registo
@@ -46,7 +46,6 @@ public class MaintenanceRecord {
         this.completionNotes = notes;
     }
 
-    // Getters
     public Long getId() { return id; }
     public Long getVersion() { return version; }
     public String getAircraftRegistration() { return aircraftRegistration; }

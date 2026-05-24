@@ -30,7 +30,7 @@ class CreateMaintenanceTemplateUseCaseTests {
     @Mock
     private AircraftModelRepository aircraftModelRepository;
 
-    @Mock // A dependência que faltava no teste
+    @Mock
     private TemplateAssembler assembler;
 
     @InjectMocks
@@ -38,25 +38,21 @@ class CreateMaintenanceTemplateUseCaseTests {
 
     @Test
     void whenAllDataIsValid_shouldCreateTemplate() {
-        // Arrange
+
         String modelName = "A320";
         CreateTemplateDTO dto = new CreateTemplateDTO("A-Check", "INSPECTION", 400, 90, List.of("Task 1"), List.of(modelName));
         AircraftModel model = mock(AircraftModel.class);
         MaintenanceTemplate savedTemplate = mock(MaintenanceTemplate.class);
-        TemplateDTO expectedDto = mock(TemplateDTO.class); // O que esperamos receber
+        TemplateDTO expectedDto = mock(TemplateDTO.class);
 
         when(templateRepository.findByTemplateName(dto.getTemplateName())).thenReturn(Optional.empty());
         when(aircraftModelRepository.findByDesignationModelName(modelName)).thenReturn(Optional.of(model));
         when(templateRepository.save(any(MaintenanceTemplate.class))).thenReturn(savedTemplate);
-        
-        // Simular o assembler
+
         when(assembler.toDTO(savedTemplate)).thenReturn(expectedDto);
 
-        // Act
-        // CORREÇÃO: O tipo de retorno é TemplateDTO
         TemplateDTO result = useCase.execute(dto);
 
-        // Assert
         assertThat(result).isEqualTo(expectedDto);
         verify(templateRepository, times(1)).save(any(MaintenanceTemplate.class));
         verify(assembler, times(1)).toDTO(savedTemplate);
@@ -64,7 +60,7 @@ class CreateMaintenanceTemplateUseCaseTests {
 
     @Test
     void whenAnAircraftModelIsNotFound_shouldThrowException() {
-        // Arrange
+
         String validModelName = "A320";
         String invalidModelName = "B747-NonExistent";
         CreateTemplateDTO dto = new CreateTemplateDTO("A-Check", "INSPECTION", 400, 90, List.of(), List.of(validModelName, invalidModelName));
@@ -72,7 +68,6 @@ class CreateMaintenanceTemplateUseCaseTests {
         when(aircraftModelRepository.findByDesignationModelName(validModelName)).thenReturn(Optional.of(mock(AircraftModel.class)));
         when(aircraftModelRepository.findByDesignationModelName(invalidModelName)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThatThrownBy(() -> useCase.execute(dto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Aircraft Model '" + invalidModelName + "' not found.");
@@ -82,11 +77,10 @@ class CreateMaintenanceTemplateUseCaseTests {
 
     @Test
     void whenTemplateNameAlreadyExists_shouldThrowException() {
-        // Arrange
+
         CreateTemplateDTO dto = new CreateTemplateDTO("A-Check", "INSPECTION", 400, 90, List.of(), List.of("A320"));
         when(templateRepository.findByTemplateName(dto.getTemplateName())).thenReturn(Optional.of(mock(MaintenanceTemplate.class)));
 
-        // Act & Assert
         assertThatThrownBy(() -> useCase.execute(dto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("A template with this name already exists.");

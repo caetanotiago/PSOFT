@@ -3,7 +3,6 @@ package isep.psoft.aisafe.maintenance.dto;
 import org.springframework.hateoas.RepresentationModel;
 import java.time.LocalDate;
 
-// 1. A classe agora estende RepresentationModel!
 public class MaintenanceRecordOutputDto extends RepresentationModel<MaintenanceRecordOutputDto> {
 
     private Long id;
@@ -13,11 +12,10 @@ public class MaintenanceRecordOutputDto extends RepresentationModel<MaintenanceR
     private LocalDate startDate;
     private Integer expectedDurationMinutes;
     private String componentCategory;
-    private String completionNotes; // Pode ser null se não estiver concluído
+    private String completionNotes;
 
     public MaintenanceRecordOutputDto() {}
 
-    // Getters e Setters normais
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

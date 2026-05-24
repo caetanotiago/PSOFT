@@ -41,34 +41,30 @@ class CreateMaintenanceRecordUseCaseTests {
 
     @Test
     void whenAllDataIsValid_shouldCreateAndSaveRecord() {
-        // Arrange
+
         CreateRecordDTO dto = new CreateRecordDTO("CS-TWB", 1L, "Annual inspection", LocalDate.now(), 480, "ENGINE");
         MaintenanceRecord savedRecord = mock(MaintenanceRecord.class);
         MaintenanceRecordOutputDto outputDto = mock(MaintenanceRecordOutputDto.class);
 
-        // Simular que todas as validações passam
         when(aircraftRepository.existsByRegistrationNumber(any(RegistrationNumber.class))).thenReturn(true);
         when(templateRepository.existsById(dto.getTemplateId())).thenReturn(true);
         when(recordRepository.save(any(MaintenanceRecord.class))).thenReturn(savedRecord);
         when(assembler.toModel(savedRecord)).thenReturn(outputDto);
 
-        // Act
         MaintenanceRecordOutputDto result = useCase.execute(dto);
 
-        // Assert
         assertThat(result).isEqualTo(outputDto);
         verify(recordRepository, times(1)).save(any(MaintenanceRecord.class));
     }
 
     @Test
     void whenTemplateDoesNotExist_shouldThrowException() {
-        // Arrange
+
         CreateRecordDTO dto = new CreateRecordDTO("CS-TWB", 99L, "Non-existent template test", LocalDate.now(), 60, "AVIONICS");
         
         when(aircraftRepository.existsByRegistrationNumber(any(RegistrationNumber.class))).thenReturn(true);
         when(templateRepository.existsById(dto.getTemplateId())).thenReturn(false);
 
-        // Act & Assert
         assertThatThrownBy(() -> useCase.execute(dto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Maintenance Template with ID 99 does not exist.");
@@ -78,13 +74,11 @@ class CreateMaintenanceRecordUseCaseTests {
 
     @Test
     void whenAircraftDoesNotExist_shouldThrowException() {
-        // Arrange
+
         CreateRecordDTO dto = new CreateRecordDTO("CS-XXX", 1L, "Non-existent aircraft test", LocalDate.now(), 60, "STRUCTURE");
-        
-        // CORREÇÃO: Usar any() para o tipo correto e simular que a validação do avião falha
+
         when(aircraftRepository.existsByRegistrationNumber(any(RegistrationNumber.class))).thenReturn(false);
 
-        // Act & Assert
         assertThatThrownBy(() -> useCase.execute(dto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Aircraft with registration CS-XXX does not exist.");

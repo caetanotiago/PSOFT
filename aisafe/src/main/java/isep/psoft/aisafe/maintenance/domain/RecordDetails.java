@@ -10,7 +10,7 @@ public class RecordDetails {
     private LocalDate startDate;
     private Integer expectedDurationMinutes;
 
-    protected RecordDetails() {} // Exigido pelo JPA
+    protected RecordDetails() {}
 
     public RecordDetails(String description, LocalDate startDate, Integer expectedDurationMinutes) {
         if (description == null || description.trim().isEmpty()) {

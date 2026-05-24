@@ -32,24 +32,19 @@ public class CreateMaintenanceRecordUseCase {
     @Transactional
     public MaintenanceRecordOutputDto execute(CreateRecordDTO dto) {
 
-        // 1. Criar o Value Object da matrícula (isto valida o formato)
         RegistrationNumber regNum = new RegistrationNumber(dto.getAircraftRegistration());
 
-        // 2. Verificar se a Aeronave existe pela matrícula
         if (!aircraftRepository.existsByRegistrationNumber(regNum)) {
             throw new IllegalArgumentException("Aircraft with registration " + dto.getAircraftRegistration() + " does not exist.");
         }
 
-        // 3. Verificar se o Template existe pelo ID
         if (!templateRepository.existsById(dto.getTemplateId())) {
             throw new IllegalArgumentException("Maintenance Template with ID " + dto.getTemplateId() + " does not exist.");
         }
 
-        // 4. Criar os outros Value Objects
         RecordDetails details = new RecordDetails(dto.getDescription(), dto.getStartDate(), dto.getExpectedDurationMinutes());
         MaintenanceComponent component = new MaintenanceComponent(dto.getComponentCategory());
 
-        // 5. Criar a Entidade e Gravar
         MaintenanceRecord newRecord = new MaintenanceRecord(
                 dto.getAircraftRegistration(),
                 dto.getTemplateId(),
@@ -59,7 +54,6 @@ public class CreateMaintenanceRecordUseCase {
 
         MaintenanceRecord savedRecord = recordRepository.save(newRecord);
 
-        // 6. Converter para DTO e retornar
         return assembler.toModel(savedRecord);
     }
 }
