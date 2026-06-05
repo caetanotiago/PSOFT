@@ -8,7 +8,9 @@ import isep.psoft.aisafe.airports.repositories.AirportRepository;
 import isep.psoft.aisafe.domain.user.Role;
 import isep.psoft.aisafe.domain.user.SystemUser;
 import isep.psoft.aisafe.domain.user.SystemUserRepository;
+import isep.psoft.aisafe.maintenance.domain.MaintenanceInterval;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
+import isep.psoft.aisafe.maintenance.domain.TemplateType;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
 
 import org.springframework.boot.CommandLineRunner;
@@ -17,20 +19,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class Bootstrapper implements CommandLineRunner {
 
     private final SystemUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    // Declarar os repositórios aqui
     private final AircraftModelRepository aircraftModelRepository;
     private final AircraftRepository aircraftRepository;
     private final AirportRepository airportRepository;
     private final MaintenanceTemplateRepository maintenanceTemplateRepository;
 
-    // Adicionar os repositórios ao construtor para injeção automática
-    public Bootstrapper(SystemUserRepository userRepository, 
+    public Bootstrapper(SystemUserRepository userRepository,
                         PasswordEncoder passwordEncoder,
                         AircraftModelRepository aircraftModelRepository,
                         AircraftRepository aircraftRepository,
@@ -45,6 +46,7 @@ public class Bootstrapper implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
         System.out.println("A iniciar o Bootstrapping de dados...");
 
@@ -60,13 +62,13 @@ public class Bootstrapper implements CommandLineRunner {
             System.out.println("Utilizador 'atcc' criado com sucesso.");
         }
 
-        // Criar Utilizador Backoffice Operator (WP#1A e WP#2A)
+        // Criar Utilizador Backoffice Operator
         if (userRepository.findByUsername("backoffice").isEmpty()) {
             userRepository.save(new SystemUser("backoffice", passwordEncoder.encode("bo123"), Role.BACKOFFICE_OPERATOR));
             System.out.println("Utilizador 'backoffice' criado com sucesso.");
         }
 
-        // Criar Supervisor e Técnico de Manutenção (WP#4A)
+        // Criar Supervisor e Técnico de Manutenção
         if (userRepository.findByUsername("supervisor").isEmpty()) {
             userRepository.save(new SystemUser("supervisor", passwordEncoder.encode("sup123"), Role.MAINTENANCE_SUPERVISOR));
             System.out.println("Utilizador 'supervisor' criado com sucesso.");
@@ -92,32 +94,43 @@ public class Bootstrapper implements CommandLineRunner {
             System.out.println("WP#1A: Aircraft Models injetados.");
         }
 
-        
+        // Aeronaves Físicas - Injetar Avião para Manutenção
         if (aircraftRepository.count() == 0) {
+            AircraftModel modeloBase = aircraftModelRepository.findAll().iterator().next();
 
-            
-
+            // CORREÇÃO 1: Adicionado o 5º argumento (AircraftStatus)
+            Aircraft aircraft = new Aircraft(
+                    new RegistrationNumber("CS-TVA"),
+                    modeloBase,
+                    new ManufacturingDate(LocalDate.of(2020, 1, 1)),
+                    new SeatingCapacity(150),
+                    new AircraftStatus("ACTIVE") // Assumindo que o construtor recebe uma String
+            );
+            aircraftRepository.save(aircraft);
+            System.out.println("WP#1A: Aeronave 'CS-TVA' injetada.");
         }
-        
 
-        // Aeroportos (WP#2A) 
+        // Aeroportos (WP#2A)
         if (airportRepository.count() == 0) {
-            
-            
+            System.out.println("WP#2A: Aeroportos ignorados.");
+        }
 
-            System.out.println("WP#2A: Aeroportos injetados.");
-        } 
-
-        // Manutenção (WP#4A) 
+        // Manutenção (WP#4A) - A TUA PARTE!
         if (maintenanceTemplateRepository.count() == 0) {
+            AircraftModel modeloBase = aircraftModelRepository.findAll().iterator().next();
 
-            
-            
+            // CORREÇÃO 2: Mudado de ROUTINE para INSPECTION
+            MaintenanceTemplate template = new MaintenanceTemplate(
+                    "Annual Inspection",
+                    TemplateType.INSPECTION,
+                    new MaintenanceInterval(500, 365),
+                    List.of("Check Engines", "Check Landing Gear", "Update Flight Software"),
+                    List.of(modeloBase)
+            );
+            maintenanceTemplateRepository.save(template);
             System.out.println("WP#4A: Maintenance Templates injetados.");
         }
 
-        System.out.println("Bootstrapping concluído com sucesso!");
-    
-
+        System.out.println("✅ Bootstrapping concluído com sucesso!");
     }
 }
