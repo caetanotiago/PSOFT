@@ -3,7 +3,7 @@ package isep.psoft.aisafe;
 import isep.psoft.aisafe.aircraftmanagement.domain.*;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftModelRepository;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
-import isep.psoft.aisafe.airports.domain.Airport;
+import isep.psoft.aisafe.airports.domain.*;
 import isep.psoft.aisafe.airports.repositories.AirportRepository;
 import isep.psoft.aisafe.domain.user.Role;
 import isep.psoft.aisafe.domain.user.SystemUser;
@@ -112,7 +112,35 @@ public class Bootstrapper implements CommandLineRunner {
 
         // Aeroportos (WP#2A)
         if (airportRepository.count() == 0) {
-            System.out.println("WP#2A: Aeroportos ignorados.");
+            airportRepository.save(new Airport(
+                new IATACode("LIS"),
+                new AirportDetails("Humberto Delgado", "Lisboa", "Portugal", "Europa", "Europe/Lisbon",
+                    new Coordinates(38.7756, -9.1354)),
+                AirportState.OPERATIONAL,
+                List.of(new Runway("03", 3805.0, "N"), new Runway("21", 3805.0, "S"))
+            ));
+            airportRepository.save(new Airport(
+                new IATACode("OPO"),
+                new AirportDetails("Francisco Sá Carneiro", "Porto", "Portugal", "Europa", "Europe/Lisbon",
+                    new Coordinates(41.2481, -8.6814)),
+                AirportState.OPERATIONAL,
+                List.of(new Runway("17", 3480.0, "N"), new Runway("35", 3480.0, "S"))
+            ));
+            airportRepository.save(new Airport(
+                new IATACode("FAO"),
+                new AirportDetails("Faro", "Faro", "Portugal", "Europa", "Europe/Lisbon",
+                    new Coordinates(37.0144, -7.9659)),
+                AirportState.OPERATIONAL,
+                List.of(new Runway("10", 2490.0, "E"))
+            ));
+            airportRepository.save(new Airport(
+                new IATACode("MAD"),
+                new AirportDetails("Adolfo Suárez Madrid-Barajas", "Madrid", "Espanha", "Europa", "Europe/Madrid",
+                    new Coordinates(40.4936, -3.5668)),
+                AirportState.OPERATIONAL,
+                List.of(new Runway("18L", 4350.0, "N"), new Runway("32R", 4100.0, "NW"))
+            ));
+            System.out.println("WP#2A: Aeroportos LIS, OPO, FAO, MAD injetados.");
         }
 
         // Manutenção (WP#4A) - A TUA PARTE!
