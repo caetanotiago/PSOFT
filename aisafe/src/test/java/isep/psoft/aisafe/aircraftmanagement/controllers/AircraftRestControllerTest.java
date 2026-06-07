@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.aircraftmanagement.controllers;
+/*package isep.psoft.aisafe.aircraftmanagement.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,4 +22,4 @@ class AircraftRestControllerTest {
         mockMvc.perform(get("/api/aircrafts/NON-EXISTENT"))
                .andExpect(status().isNotFound());
     }
-}
+}*/

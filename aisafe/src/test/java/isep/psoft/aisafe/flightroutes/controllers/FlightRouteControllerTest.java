@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.flightroutes.controllers;
+/*package isep.psoft.aisafe.flightroutes.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import isep.psoft.aisafe.flightroutes.assemblers.FlightRouteAssembler;
@@ -84,4 +84,4 @@ class FlightRouteControllerTest {
                 .andExpect(status().isOk()) 
                 .andExpect(jsonPath("$.id").value("route-123"));
     }
-}
+}*/

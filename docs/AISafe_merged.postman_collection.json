@@ -326,223 +326,52 @@
       ]
     },
     {
-      "name": "Maintenance",
+      "name": "Forum",
       "item": [
         {
-          "name": "US115A — Create a Maintenance Record",
+          "name": "Create a new post",
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
-            "url": "{{baseUrl}}/api/maintenance-records",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"aircraftRegistration\": \"CS-TUA\",\n  \"technicianNotes\": \"Initial inspection\",\n  \"plannedDateTime\": \"2024-05-20T10:00:00Z\",\n  \"maintenanceType\": \"A_CHECK\"\n}"
-            }
-          }
-        },
-        {
-          "name": "US116 — View Maintenance Records of a Specific Aircraft",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-records/aircraft/CS-TUA"
-          }
-        },
-        {
-          "name": "US117 — View Total Maintenance Hours for the Fleet",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-records/fleet/maintenance-hours"
-          }
-        },
-        {
-          "name": "US119 — Complete a Maintenance Record",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
-              { "key": "If-Match", "value": "\"1\"" }
-            ],
-            "url": "{{baseUrl}}/api/maintenance-records/1/complete",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"actualStartDateTime\": \"2024-05-20T10:05:00Z\",\n  \"actualEndDateTime\": \"2024-05-20T11:00:00Z\",\n  \"interventionDescription\": \"Completed all checks.\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Get Maintenance Record by ID",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-records/1"
-          }
-        },
-        {
-          "name": "US115 — Create a Maintenance Template",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/maintenance-templates",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"A-Check Template\",\n  \"description\": \"Standard A-Check for A320\",\n  \"tasks\": [\n    { \"description\": \"Inspect landing gear\" },\n    { \"description\": \"Check fluid levels\" }\n  ]\n}"
-            }
-          }
-        },
-        {
-          "name": "Get Maintenance Template by ID",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-templates/1"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Flight Routes",
-      "item": [
-        {
-          "name": "US110 — Create a Flight Route",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/routes",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"originIata\": \"LIS\",\n  \"destinationIata\": \"OPO\",\n  \"airlineCode\": \"TP\",\n  \"flightNumber\": \"1970\"\n}"
-            }
-          }
-        },
-        {
-          "name": "US113 — Get Flight Route by ID",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/routes/LIS-OPO-TP1970"
-          }
-        },
-        {
-          "name": "US114 — Search Flight Routes",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+              "raw": "{\n    \"title\": \"New Post Title\",\n    \"content\": \"This is the content of the new post.\",\n    \"author\": \"John Doe\"\n}"
+            },
             "url": {
-              "raw": "{{baseUrl}}/api/routes/search?origin=LIS&dest=OPO",
-              "query": [
-                { "key": "origin", "value": "LIS" },
-                { "key": "dest", "value": "OPO" }
+              "raw": "{{baseUrl}}/forum/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "forum",
+                "posts"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "US112 — Update a Flight Route",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/routes/LIS-OPO-TP1970",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"INACTIVE\"\n}"
-            }
-          }
-        },
-        {
-          "name": "US111 — Get Flight Route History",
+          "name": "Get all posts",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/routes/LIS-OPO-TP1970/history"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Aircraft Management",
-      "item": [
-        {
-          "name": "Create Aircraft",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/aircrafts",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"registrationNumber\": \"CS-TUA\",\n  \"modelName\": \"A320\",\n  \"manufacturer\": \"Airbus\",\n  \"capacity\": 180\n}"
-            }
-          }
-        },
-        {
-          "name": "Get Aircraft by Registration Number",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/aircrafts/CS-TUA"
-          }
-        },
-        {
-          "name": "Search Aircrafts",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/aircrafts?model=A320&status=ACTIVE&year=2020",
-              "query": [
-                { "key": "model", "value": "A320" },
-                { "key": "status", "value": "ACTIVE" },
-                { "key": "year", "value": "2020" }
+              "raw": "{{baseUrl}}/forum/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "forum",
+                "posts"
               ]
             }
-          }
-        },
-        {
-          "name": "Update Aircraft Status",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/aircrafts/CS-TUA/status",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"INACTIVE\",\n  \"version\": 1\n}"
-            }
-          }
-        },
-        {
-          "name": "Create Aircraft Model",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/aircraft-models",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"modelName\": \"A320\",\n  \"manufacturer\": \"Airbus\",\n  \"capacity\": 180,\n  \"engineType\": \"Jet\",\n  \"maxSpeed\": 871\n}"
-            }
-          }
+          },
+          "response": []
         }
       ]
     }

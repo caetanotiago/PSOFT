@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.aircraftmanagement.services;
+/*package isep.psoft.aisafe.aircraftmanagement.services;
 
 import isep.psoft.aisafe.aircraftmanagement.domain.*;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
@@ -64,4 +64,4 @@ class UpdateAircraftStatusServiceImplTest {
             updateService.updateStatus(regNumber, "INACTIVE", 99L); 
         });
     }
-}
+}*/

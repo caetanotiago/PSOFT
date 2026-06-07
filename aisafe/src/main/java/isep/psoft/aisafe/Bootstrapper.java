@@ -143,11 +143,10 @@ public class Bootstrapper implements CommandLineRunner {
             System.out.println("WP#2A: Aeroportos LIS, OPO, FAO, MAD injetados.");
         }
 
-        // Manutenção (WP#4A) - A TUA PARTE!
+        // Manutenção (WP#4A)
         if (maintenanceTemplateRepository.count() == 0) {
             AircraftModel modeloBase = aircraftModelRepository.findAll().iterator().next();
 
-            // CORREÇÃO 2: Mudado de ROUTINE para INSPECTION
             MaintenanceTemplate template = new MaintenanceTemplate(
                     "Annual Inspection",
                     TemplateType.INSPECTION,

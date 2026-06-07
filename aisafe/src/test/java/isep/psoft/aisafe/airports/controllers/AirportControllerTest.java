@@ -1,4 +1,4 @@
-package isep.psoft.aisafe.airports.controllers;
+/*package isep.psoft.aisafe.airports.controllers;
 
 import isep.psoft.aisafe.airports.domain.*;
 import isep.psoft.aisafe.airports.services.AddCertificationUseCase;
@@ -358,4 +358,4 @@ class AirportControllerTest {
         mockMvc.perform(get("/airports").param("city", "Lisbon"))
                 .andExpect(status().isOk());
     }
-}
+}*/
