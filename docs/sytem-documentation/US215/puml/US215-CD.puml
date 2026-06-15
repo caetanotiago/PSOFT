@@ -1,0 +1,42 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class FlightRouteController <<Controller>> {
+        + getNetworkTotalDistance() : ResponseEntity<NetworkDistanceDTO>
+    }
+    class NetworkDistanceDTO <<DTO>> {
+        + totalDistanceKm : Double
+    }
+}
+
+package "Application" {
+    class CalculateNetworkDistanceService <<Service>> {
+        + calculateTotalDistance() : NetworkDistanceDTO
+    }
+}
+
+package "Domain" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - distance : RouteDistance
+        - status : RouteStatus
+    }
+}
+
+package "Persistence" {
+    interface FlightRouteRepository <<Repository>> {
+        + sumActiveRoutesDistance() : Double
+    }
+}
+
+' Relationships
+FlightRouteController ..> NetworkDistanceDTO : returns
+FlightRouteController --> CalculateNetworkDistanceService : uses
+
+CalculateNetworkDistanceService --> FlightRouteRepository : uses
+CalculateNetworkDistanceService ..> NetworkDistanceDTO : creates
+
+FlightRouteRepository ..> FlightRoute : aggregates
+
+@enduml

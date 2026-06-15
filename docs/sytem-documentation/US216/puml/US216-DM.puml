@@ -1,0 +1,32 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam hide empty members
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+    }
+}
+
+package "Flight Route & Schedule Aggregate" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - distance : RouteDistance
+        - status : RouteStatus
+    }
+    class RouteDistance <<Value Object>> {
+        - distance : Double
+    }
+
+    FlightRoute *-- RouteDistance
+    FlightRoute --> Airport : origin >
+    FlightRoute --> Airport : destination >
+
+    note bottom of FlightRoute
+        An alternative route (itinerary) is a chain of
+        active FlightRoutes connecting two airports
+        via one or more stopovers.
+    end note
+}
+@enduml

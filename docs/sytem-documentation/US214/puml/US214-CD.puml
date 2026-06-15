@@ -1,0 +1,69 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class FlightRouteController <<Controller>> {
+        + listActiveRoutes(sortBy : String, pageable : Pageable) : ResponseEntity<List<FlightRouteDTO>>
+    }
+    class FlightRouteDTO <<DTO>> {
+        + routeID : String
+        + originIATA : String
+        + destIATA : String
+        + distance : Double
+        + usageCount : Long
+    }
+    class FlightRouteAssembler <<Component>> {
+        + toDTOList(routes : List<RouteUsage>) : List<FlightRouteDTO>
+    }
+}
+
+package "Application" {
+    class ListActiveRoutesService <<Service>> {
+        + listActiveRoutes(sortBy : String, pageable : Pageable) : List<RouteUsage>
+        - resolveStrategy(sortBy : String) : RouteSortStrategy
+    }
+    interface RouteSortStrategy <<Strategy>> {
+        + sort(routes : List<RouteUsage>) : List<RouteUsage>
+    }
+    class PopularitySortStrategy <<Strategy>> {
+        + sort(routes : List<RouteUsage>) : List<RouteUsage>
+    }
+    class DistanceSortStrategy <<Strategy>> {
+        + sort(routes : List<RouteUsage>) : List<RouteUsage>
+    }
+}
+
+package "Domain" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - distance : RouteDistance
+        - status : RouteStatus
+    }
+    class RouteUsage <<Value Object>> {
+        - route : FlightRoute
+        - usageCount : Long
+    }
+}
+
+package "Persistence" {
+    interface FlightRouteRepository <<Repository>> {
+        + findActiveRoutesWithUsage() : List<RouteUsage>
+    }
+}
+
+' Relationships
+FlightRouteController ..> FlightRouteDTO : returns
+FlightRouteController --> ListActiveRoutesService : uses
+FlightRouteController --> FlightRouteAssembler : uses
+
+ListActiveRoutesService --> FlightRouteRepository : uses
+ListActiveRoutesService --> RouteSortStrategy : uses
+RouteSortStrategy <|.. PopularitySortStrategy
+RouteSortStrategy <|.. DistanceSortStrategy
+ListActiveRoutesService ..> RouteUsage : handles
+
+FlightRouteRepository ..> RouteUsage : produces
+RouteUsage --> FlightRoute : wraps
+FlightRouteAssembler ..> FlightRouteDTO : creates
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": ScheduledFlightController" as Ctrl <<Controller>>
+participant ": CreateScheduledFlightService" as Service <<Service>>
+participant "aircraftRepo : AircraftRepository" as AircraftRepo <<Repository>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant "route : FlightRoute" as Route <<Entity>>
+participant "sfRepo : ScheduledFlightRepository" as SfRepo <<Repository>>
+participant ": ScheduledFlightFactory" as Factory <<Component>>
+participant "flight : ScheduledFlight" as Flight <<Entity>>
+participant ": ScheduledFlightAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : POST /api/scheduled-flights (CreateScheduledFlightDTO)
+activate Ctrl
+
+Ctrl -> Service : create(CreateScheduledFlightDTO)
+activate Service
+
+Service -> AircraftRepo : findById(registration)
+activate AircraftRepo
+AircraftRepo --> Service : aircraft
+deactivate AircraftRepo
+
+Service -> RouteRepo : findById(routeID)
+activate RouteRepo
+RouteRepo --> Service : route
+deactivate RouteRepo
+
+' Information Expert: the route knows its own requirements
+Service -> Route : isCompliant(aircraft)
+activate Route
+Route --> Service : true
+deactivate Route
+
+' Aircraft availability (status + no overlapping flight)
+Service -> SfRepo : existsOverlappingFlight(aircraft, schedule)
+activate SfRepo
+SfRepo --> Service : false
+deactivate SfRepo
+
+' Creator: factory instantiates the aggregate and its Value Objects
+Service -> Factory : create(aircraft, route, schedule)
+activate Factory
+Factory -> Flight ** : new ScheduledFlight(aircraft, route, schedule, SCHEDULED)
+Factory --> Service : flight
+deactivate Factory
+
+Service -> SfRepo : save(flight)
+activate SfRepo
+SfRepo --> Service : savedFlight
+deactivate SfRepo
+
+Service --> Ctrl : savedFlight
+deactivate Service
+
+Ctrl -> Assembler : toDTO(savedFlight)
+activate Assembler
+Assembler --> Ctrl : scheduledFlightDTO
+deactivate Assembler
+
+Ctrl --> ATCC : 201 Created (scheduledFlightDTO)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

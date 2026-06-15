@@ -1,0 +1,53 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": FlightRouteController" as Ctrl <<Controller>>
+participant ": ListActiveRoutesService" as Service <<Service>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant "popularity : PopularitySortStrategy" as Pop <<Strategy>>
+participant "distance : DistanceSortStrategy" as Dist <<Strategy>>
+participant ": FlightRouteAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : GET /api/routes/active?sortBy={popularity|distance}
+activate Ctrl
+
+Ctrl -> Service : listActiveRoutes(sortBy, pageable)
+activate Service
+
+' Validate the sort criterion (400 Bad Request if invalid)
+Service -> Service : validate(sortBy)
+
+Service -> RouteRepo : findActiveRoutesWithUsage()
+activate RouteRepo
+RouteRepo --> Service : List<RouteUsage>
+deactivate RouteRepo
+
+' Strategy Pattern: the concrete algorithm is resolved from the sortBy parameter
+alt sortBy == "popularity"
+    Service -> Pop : sort(routeUsages)
+    activate Pop
+    Pop --> Service : sortedRouteUsages
+    deactivate Pop
+else sortBy == "distance"
+    Service -> Dist : sort(routeUsages)
+    activate Dist
+    Dist --> Service : sortedRouteUsages
+    deactivate Dist
+end
+
+Service --> Ctrl : sortedRouteUsages
+deactivate Service
+
+Ctrl -> Assembler : toDTOList(sortedRouteUsages)
+activate Assembler
+Assembler --> Ctrl : routeDTOList
+deactivate Assembler
+
+Ctrl --> ATCC : 200 OK (routeDTOList)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

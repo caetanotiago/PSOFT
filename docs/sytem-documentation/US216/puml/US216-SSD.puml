@@ -1,0 +1,13 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+participant "System" as SYS
+
+activate ATCC
+ATCC -> SYS : GET /api/routes/alternatives?origin={iata}&dest={iata}
+activate SYS
+
+SYS --> ATCC : 200 OK (list of alternative itineraries)
+deactivate SYS
+deactivate ATCC
+@enduml

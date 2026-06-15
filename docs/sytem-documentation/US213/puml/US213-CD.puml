@@ -1,0 +1,51 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class ScheduledFlightController <<Controller>> {
+        + getScheduledFlightsByAircraft(registration : String, pageable : Pageable) : ResponseEntity<Page<ScheduledFlightDTO>>
+    }
+    class ScheduledFlightDTO <<DTO>> {
+        + id : String
+        + routeID : String
+        + date : LocalDate
+        + time : LocalTime
+        + status : String
+    }
+    class ScheduledFlightAssembler <<Component>> {
+        + toDTOPage(flights : Page<ScheduledFlight>) : Page<ScheduledFlightDTO>
+    }
+}
+
+package "Application" {
+    class ViewScheduledFlightsByAircraftService <<Service>> {
+        + viewByAircraft(registration : String, pageable : Pageable) : Page<ScheduledFlight>
+    }
+}
+
+package "Domain" {
+    class ScheduledFlight <<Entity>> <<Root>> {
+        - flightSchedule : FlightSchedule
+        - flightStatus : FlightStatus
+    }
+}
+
+package "Persistence" {
+    interface ScheduledFlightRepository <<Repository>> {
+        + findByAircraftRegistration(registration : String, pageable : Pageable) : Page<ScheduledFlight>
+    }
+}
+
+' Relationships
+ScheduledFlightController ..> ScheduledFlightDTO : returns
+ScheduledFlightController --> ViewScheduledFlightsByAircraftService : uses
+ScheduledFlightController --> ScheduledFlightAssembler : uses
+
+ViewScheduledFlightsByAircraftService --> ScheduledFlightRepository : uses
+ViewScheduledFlightsByAircraftService ..> ScheduledFlight : retrieves
+
+ScheduledFlightRepository ..> ScheduledFlight : persists/loads
+ScheduledFlightAssembler ..> ScheduledFlightDTO : creates
+
+@enduml

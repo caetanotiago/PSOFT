@@ -1,0 +1,31 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": FlightRouteController" as Ctrl <<Controller>>
+participant ": CalculateNetworkDistanceService" as Service <<Service>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant ": NetworkDistanceDTO" as DTO <<DTO>>
+
+activate ATCC
+
+ATCC -> Ctrl : GET /api/routes/network/total-distance
+activate Ctrl
+
+Ctrl -> Service : calculateTotalDistance()
+activate Service
+
+Service -> RouteRepo : sumActiveRoutesDistance()
+activate RouteRepo
+RouteRepo --> Service : Double (totalKm)
+deactivate RouteRepo
+
+Service -> DTO ** : new NetworkDistanceDTO(totalKm)
+Service --> Ctrl : NetworkDistanceDTO
+deactivate Service
+
+Ctrl --> ATCC : 200 OK (NetworkDistanceDTO)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

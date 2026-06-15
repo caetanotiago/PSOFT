@@ -1,0 +1,35 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": ScheduledFlightController" as Ctrl <<Controller>>
+participant ": ViewScheduledFlightsByAircraftService" as Service <<Service>>
+participant "sfRepo : ScheduledFlightRepository" as SfRepo <<Repository>>
+participant ": ScheduledFlightAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : GET /api/scheduled-flights?aircraft=reg
+activate Ctrl
+
+Ctrl -> Service : viewByAircraft(registration, pageable)
+activate Service
+
+Service -> SfRepo : findByAircraftRegistration(registration, pageable)
+activate SfRepo
+SfRepo --> Service : Page<ScheduledFlight>
+deactivate SfRepo
+
+Service --> Ctrl : Page<ScheduledFlight>
+deactivate Service
+
+Ctrl -> Assembler : toDTOPage(flights)
+activate Assembler
+Assembler --> Ctrl : Page<ScheduledFlightDTO>
+deactivate Assembler
+
+Ctrl --> ATCC : 200 OK (paginated scheduledFlightDTOs)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

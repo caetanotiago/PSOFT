@@ -1,0 +1,27 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam hide empty members
+skinparam classAttributeIconSize 0
+
+package "Flight Route & Schedule Aggregate" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - routeID : RouteID
+        - distance : RouteDistance
+        - status : RouteStatus
+    }
+    class RouteDistance <<Value Object>> {
+        - distance : Double
+    }
+    class RouteStatus <<Value Object>> {
+        - state : String
+    }
+
+    FlightRoute *-- RouteDistance
+    FlightRoute *-- RouteStatus
+
+    note bottom of FlightRoute
+        Network total distance =
+        SUM(distance) for routes with status = ACTIVE
+    end note
+}
+@enduml

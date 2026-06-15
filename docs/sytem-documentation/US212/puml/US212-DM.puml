@@ -1,0 +1,54 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam hide empty members
+skinparam classAttributeIconSize 0
+
+package "Aircraft Aggregate" {
+    class Aircraft <<Entity>> <<Root>> {
+        - registrationNumber : RegistrationNumber
+        - status : AircraftStatus
+        - seatingCapacity : SeatingCapacity
+        - model : AircraftModel
+    }
+}
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+        - status : AirportStatus
+    }
+}
+
+package "Flight Route & Schedule Aggregate" {
+    class ScheduledFlight <<Entity>> <<Root>> {
+        - flightSchedule : FlightSchedule
+        - flightStatus : FlightStatus
+        - version : Long
+    }
+    class FlightSchedule <<Value Object>> {
+        - date : LocalDate
+        - time : LocalTime
+    }
+    class FlightStatus <<Value Object>> {
+        - state : String
+    }
+    class FlightRoute <<Entity>> {
+        - routeID : RouteID
+        - requirements : RouteRequirements
+        - status : RouteStatus
+    }
+    class RouteRequirements <<Value Object>> {
+        - minRange : Double
+        - minCapacity : Integer
+    }
+
+    ScheduledFlight *-- FlightSchedule
+    ScheduledFlight *-- FlightStatus
+    ScheduledFlight *-- FlightRoute
+    FlightRoute *-- RouteRequirements
+
+    ScheduledFlight --> Aircraft : uses >
+    FlightRoute --> Airport : origin >
+    FlightRoute --> Airport : destination >
+}
+@enduml

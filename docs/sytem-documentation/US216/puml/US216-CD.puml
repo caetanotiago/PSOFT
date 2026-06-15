@@ -1,0 +1,63 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class FlightRouteController <<Controller>> {
+        + searchAlternativeRoutes(origin : String, dest : String) : ResponseEntity<List<ItineraryDTO>>
+    }
+    class ItineraryDTO <<DTO>> {
+        + legs : List<RouteLegDTO>
+        + numberOfStops : Integer
+        + totalDistance : Double
+    }
+    class ItineraryAssembler <<Component>> {
+        + toDTOList(itineraries : List<Itinerary>) : List<ItineraryDTO>
+    }
+}
+
+package "Application" {
+    class SearchAlternativeRoutesService <<Service>> {
+        + searchAlternatives(origin : String, dest : String) : List<Itinerary>
+    }
+    interface RouteSearchStrategy <<Strategy>> {
+        + search(routes : List<FlightRoute>, origin : String, dest : String) : List<Itinerary>
+    }
+    class MinStopsRouteSearch <<Strategy>> {
+        + search(routes : List<FlightRoute>, origin : String, dest : String) : List<Itinerary>
+    }
+}
+
+package "Domain" {
+    class FlightRoute <<Entity>> <<Root>> {
+        - distance : RouteDistance
+        - status : RouteStatus
+    }
+    class Itinerary <<Value Object>> {
+        - legs : List<FlightRoute>
+        - numberOfStops : Integer
+        - totalDistance : Double
+    }
+}
+
+package "Persistence" {
+    interface FlightRouteRepository <<Repository>> {
+        + findAllActive() : List<FlightRoute>
+    }
+}
+
+' Relationships
+FlightRouteController ..> ItineraryDTO : returns
+FlightRouteController --> SearchAlternativeRoutesService : uses
+FlightRouteController --> ItineraryAssembler : uses
+
+SearchAlternativeRoutesService --> FlightRouteRepository : uses
+SearchAlternativeRoutesService --> RouteSearchStrategy : uses
+RouteSearchStrategy <|.. MinStopsRouteSearch
+SearchAlternativeRoutesService ..> Itinerary : produces
+
+Itinerary --> FlightRoute : chains
+FlightRouteRepository ..> FlightRoute : persists/loads
+ItineraryAssembler ..> ItineraryDTO : creates
+
+@enduml

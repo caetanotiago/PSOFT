@@ -1,0 +1,33 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam hide empty members
+skinparam classAttributeIconSize 0
+
+package "Aircraft Aggregate" {
+    class Aircraft <<Entity>> <<Root>> {
+        - registrationNumber : RegistrationNumber
+    }
+}
+
+package "Flight Route & Schedule Aggregate" {
+    class ScheduledFlight <<Entity>> <<Root>> {
+        - flightSchedule : FlightSchedule
+        - flightStatus : FlightStatus
+    }
+    class FlightSchedule <<Value Object>> {
+        - date : LocalDate
+        - time : LocalTime
+    }
+    class FlightStatus <<Value Object>> {
+        - state : String
+    }
+    class FlightRoute <<Entity>> {
+        - routeID : RouteID
+    }
+
+    ScheduledFlight *-- FlightSchedule
+    ScheduledFlight *-- FlightStatus
+    ScheduledFlight *-- FlightRoute
+    ScheduledFlight --> Aircraft : uses >
+}
+@enduml

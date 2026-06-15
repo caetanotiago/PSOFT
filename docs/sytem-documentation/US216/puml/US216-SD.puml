@@ -1,0 +1,42 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant ": FlightRouteController" as Ctrl <<Controller>>
+participant ": SearchAlternativeRoutesService" as Service <<Service>>
+participant "routeRepo : FlightRouteRepository" as RouteRepo <<Repository>>
+participant "strategy : RouteSearchStrategy" as Strategy <<Strategy>>
+participant ": ItineraryAssembler" as Assembler <<Component>>
+
+activate ATCC
+
+ATCC -> Ctrl : GET /api/routes/alternatives?origin=X&dest=Y
+activate Ctrl
+
+Ctrl -> Service : searchAlternatives(origin, dest)
+activate Service
+
+Service -> RouteRepo : findAllActive()
+activate RouteRepo
+RouteRepo --> Service : List<FlightRoute>
+deactivate RouteRepo
+
+' Delegate to the pluggable algorithm (Strategy Pattern)
+Service -> Strategy : search(activeRoutes, origin, dest)
+activate Strategy
+Strategy --> Service : List<Itinerary>
+deactivate Strategy
+
+Service --> Ctrl : List<Itinerary>
+deactivate Service
+
+Ctrl -> Assembler : toDTOList(itineraries)
+activate Assembler
+Assembler --> Ctrl : List<ItineraryDTO>
+deactivate Assembler
+
+Ctrl --> ATCC : 200 OK (itineraryDTOs)
+deactivate Ctrl
+deactivate ATCC
+
+@enduml

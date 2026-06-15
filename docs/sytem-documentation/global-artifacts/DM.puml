@@ -154,6 +154,17 @@ package "Flight Route & Schedule Aggregate" {
     ScheduledFlight --> Aircraft : uses >
     FlightRoute --> Airport : origin >
     FlightRoute --> Airport : destination >
+
+    note bottom of ScheduledFlight
+        Route Popularity (Usage Count) is a derived metric:
+        number of ScheduledFlight per FlightRoute (US214).
+    end note
+
+    note bottom of FlightRoute
+        An Alternative Route (Itinerary) is a derived query result:
+        a chain of active FlightRoutes connecting two airports
+        via one or more stopovers (US216).
+    end note
 }
 
 package "Maintenance Aggregate" {

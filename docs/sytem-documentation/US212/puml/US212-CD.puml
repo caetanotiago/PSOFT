@@ -1,0 +1,93 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Presentation" {
+    class ScheduledFlightController <<Controller>> {
+        + createScheduledFlight(dto : CreateScheduledFlightDTO) : ResponseEntity<ScheduledFlightDTO>
+    }
+    class CreateScheduledFlightDTO <<DTO>> {
+        + aircraftRegistration : String
+        + routeID : String
+        + date : LocalDate
+        + time : LocalTime
+    }
+    class ScheduledFlightDTO <<DTO>> {
+        + id : String
+        + aircraftRegistration : String
+        + routeID : String
+        + date : LocalDate
+        + time : LocalTime
+        + status : String
+    }
+    class ScheduledFlightAssembler <<Component>> {
+        + toDTO(flight : ScheduledFlight) : ScheduledFlightDTO
+    }
+}
+
+package "Application" {
+    class CreateScheduledFlightService <<Service>> {
+        + create(dto : CreateScheduledFlightDTO) : ScheduledFlight
+    }
+    class ScheduledFlightFactory <<Component>> {
+        + create(aircraft : Aircraft, route : FlightRoute, schedule : FlightSchedule) : ScheduledFlight
+    }
+}
+
+package "Domain" {
+    class ScheduledFlight <<Entity>> <<Root>> {
+        - flightSchedule : FlightSchedule
+        - flightStatus : FlightStatus
+        - version : Long
+    }
+    class FlightSchedule <<Value Object>> {
+        - date : LocalDate
+        - time : LocalTime
+    }
+    class FlightStatus <<Value Object>> {
+        - state : String
+    }
+    class FlightRoute <<Entity>> <<Root>> {
+        - requirements : RouteRequirements
+        + isCompliant(aircraft : Aircraft) : boolean
+    }
+    class Aircraft <<Entity>> <<Root>> {
+        - status : AircraftStatus
+        - seatingCapacity : SeatingCapacity
+    }
+
+    ScheduledFlight *-- FlightSchedule
+    ScheduledFlight *-- FlightStatus
+    ScheduledFlight --> FlightRoute : on >
+    ScheduledFlight --> Aircraft : uses >
+}
+
+package "Persistence" {
+    interface ScheduledFlightRepository <<Repository>> {
+        + save(flight : ScheduledFlight) : ScheduledFlight
+        + existsOverlappingFlight(reg : String, schedule : FlightSchedule) : boolean
+    }
+    interface FlightRouteRepository <<Repository>> {
+        + findById(id : String) : Optional<FlightRoute>
+    }
+    interface AircraftRepository <<Repository>> {
+        + findById(reg : String) : Optional<Aircraft>
+    }
+}
+
+' Relationships
+ScheduledFlightController ..> CreateScheduledFlightDTO : receives
+ScheduledFlightController ..> ScheduledFlightDTO : returns
+ScheduledFlightController --> CreateScheduledFlightService : uses
+ScheduledFlightController --> ScheduledFlightAssembler : uses
+
+CreateScheduledFlightService --> ScheduledFlightFactory : uses
+CreateScheduledFlightService --> ScheduledFlightRepository : uses
+CreateScheduledFlightService --> FlightRouteRepository : uses
+CreateScheduledFlightService --> AircraftRepository : uses
+ScheduledFlightFactory ..> ScheduledFlight : creates
+
+ScheduledFlightRepository ..> ScheduledFlight : persists/loads
+ScheduledFlightAssembler ..> ScheduledFlightDTO : creates
+
+@enduml
