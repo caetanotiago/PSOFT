@@ -4,6 +4,7 @@ import isep.psoft.aisafe.airports.domain.AirportNotFoundException;
 import isep.psoft.aisafe.airports.domain.DuplicateIATACodeException;
 import isep.psoft.aisafe.airports.domain.InvalidStatusTransitionException;
 import isep.psoft.aisafe.airports.domain.ModelAlreadyCertifiedException;
+import isep.psoft.aisafe.flightroutes.domain.RouteRequirementsNotMetException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -98,5 +99,15 @@ public class GlobalExceptionHandler {
         Map<String, String> response = new HashMap<>();
         response.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // --- EXCEÇÕES DO WP#3B (Flight Operations) ---
+
+    // Aeronave não cumpre os requisitos da rota (alcance/capacidade) → 422 Unprocessable Entity
+    @ExceptionHandler(RouteRequirementsNotMetException.class)
+    public ResponseEntity<Map<String, String>> handleRouteRequirementsNotMet(RouteRequirementsNotMetException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
     }
 }

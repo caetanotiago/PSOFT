@@ -23,4 +23,12 @@ public class RouteRequirements {
         this.minRange = minRange;
         this.minCapacity = minCapacity;
     }
+
+    /**
+     * Information Expert (US212): the requirements know whether an aircraft with the
+     * given range and seating capacity is allowed to operate this route.
+     */
+    public boolean isMetBy(double aircraftRange, int aircraftCapacity) {
+        return aircraftRange >= this.minRange && aircraftCapacity >= this.minCapacity;
+    }
 }

@@ -1,16 +1,26 @@
 package isep.psoft.aisafe.flightroutes.controllers;
 
 import isep.psoft.aisafe.flightroutes.assemblers.FlightRouteAssembler;
+import isep.psoft.aisafe.flightroutes.assemblers.ItineraryAssembler;
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
+import isep.psoft.aisafe.flightroutes.domain.Itinerary;
 import isep.psoft.aisafe.flightroutes.domain.RouteHistory;
+import isep.psoft.aisafe.flightroutes.domain.RouteUsage;
 import isep.psoft.aisafe.flightroutes.dto.CreateRouteDTO;
 import isep.psoft.aisafe.flightroutes.dto.FlightRouteDTO;
+import isep.psoft.aisafe.flightroutes.dto.ItineraryDTO;
+import isep.psoft.aisafe.flightroutes.dto.NetworkDistanceDTO;
 import isep.psoft.aisafe.flightroutes.dto.RouteHistoryDTO;
 import isep.psoft.aisafe.flightroutes.dto.UpdateRouteDTO;
+import isep.psoft.aisafe.flightroutes.services.CalculateNetworkDistanceService;
 import isep.psoft.aisafe.flightroutes.services.CreateFlightRouteService;
 import isep.psoft.aisafe.flightroutes.services.GetRouteHistoryService;
+import isep.psoft.aisafe.flightroutes.services.ListActiveRoutesService;
+import isep.psoft.aisafe.flightroutes.services.SearchAlternativeRoutesService;
 import isep.psoft.aisafe.flightroutes.services.SearchFlightRoutesService;
 import isep.psoft.aisafe.flightroutes.services.UpdateFlightRouteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,14 +32,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/routes")
 @RequiredArgsConstructor
+@Tag(name = "Flight Routes", description = "Route management and operations (WP#3A & WP#3B)")
 public class FlightRouteController {
 
     private final CreateFlightRouteService createService;
     private final UpdateFlightRouteService updateService;
     private final GetRouteHistoryService historyService;
     private final SearchFlightRoutesService searchService;
-    
+
+    // WP#3B (US214/US215/US216)
+    private final ListActiveRoutesService listActiveRoutesService;
+    private final CalculateNetworkDistanceService networkDistanceService;
+    private final SearchAlternativeRoutesService searchAlternativeRoutesService;
+
     private final FlightRouteAssembler assembler;
+    private final ItineraryAssembler itineraryAssembler;
 
     // US110: Criar Rota
     @PostMapping
@@ -56,6 +73,32 @@ public class FlightRouteController {
         
         List<FlightRoute> routes = searchService.searchRoutes(origin, dest);
         return ResponseEntity.ok(assembler.toDTOList(routes));
+    }
+
+    // US214: Listar rotas ativas ordenadas por popularidade ou distância
+    @GetMapping("/active")
+    @Operation(summary = "US214 — List active routes sorted by popularity or distance")
+    public ResponseEntity<List<FlightRouteDTO>> listActiveRoutes(
+            @RequestParam(defaultValue = "popularity") String sortBy) {
+        List<RouteUsage> usages = listActiveRoutesService.listActiveRoutes(sortBy);
+        return ResponseEntity.ok(assembler.toDTOWithUsageList(usages));
+    }
+
+    // US215: Distância total da rede (rotas ativas)
+    @GetMapping("/network/total-distance")
+    @Operation(summary = "US215 — Calculate the total distance covered by all routes in the network")
+    public ResponseEntity<NetworkDistanceDTO> getNetworkTotalDistance() {
+        return ResponseEntity.ok(networkDistanceService.calculateTotalDistance());
+    }
+
+    // US216: Pesquisar rotas alternativas entre dois aeroportos
+    @GetMapping("/alternatives")
+    @Operation(summary = "US216 — Search for alternative routes (itineraries) between two airports")
+    public ResponseEntity<List<ItineraryDTO>> searchAlternativeRoutes(
+            @RequestParam String origin,
+            @RequestParam String dest) {
+        List<Itinerary> itineraries = searchAlternativeRoutesService.searchAlternatives(origin, dest);
+        return ResponseEntity.ok(itineraryAssembler.toDTOList(itineraries));
     }
 
     // US112: Atualizar ou Desativar uma rota

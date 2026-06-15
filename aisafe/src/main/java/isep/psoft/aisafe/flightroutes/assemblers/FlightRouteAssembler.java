@@ -2,6 +2,7 @@ package isep.psoft.aisafe.flightroutes.assemblers;
 
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
 import isep.psoft.aisafe.flightroutes.domain.RouteHistory;
+import isep.psoft.aisafe.flightroutes.domain.RouteUsage;
 import isep.psoft.aisafe.flightroutes.dto.FlightRouteDTO;
 import isep.psoft.aisafe.flightroutes.dto.RouteHistoryDTO;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,17 @@ public class FlightRouteAssembler {
 
     public List<FlightRouteDTO> toDTOList(List<FlightRoute> routes) {
         return routes.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    // US214 - inclui a contagem de utilização (popularidade) no DTO
+    public FlightRouteDTO toDTOWithUsage(RouteUsage routeUsage) {
+        FlightRouteDTO dto = toDTO(routeUsage.getRoute());
+        dto.setUsageCount(routeUsage.getUsageCount());
+        return dto;
+    }
+
+    public List<FlightRouteDTO> toDTOWithUsageList(List<RouteUsage> usages) {
+        return usages.stream().map(this::toDTOWithUsage).collect(Collectors.toList());
     }
 
     public RouteHistoryDTO toHistoryDTO(RouteHistory history) {

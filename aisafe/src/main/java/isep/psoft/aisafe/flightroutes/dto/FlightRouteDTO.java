@@ -14,4 +14,5 @@ public class FlightRouteDTO {
     private Integer minCapacity;
     private Integer estimatedFlightTime;
     private String status;
+    private Long usageCount; // US214 - popularidade (nº de voos agendados); null quando não aplicável
 }

@@ -35,7 +35,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/h2-console/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml",
+                                "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         
                         // Regras do WP#1A (Aircraft Models)
                         .requestMatchers(HttpMethod.POST,  "/api/aircraft-models").hasRole("BACKOFFICE_OPERATOR")
@@ -54,7 +55,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,  "/api/routes").hasRole("ATCC")
                         .requestMatchers(HttpMethod.PATCH, "/api/routes/*").hasAnyRole("ATCC", "BACKOFFICE_OPERATOR")
                         .requestMatchers(HttpMethod.GET,   "/api/routes/**").hasRole("ATCC")
-                        
+
+                        //Regras para o WP#3B (Scheduled Flights / Flight Operations)
+                        .requestMatchers(HttpMethod.POST,  "/api/scheduled-flights").hasRole("ATCC")
+                        .requestMatchers(HttpMethod.GET,   "/api/scheduled-flights/**").hasRole("ATCC")
+
                         // Regras do WP#4A (Maintenance Templates & Records)
                         .requestMatchers(HttpMethod.POST,  "/api/maintenance-templates").hasRole("BACKOFFICE_OPERATOR")
                         .requestMatchers(HttpMethod.GET,   "/api/maintenance-templates/**").hasAnyRole("BACKOFFICE_OPERATOR", "MAINTENANCE_SUPERVISOR")
