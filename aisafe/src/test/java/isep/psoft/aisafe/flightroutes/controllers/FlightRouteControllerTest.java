@@ -3,7 +3,11 @@ package isep.psoft.aisafe.flightroutes.controllers;
 import isep.psoft.aisafe.flightroutes.assemblers.FlightRouteAssembler;
 import isep.psoft.aisafe.flightroutes.assemblers.ItineraryAssembler;
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
+import isep.psoft.aisafe.flightroutes.domain.Itinerary;
+import isep.psoft.aisafe.flightroutes.domain.RouteUsage;
 import isep.psoft.aisafe.flightroutes.dto.FlightRouteDTO;
+import isep.psoft.aisafe.flightroutes.dto.ItineraryDTO;
+import isep.psoft.aisafe.flightroutes.dto.NetworkDistanceDTO;
 import isep.psoft.aisafe.flightroutes.dto.RouteHistoryDTO;
 import isep.psoft.aisafe.flightroutes.services.CalculateNetworkDistanceService;
 import isep.psoft.aisafe.flightroutes.services.CreateFlightRouteService;
@@ -247,5 +251,103 @@ class FlightRouteControllerTest {
     void search_routes_returns_403_for_wrong_role() throws Exception {
         mockMvc.perform(get("/api/routes/search"))
                 .andExpect(status().isForbidden());
+    }
+
+    // ─── US214 — GET /api/routes/active ───────────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void list_active_routes_returns_200() throws Exception {
+        FlightRouteDTO dto = sampleDTO();
+        dto.setUsageCount(3L);
+        when(listActiveRoutesService.listActiveRoutes("popularity"))
+                .thenReturn(List.of(mock(RouteUsage.class)));
+        when(assembler.toDTOWithUsageList(any())).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/routes/active").param("sortBy", "popularity"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].usageCount").value(3));
+    }
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void list_active_routes_uses_default_sort_when_no_param() throws Exception {
+        when(listActiveRoutesService.listActiveRoutes("popularity"))
+                .thenReturn(List.of(mock(RouteUsage.class)));
+        when(assembler.toDTOWithUsageList(any())).thenReturn(List.of(sampleDTO()));
+
+        mockMvc.perform(get("/api/routes/active"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void list_active_routes_returns_400_on_invalid_sortBy() throws Exception {
+        when(listActiveRoutesService.listActiveRoutes("xpto"))
+                .thenThrow(new IllegalArgumentException("Invalid sortBy value"));
+
+        mockMvc.perform(get("/api/routes/active").param("sortBy", "xpto"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void list_active_routes_returns_401_without_token() throws Exception {
+        mockMvc.perform(get("/api/routes/active"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles = "MAINTENANCE_TECHNICIAN")
+    void list_active_routes_returns_403_for_wrong_role() throws Exception {
+        mockMvc.perform(get("/api/routes/active"))
+                .andExpect(status().isForbidden());
+    }
+
+    // ─── US215 — GET /api/routes/network/total-distance ───────────────────────
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void network_total_distance_returns_200() throws Exception {
+        when(networkDistanceService.calculateTotalDistance())
+                .thenReturn(new NetworkDistanceDTO(1012.0));
+
+        mockMvc.perform(get("/api/routes/network/total-distance"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalDistanceKm").value(1012.0));
+    }
+
+    // ─── US216 — GET /api/routes/alternatives ─────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void alternatives_returns_200_with_list() throws Exception {
+        ItineraryDTO itinerary = new ItineraryDTO();
+        itinerary.setNumberOfStops(1);
+        itinerary.setTotalDistance(734.0);
+        when(searchAlternativeRoutesService.searchAlternatives("LIS", "MAD"))
+                .thenReturn(List.of(mock(Itinerary.class)));
+        when(itineraryAssembler.toDTOList(any())).thenReturn(List.of(itinerary));
+
+        mockMvc.perform(get("/api/routes/alternatives").param("origin", "LIS").param("dest", "MAD"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].numberOfStops").value(1))
+                .andExpect(jsonPath("$[0].totalDistance").value(734.0));
+    }
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void alternatives_returns_404_when_airport_missing() throws Exception {
+        when(searchAlternativeRoutesService.searchAlternatives(anyString(), anyString()))
+                .thenThrow(new jakarta.persistence.EntityNotFoundException("Airport not found"));
+
+        mockMvc.perform(get("/api/routes/alternatives").param("origin", "XXX").param("dest", "MAD"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void alternatives_returns_400_when_required_params_missing() throws Exception {
+        mockMvc.perform(get("/api/routes/alternatives").param("origin", "LIS"))
+                .andExpect(status().isBadRequest());
     }
 }
