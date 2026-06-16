@@ -49,7 +49,10 @@ public class FlightRouteAssembler {
         RouteHistoryDTO dto = new RouteHistoryDTO();
         dto.setChangeDate(history.getChangeDate().toString());
         dto.setDescription(history.getDescription());
-        dto.setPreviousDistance(history.getPreviousDistance());
+        dto.setPreviousMinRange(history.getPreviousMinRange());
+        dto.setPreviousMinCapacity(history.getPreviousMinCapacity());
+        dto.setPreviousEstimatedFlightTime(history.getPreviousEstimatedFlightTime());
+        dto.setPreviousStatus(history.getPreviousStatus());
         return dto;
     }
 

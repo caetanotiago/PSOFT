@@ -22,15 +22,19 @@ class FlightRouteTest {
         int initialHistorySize = route.getHistoryLog().size();
         assertEquals(1, initialHistorySize);
 
-        // Act
-        RouteRequirements newReqs = new RouteRequirements(600.0, 200);
-        EstimatedFlightTime newTime = new EstimatedFlightTime(75);
-        route.updateDetails(newReqs, newTime);
+        // Act — atualização parcial (só capacidade e tempo); minRange fica inalterado.
+        route.updateDetails(null, 200, 75);
 
         // Assert
         assertEquals(initialHistorySize + 1, route.getHistoryLog().size());
         assertEquals(200, route.getRequirements().getMinCapacity());
-        assertEquals("Route requirements/time updated.", route.getHistoryLog().get(1).getDescription());
+        assertEquals(500.0, route.getRequirements().getMinRange());
+        RouteHistory record = route.getHistoryLog().get(1);
+        assertEquals("Route details updated.", record.getDescription());
+        // Histórico dinâmico: só os atributos alterados têm "previous"; minRange não mudou.
+        assertNull(record.getPreviousMinRange());
+        assertEquals(150, record.getPreviousMinCapacity());
+        assertEquals(60, record.getPreviousEstimatedFlightTime());
     }
 
     @Test
@@ -42,11 +46,41 @@ class FlightRouteTest {
                                             new RouteRequirements(500.0, 150), new EstimatedFlightTime(60));
         
         // Act
-        route.deactivate();
+        route.changeStatus("INACTIVE");
 
         // Assert
         assertEquals("INACTIVE", route.getStatus().getState());
         assertEquals(2, route.getHistoryLog().size());
-        assertEquals("Route deactivated.", route.getHistoryLog().get(1).getDescription());
+        RouteHistory record = route.getHistoryLog().get(1);
+        assertEquals("Route deactivated.", record.getDescription());
+        assertEquals("ACTIVE", record.getPreviousStatus());
+    }
+
+    @Test
+    void ensureReactivatingRouteWorks() {
+        Airport mockOrigin = mock(Airport.class);
+        Airport mockDest = mock(Airport.class);
+        FlightRoute route = new FlightRoute(mockOrigin, mockDest, new RouteDistance(300.0),
+                                            new RouteRequirements(500.0, 150), new EstimatedFlightTime(60));
+        route.changeStatus("INACTIVE");
+
+        // Act — reativar
+        route.changeStatus("ACTIVE");
+
+        // Assert
+        assertEquals("ACTIVE", route.getStatus().getState());
+        assertEquals("Route activated.", route.getHistoryLog().get(2).getDescription());
+        assertEquals("INACTIVE", route.getHistoryLog().get(2).getPreviousStatus());
+    }
+
+    @Test
+    void ensureChangingToSameStatusThrows() {
+        Airport mockOrigin = mock(Airport.class);
+        Airport mockDest = mock(Airport.class);
+        FlightRoute route = new FlightRoute(mockOrigin, mockDest, new RouteDistance(300.0),
+                                            new RouteRequirements(500.0, 150), new EstimatedFlightTime(60));
+
+        // Rota nasce ACTIVE → tentar ativar de novo deve falhar.
+        assertThrows(IllegalStateException.class, () -> route.changeStatus("ACTIVE"));
     }
 }

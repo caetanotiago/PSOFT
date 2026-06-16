@@ -1,10 +1,9 @@
 package isep.psoft.aisafe.flightroutes.services;
 
-import isep.psoft.aisafe.flightroutes.domain.EstimatedFlightTime;
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
-import isep.psoft.aisafe.flightroutes.domain.RouteRequirements;
 import isep.psoft.aisafe.flightroutes.dto.UpdateRouteDTO;
 import isep.psoft.aisafe.flightroutes.repositories.FlightRouteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,23 +16,21 @@ public class UpdateFlightRouteService {
 
     @Transactional
     public FlightRoute updateRoute(String id, UpdateRouteDTO dto) {
-        
-        // Procurar a Rota
-        FlightRoute route = routeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Flight Route not found: " + id));
 
-        // Verificar se é para desativar
-        if ("INACTIVE".equalsIgnoreCase(dto.getStatus())) {
-            route.deactivate();
-        } 
-        // Ou se é para atualizar detalhes operacionais
-        else if (dto.getMinRange() != null && dto.getMinCapacity() != null && dto.getEstimatedFlightTime() != null) {
-            RouteRequirements newReqs = new RouteRequirements(dto.getMinRange(), dto.getMinCapacity());
-            EstimatedFlightTime newTime = new EstimatedFlightTime(dto.getEstimatedFlightTime());
-            route.updateDetails(newReqs, newTime);
+        // Procurar a Rota (404 se não existir)
+        FlightRoute route = routeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Flight Route not found: " + id));
+
+        // Atualização parcial dos detalhes operacionais (qualquer subconjunto dos campos).
+        if (dto.getMinRange() != null || dto.getMinCapacity() != null || dto.getEstimatedFlightTime() != null) {
+            route.updateDetails(dto.getMinRange(), dto.getMinCapacity(), dto.getEstimatedFlightTime());
         }
 
-        
+        // Mudança de estado (ativar/desativar) — pode vir no mesmo pedido que os detalhes.
+        if (dto.getStatus() != null) {
+            route.changeStatus(dto.getStatus());
+        }
+
         return routeRepository.save(route);
     }
 }

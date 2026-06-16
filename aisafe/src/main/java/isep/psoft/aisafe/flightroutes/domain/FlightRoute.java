@@ -54,23 +54,64 @@ public class FlightRoute {
         this.requirements = requirements;
         this.estimatedFlightTime = estimatedFlightTime;
         this.status = RouteStatus.active(); // Uma rota nasce sempre ativa
-        
+
         // Regista a criação no histórico (US111)
-        this.historyLog.add(new RouteHistory("Route created.", distance.getDistance()));
+        this.historyLog.add(RouteHistory.created());
     }
 
-    // US112 (Update) 
-    public void updateDetails(RouteRequirements newRequirements, EstimatedFlightTime newTime) {
-        this.requirements = newRequirements;
-        this.estimatedFlightTime = newTime;
-        
-        // Adiciona automaticamente o registo de histórico
-        this.historyLog.add(new RouteHistory("Route requirements/time updated.", this.distance.getDistance()));
+    // US112 (Update) — atualização parcial dos detalhes operacionais.
+    // Cada parâmetro a null = atributo não alterado. Regista no histórico apenas os valores
+    // anteriores dos atributos efetivamente alterados (US111 — histórico dinâmico).
+    public void updateDetails(Double newMinRange, Integer newMinCapacity, Integer newTime) {
+        Double effMinRange = this.requirements.getMinRange();
+        Integer effMinCapacity = this.requirements.getMinCapacity();
+        Integer effTime = this.estimatedFlightTime.getDurationMinutes();
+
+        Double prevMinRange = null;
+        Integer prevMinCapacity = null;
+        Integer prevTime = null;
+
+        if (newMinRange != null && !newMinRange.equals(effMinRange)) {
+            prevMinRange = effMinRange;
+            effMinRange = newMinRange;
+        }
+        if (newMinCapacity != null && !newMinCapacity.equals(effMinCapacity)) {
+            prevMinCapacity = effMinCapacity;
+            effMinCapacity = newMinCapacity;
+        }
+        if (newTime != null && !newTime.equals(effTime)) {
+            prevTime = effTime;
+            effTime = newTime;
+        }
+
+        // Nada mudou de facto → não altera estado nem regista histórico.
+        if (prevMinRange == null && prevMinCapacity == null && prevTime == null) {
+            return;
+        }
+
+        this.requirements = new RouteRequirements(effMinRange, effMinCapacity);
+        this.estimatedFlightTime = new EstimatedFlightTime(effTime);
+        this.historyLog.add(RouteHistory.detailsUpdated(prevMinRange, prevMinCapacity, prevTime));
     }
 
-    // US112 (Deactivate)
-    public void deactivate() {
-        this.status = RouteStatus.inactive();
-        this.historyLog.add(new RouteHistory("Route deactivated.", this.distance.getDistance()));
+    // US112 (Activate/Deactivate) — "deactivate a route" = mudar o status para INACTIVE.
+    public void changeStatus(String newState) {
+        String current = this.status.getState();
+
+        if ("INACTIVE".equalsIgnoreCase(newState)) {
+            if ("INACTIVE".equalsIgnoreCase(current)) {
+                throw new IllegalStateException("Route is already INACTIVE.");
+            }
+            this.status = RouteStatus.inactive();
+            this.historyLog.add(RouteHistory.statusChanged(current, "Route deactivated."));
+        } else if ("ACTIVE".equalsIgnoreCase(newState)) {
+            if ("ACTIVE".equalsIgnoreCase(current)) {
+                throw new IllegalStateException("Route is already ACTIVE.");
+            }
+            this.status = RouteStatus.active();
+            this.historyLog.add(RouteHistory.statusChanged(current, "Route activated."));
+        } else {
+            throw new IllegalArgumentException("Invalid status: " + newState + " (must be ACTIVE or INACTIVE).");
+        }
     }
 }
