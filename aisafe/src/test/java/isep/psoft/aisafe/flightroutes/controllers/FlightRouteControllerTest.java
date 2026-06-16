@@ -1,87 +1,251 @@
-/*package isep.psoft.aisafe.flightroutes.controllers;
+package isep.psoft.aisafe.flightroutes.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import isep.psoft.aisafe.flightroutes.assemblers.FlightRouteAssembler;
+import isep.psoft.aisafe.flightroutes.assemblers.ItineraryAssembler;
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
-import isep.psoft.aisafe.flightroutes.dto.CreateRouteDTO;
 import isep.psoft.aisafe.flightroutes.dto.FlightRouteDTO;
-import isep.psoft.aisafe.flightroutes.services.*;
-import isep.psoft.aisafe.infrastructure.security.JwtAuthenticationFilter;
+import isep.psoft.aisafe.flightroutes.dto.RouteHistoryDTO;
+import isep.psoft.aisafe.flightroutes.services.CalculateNetworkDistanceService;
+import isep.psoft.aisafe.flightroutes.services.CreateFlightRouteService;
+import isep.psoft.aisafe.flightroutes.services.GetRouteHistoryService;
+import isep.psoft.aisafe.flightroutes.services.ListActiveRoutesService;
+import isep.psoft.aisafe.flightroutes.services.SearchAlternativeRoutesService;
+import isep.psoft.aisafe.flightroutes.services.SearchFlightRoutesService;
+import isep.psoft.aisafe.flightroutes.services.UpdateFlightRouteService;
+import isep.psoft.aisafe.infrastructure.security.JwtTokenProvider;
+import isep.psoft.aisafe.infrastructure.security.SecurityConfig;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean; 
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(
-    controllers = FlightRouteController.class,
-    excludeAutoConfiguration = {SecurityAutoConfiguration.class},
-    excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class)
-)
+@WebMvcTest(FlightRouteController.class)
+@Import(SecurityConfig.class)
 class FlightRouteControllerTest {
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private MockMvc mockMvc;
 
-    // NOVO PADRÃO NO SPRING BOOT 4: @MockitoBean
+    // Colaboradores Phase 1 (testados)
     @MockitoBean private CreateFlightRouteService createService;
     @MockitoBean private UpdateFlightRouteService updateService;
     @MockitoBean private GetRouteHistoryService historyService;
     @MockitoBean private SearchFlightRoutesService searchService;
     @MockitoBean private FlightRouteAssembler assembler;
 
+    // Colaboradores WP#3B — apenas mockados para o contexto arrancar (testados na Phase 2)
+    @MockitoBean private ListActiveRoutesService listActiveRoutesService;
+    @MockitoBean private CalculateNetworkDistanceService networkDistanceService;
+    @MockitoBean private SearchAlternativeRoutesService searchAlternativeRoutesService;
+    @MockitoBean private ItineraryAssembler itineraryAssembler;
+
+    // Exigidos pelo JwtAuthenticationFilter que a slice MVC instancia
+    @MockitoBean private JwtTokenProvider jwtTokenProvider;
+    @MockitoBean private UserDetailsService userDetailsService;
+
+    private static final String VALID_BODY = """
+            { "originIATA":"LIS", "destIATA":"OPO", "minRange":500.0, "minCapacity":150, "estimatedFlightTime":50 }""";
+
+    private FlightRouteDTO sampleDTO() {
+        FlightRouteDTO dto = new FlightRouteDTO();
+        dto.setId("route-123");
+        dto.setOriginIATA("LIS");
+        dto.setDestIATA("OPO");
+        dto.setStatus("ACTIVE");
+        return dto;
+    }
+
+    // ─── US110 — POST /api/routes ─────────────────────────────────────────────
+
     @Test
-    void ensureCreateRouteReturns201Created() throws Exception {
-        // Arrange
-        CreateRouteDTO requestDto = new CreateRouteDTO();
-        requestDto.setOriginIATA("LIS");
-        requestDto.setDestIATA("OPO");
-        requestDto.setMinRange(300.0);
-        requestDto.setMinCapacity(100);
-        requestDto.setEstimatedFlightTime(50);
+    @WithMockUser(roles = "ATCC")
+    void post_route_returns_201_with_body() throws Exception {
+        when(createService.createRoute(any())).thenReturn(mock(FlightRoute.class));
+        when(assembler.toDTO(any())).thenReturn(sampleDTO());
 
-        FlightRouteDTO responseDto = new FlightRouteDTO();
-        responseDto.setId("route-123");
-        responseDto.setOriginIATA("LIS");
-        responseDto.setDestIATA("OPO");
-
-        when(createService.createRoute(any(CreateRouteDTO.class))).thenReturn(null);
-        when(assembler.toDTO(any())).thenReturn(responseDto);
-
-        // Act & Assert
         mockMvc.perform(post("/api/routes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isCreated()) 
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(VALID_BODY))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value("route-123"))
                 .andExpect(jsonPath("$.originIATA").value("LIS"));
     }
 
     @Test
-    void ensureGetRouteByIdReturns200Ok() throws Exception {
-        // Arrange
-        FlightRouteDTO responseDto = new FlightRouteDTO();
-        responseDto.setId("route-123");
-        responseDto.setOriginIATA("LIS");
+    @WithMockUser(roles = "ATCC")
+    void post_route_returns_400_on_invalid_body() throws Exception {
+        // Falta o originIATA (e outros campos obrigatórios) → falha de validação @Valid
+        mockMvc.perform(post("/api/routes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"destIATA\":\"OPO\"}"))
+                .andExpect(status().isBadRequest());
+    }
 
-        when(searchService.getRouteById("route-123")).thenReturn(null);
-        when(assembler.toDTO(any())).thenReturn(responseDto);
+    @Test
+    void post_route_returns_401_without_token() throws Exception {
+        mockMvc.perform(post("/api/routes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(VALID_BODY))
+                .andExpect(status().isUnauthorized());
+    }
 
-        // Act & Assert
-        mockMvc.perform(get("/api/routes/route-123")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()) 
+    @Test
+    @WithMockUser(roles = "BACKOFFICE_OPERATOR")
+    void post_route_returns_403_for_non_atcc_role() throws Exception {
+        // POST /api/routes é exclusivo do ATCC
+        mockMvc.perform(post("/api/routes")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(VALID_BODY))
+                .andExpect(status().isForbidden());
+    }
+
+    // ─── US112 — PATCH /api/routes/{id} ───────────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void patch_route_returns_200() throws Exception {
+        when(updateService.updateRoute(eq("route-123"), any())).thenReturn(mock(FlightRoute.class));
+        when(assembler.toDTO(any())).thenReturn(sampleDTO());
+
+        mockMvc.perform(patch("/api/routes/route-123")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"minCapacity\":180}"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("route-123"));
     }
-}*/
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void patch_route_returns_409_on_same_status() throws Exception {
+        when(updateService.updateRoute(eq("route-123"), any()))
+                .thenThrow(new IllegalStateException("Route is already ACTIVE."));
+
+        mockMvc.perform(patch("/api/routes/route-123")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"ACTIVE\"}"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void patch_route_returns_400_on_invalid_status() throws Exception {
+        when(updateService.updateRoute(eq("route-123"), any()))
+                .thenThrow(new IllegalArgumentException("Invalid status: FOO"));
+
+        mockMvc.perform(patch("/api/routes/route-123")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"FOO\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void patch_route_returns_404_when_not_found() throws Exception {
+        when(updateService.updateRoute(eq("missing"), any()))
+                .thenThrow(new EntityNotFoundException("Flight Route not found: missing"));
+
+        mockMvc.perform(patch("/api/routes/missing")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"minCapacity\":180}"))
+                .andExpect(status().isNotFound());
+    }
+
+    // ─── US113 — GET /api/routes/{id} ─────────────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void get_route_by_id_returns_200() throws Exception {
+        when(searchService.getRouteById("route-123")).thenReturn(mock(FlightRoute.class));
+        when(assembler.toDTO(any())).thenReturn(sampleDTO());
+
+        mockMvc.perform(get("/api/routes/route-123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("route-123"));
+    }
+
+    @Test
+    void get_route_by_id_returns_401_without_token() throws Exception {
+        mockMvc.perform(get("/api/routes/route-123"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    // ─── US111 — GET /api/routes/{id}/history ─────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void get_route_history_returns_200_with_list() throws Exception {
+        RouteHistoryDTO created = new RouteHistoryDTO();
+        created.setChangeDate("2026-06-16T10:00:00");
+        created.setDescription("Route created.");
+        RouteHistoryDTO updated = new RouteHistoryDTO();
+        updated.setChangeDate("2026-06-16T10:05:00");
+        updated.setDescription("Route details updated.");
+        updated.setPreviousMinCapacity(150);
+
+        when(historyService.getRouteHistory("route-123")).thenReturn(List.of());
+        when(assembler.toHistoryDTOList(any())).thenReturn(List.of(created, updated));
+
+        mockMvc.perform(get("/api/routes/route-123/history"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].description").value("Route created."))
+                .andExpect(jsonPath("$[1].previousMinCapacity").value(150));
+    }
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void get_route_history_returns_404_when_route_not_found() throws Exception {
+        when(historyService.getRouteHistory("missing"))
+                .thenThrow(new EntityNotFoundException("Flight Route not found: missing"));
+
+        mockMvc.perform(get("/api/routes/missing/history"))
+                .andExpect(status().isNotFound());
+    }
+
+    // ─── US114 — GET /api/routes/search ───────────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "ATCC")
+    void search_routes_returns_200() throws Exception {
+        when(searchService.searchRoutes(anyString(), anyString())).thenReturn(List.of(mock(FlightRoute.class)));
+        when(assembler.toDTOList(any())).thenReturn(List.of(sampleDTO()));
+
+        mockMvc.perform(get("/api/routes/search").param("origin", "LIS").param("dest", "OPO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("route-123"));
+    }
+
+    @Test
+    @WithMockUser(roles = "MAINTENANCE_TECHNICIAN")
+    void search_routes_returns_403_for_wrong_role() throws Exception {
+        mockMvc.perform(get("/api/routes/search"))
+                .andExpect(status().isForbidden());
+    }
+}

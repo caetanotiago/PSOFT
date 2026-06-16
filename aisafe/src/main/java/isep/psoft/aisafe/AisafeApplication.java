@@ -2,10 +2,11 @@ package isep.psoft.aisafe;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+// Nota: @EnableJpaRepositories explícito foi removido por ser redundante — o @SpringBootApplication
+// já ativa os repositórios JPA (a partir deste pacote) via auto-configuração. Mantê-lo forçava o JPA
+// mesmo em slices @WebMvcTest (sem datasource), quebrando os testes de controller.
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "isep.psoft.aisafe")
 public class AisafeApplication {
 
 	public static void main(String[] args) {
