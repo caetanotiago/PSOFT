@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**", "/h2-console/**").permitAll()
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml",
                                 "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        
+
                         // Regras do WP#1A (Aircraft Models)
                         .requestMatchers(HttpMethod.POST,  "/api/aircraft-models").hasRole("BACKOFFICE_OPERATOR")
                         .requestMatchers(HttpMethod.GET,   "/api/aircraft-models/**").hasAnyRole("BACKOFFICE_OPERATOR", "ATCC")
@@ -64,9 +64,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,  "/api/maintenance-templates").hasRole("BACKOFFICE_OPERATOR")
                         .requestMatchers(HttpMethod.GET,   "/api/maintenance-templates/**").hasAnyRole("BACKOFFICE_OPERATOR", "MAINTENANCE_SUPERVISOR")
                         .requestMatchers(HttpMethod.POST,  "/api/maintenance-records").hasAnyRole("MAINTENANCE_SUPERVISOR", "MAINTENANCE_TECHNICIAN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/maintenance-records/*").hasAnyRole("MAINTENANCE_SUPERVISOR", "MAINTENANCE_TECHNICIAN")
+
+                        // CORREÇÃO FEITA AQUI: Mudei de /* para /**
+                        .requestMatchers(HttpMethod.PATCH, "/api/maintenance-records/**").hasAnyRole("MAINTENANCE_SUPERVISOR", "MAINTENANCE_TECHNICIAN")
+
                         .requestMatchers(HttpMethod.GET,   "/api/maintenance-records/**").hasAnyRole("MAINTENANCE_SUPERVISOR", "MAINTENANCE_TECHNICIAN", "ATCC")
-                        
+
                         .anyRequest().authenticated()
                 )
                 // Return 401 (not 403) when an unauthenticated request hits a protected endpoint.

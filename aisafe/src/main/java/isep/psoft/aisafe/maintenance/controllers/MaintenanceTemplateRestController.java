@@ -24,7 +24,8 @@ public class MaintenanceTemplateRestController {
     private ViewMaintenanceTemplateByIdUseCase viewByIdUseCase;
 
     @PostMapping
-    @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
+    // CORREÇÃO: Passou para BACKOFFICE_OPERATOR para não chocar com o SecurityConfig
+    @PreAuthorize("hasRole('BACKOFFICE_OPERATOR')")
     public ResponseEntity<TemplateDTO> createTemplate(@Valid @RequestBody CreateTemplateDTO createDto) {
 
         TemplateDTO responseDto = createUseCase.execute(createDto);
@@ -38,7 +39,8 @@ public class MaintenanceTemplateRestController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
+    // CORREÇÃO: Passou para BACKOFFICE_OPERATOR ou SUPERVISOR
+    @PreAuthorize("hasRole('BACKOFFICE_OPERATOR') or hasRole('MAINTENANCE_SUPERVISOR')")
     public ResponseEntity<TemplateDTO> getTemplateById(@PathVariable Long id) {
         return viewByIdUseCase.execute(id)
                 .map(ResponseEntity::ok)

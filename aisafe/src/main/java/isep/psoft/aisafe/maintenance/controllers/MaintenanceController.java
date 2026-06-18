@@ -50,12 +50,12 @@ public class MaintenanceController {
      * US116: View Maintenance Records of a Specific Aircraft
      */
     @GetMapping("/aircraft/{registration}")
-    @PreAuthorize("hasRole('MAINTENANCE_MANAGER')")
+    // CORREÇÃO: O teu Bootstrapper não cria nenhum MANAGER. Tem de ser SUPERVISOR ou TECHNICIAN.
+    @PreAuthorize("hasRole('MAINTENANCE_SUPERVISOR') or hasRole('MAINTENANCE_TECHNICIAN')")
     public ResponseEntity<List<MaintenanceRecordOutputDto>> getRecordsByAircraft(@PathVariable String registration) {
         List<MaintenanceRecordOutputDto> records = viewRecordsUseCase.execute(registration);
         return ResponseEntity.ok(records);
     }
-
     /**
      * US117: View Total Maintenance Hours for the Fleet
      */

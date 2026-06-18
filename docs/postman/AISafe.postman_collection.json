@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "AISafe — WP#2A Airports",
+    "name": "AISafe — Projeto Completo Corrigido",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -8,16 +8,14 @@
       "name": "Auth",
       "item": [
         {
-          "name": "Login (backoffice)",
+          "name": "Login (technician) - PARA A TUA PARTE",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "const body = pm.response.json();",
-                  "pm.test('Token present', () => pm.expect(body.token).to.be.a('string'));",
-                  "pm.environment.set('jwtToken', body.token);"
+                  "pm.environment.set('jwtToken', pm.response.json().token);"
                 ]
               }
             }
@@ -28,7 +26,53 @@
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
-              "raw": "{ \"username\": \"backoffice\", \"password\": \"backoffice123\" }"
+              "raw": "{ \"username\": \"technician\", \"password\": \"tech123\" }"
+            }
+          }
+        },
+        {
+          "name": "Login (supervisor)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('jwtToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"username\": \"supervisor\", \"password\": \"sup123\" }"
+            }
+          }
+        },
+        {
+          "name": "Login (backoffice)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('jwtToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"username\": \"backoffice\", \"password\": \"bo123\" }"
             }
           }
         },
@@ -58,276 +102,31 @@
       ]
     },
     {
-      "name": "WP#2A — Airports",
+      "name": "Maintenance (WP#4A)",
       "item": [
         {
-          "name": "US106 — Register Airport (201)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
-                  "const b = pm.response.json();",
-                  "pm.test('iataCode returned', () => pm.expect(b.iataCode).to.eql('TST'));",
-                  "pm.test('self link present', () => pm.expect(b._links.self).to.exist);"
-                ]
-              }
-            }
-          ],
+          "name": "US115 — Create a Maintenance Template",
           "request": {
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
             ],
-            "url": "{{baseUrl}}/airports",
+            "url": "{{baseUrl}}/api/maintenance-templates",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"iataCode\": \"TST\",\n  \"name\": \"Test Airport\",\n  \"city\": \"TestCity\",\n  \"country\": \"TestCountry\",\n  \"region\": \"Europe\",\n  \"timezone\": \"Europe/Lisbon\",\n  \"latitude\": 38.7,\n  \"longitude\": -9.1,\n  \"runways\": [\n    { \"name\": \"01/19\", \"length\": 2000.0, \"orientation\": \"010/190\" }\n  ]\n}"
+              "raw": "{\n  \"templateName\": \"Revisao Geral\",\n  \"templateType\": \"INSPECTION\",\n  \"flightHours\": 5000,\n  \"calendarDays\": 365,\n  \"checklist\": [\"Verificar fluidos\", \"Verificar travoes\"],\n  \"applicableModels\": [\"A320\"]\n}"
             }
           }
         },
         {
-          "name": "US106 — Register Duplicate (409)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/airports",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"iataCode\": \"LIS\",\n  \"name\": \"Test\",\n  \"city\": \"Lisbon\",\n  \"country\": \"Portugal\",\n  \"timezone\": \"Europe/Lisbon\",\n  \"latitude\": 38.7,\n  \"longitude\": -9.1,\n  \"runways\": [{ \"name\": \"03/21\", \"length\": 3805.0, \"orientation\": \"030/210\" }]\n}"
-            }
-          }
-        },
-        {
-          "name": "US107 — View Airport LIS (200)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "const b = pm.response.json();",
-                  "pm.test('iataCode = LIS',   () => pm.expect(b.iataCode).to.eql('LIS'));",
-                  "pm.test('status field',     () => pm.expect(b.status).to.be.a('string'));",
-                  "pm.test('runways array',    () => pm.expect(b.runways).to.be.an('array'));",
-                  "pm.test('self link',        () => pm.expect(b._links.self).to.exist);",
-                  "pm.test('update-status lk', () => pm.expect(b._links['update-status']).to.exist);"
-                ]
-              }
-            }
-          ],
+          "name": "US115 — View Maintenance Templates",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/airports/LIS"
+            "url": "{{baseUrl}}/api/maintenance-templates/1"
           }
         },
-        {
-          "name": "US107 — Airport Not Found (404)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/airports/XXX"
-          }
-        },
-        {
-          "name": "US108 — Search by city=Lisbon (200)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('self link', () => pm.expect(pm.response.json()._links.self).to.exist);"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": {
-              "raw": "{{baseUrl}}/airports?city=Lisbon",
-              "query": [{ "key": "city", "value": "Lisbon" }]
-            }
-          }
-        },
-        {
-          "name": "US108 — Search no criteria (empty list ok)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200 — never 404 on search', () => pm.response.to.have.status(200));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/airports"
-          }
-        },
-        {
-          "name": "US106a — Add Certification LIS (201)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
-                  "const b = pm.response.json();",
-                  "pm.test('certifiedModels not empty', () => pm.expect(b.certifiedModels.length).to.be.above(0));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/airports/LIS/certifications",
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"manufacturer\": \"Airbus\", \"modelName\": \"A320\" }"
-            }
-          }
-        },
-        {
-          "name": "US106a — Duplicate Certification (409)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/airports/LIS/certifications",
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"manufacturer\": \"Airbus\", \"modelName\": \"A320\" }"
-            }
-          }
-        },
-        {
-          "name": "US109 — Update Status CLOSED (200)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200',      () => pm.response.to.have.status(200));",
-                  "pm.test('status = CLOSED',  () => pm.expect(pm.response.json().status).to.eql('CLOSED'));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/airports/OPO/status",
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"state\": \"CLOSED\" }"
-            }
-          }
-        },
-        {
-          "name": "US109 — Invalid Transition (409)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/airports/LIS/status",
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"state\": \"OPERATIONAL\" }"
-            }
-          }
-        },
-        {
-          "name": "US109 — Invalid State Value (400)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/airports/LIS/status",
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"state\": \"FLYING\" }"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Maintenance",
-      "item": [
         {
           "name": "US115A — Create a Maintenance Record",
           "request": {
@@ -339,7 +138,7 @@
             "url": "{{baseUrl}}/api/maintenance-records",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"aircraftRegistration\": \"CS-TUA\",\n  \"technicianNotes\": \"Initial inspection\",\n  \"plannedDateTime\": \"2024-05-20T10:00:00Z\",\n  \"maintenanceType\": \"A_CHECK\"\n}"
+              "raw": "{\n  \"aircraftRegistration\": \"CS-TVA\",\n  \"templateId\": 1,\n  \"description\": \"Inspecao de Rotina\",\n  \"startDate\": \"2026-06-10\",\n  \"expectedDurationMinutes\": 180,\n  \"componentCategory\": \"Engines\"\n}"
             }
           }
         },
@@ -348,7 +147,7 @@
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-records/aircraft/CS-TUA"
+            "url": "{{baseUrl}}/api/maintenance-records/aircraft/CS-TVA"
           }
         },
         {
@@ -366,12 +165,12 @@
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
-              { "key": "If-Match", "value": "\"1\"" }
+              { "key": "If-Match", "value": "\"0\"" }
             ],
             "url": "{{baseUrl}}/api/maintenance-records/1/complete",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"actualStartDateTime\": \"2024-05-20T10:05:00Z\",\n  \"actualEndDateTime\": \"2024-05-20T11:00:00Z\",\n  \"interventionDescription\": \"Completed all checks.\"\n}"
+              "raw": "{\n  \"notes\": \"Inspecao terminada com sucesso. Todos os componentes verificados e validados.\"\n}"
             }
           }
         },
@@ -382,28 +181,74 @@
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
             "url": "{{baseUrl}}/api/maintenance-records/1"
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "WP#2A — Airports",
+      "item": [
         {
-          "name": "US115 — Create a Maintenance Template",
+          "name": "US106 — Register Airport",
           "request": {
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
             ],
-            "url": "{{baseUrl}}/api/maintenance-templates",
+            "url": "{{baseUrl}}/airports",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"A-Check Template\",\n  \"description\": \"Standard A-Check for A320\",\n  \"tasks\": [\n    { \"description\": \"Inspect landing gear\" },\n    { \"description\": \"Check fluid levels\" }\n  ]\n}"
+              "raw": "{\n  \"iataCode\": \"TST\",\n  \"name\": \"Test Airport\",\n  \"city\": \"TestCity\",\n  \"country\": \"TestCountry\",\n  \"region\": \"Europe\",\n  \"timezone\": \"Europe/Lisbon\",\n  \"latitude\": 38.7,\n  \"longitude\": -9.1,\n  \"runways\": [\n    { \"name\": \"01/19\", \"length\": 2000.0, \"orientation\": \"010/190\" }\n  ]\n}"
             }
           }
         },
         {
-          "name": "Get Maintenance Template by ID",
+          "name": "US107 — View Airport LIS",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-templates/1"
+            "url": "{{baseUrl}}/airports/LIS"
+          }
+        },
+        {
+          "name": "US108 — Search by city=Lisbon",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/airports?city=Lisbon",
+              "query": [{ "key": "city", "value": "Lisbon" }]
+            }
+          }
+        },
+        {
+          "name": "US106a — Add Certification LIS",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/LIS/certifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"manufacturer\": \"Airbus\", \"modelName\": \"A320\" }"
+            }
+          }
+        },
+        {
+          "name": "US109 — Update Status CLOSED",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/OPO/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"state\": \"CLOSED\" }"
+            }
           }
         }
       ]
@@ -425,51 +270,6 @@
               "raw": "{\n  \"originIata\": \"LIS\",\n  \"destinationIata\": \"OPO\",\n  \"airlineCode\": \"TP\",\n  \"flightNumber\": \"1970\"\n}"
             }
           }
-        },
-        {
-          "name": "US113 — Get Flight Route by ID",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/routes/LIS-OPO-TP1970"
-          }
-        },
-        {
-          "name": "US114 — Search Flight Routes",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": {
-              "raw": "{{baseUrl}}/api/routes/search?origin=LIS&dest=OPO",
-              "query": [
-                { "key": "origin", "value": "LIS" },
-                { "key": "dest", "value": "OPO" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "US112 — Update a Flight Route",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/routes/LIS-OPO-TP1970",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"INACTIVE\"\n}"
-            }
-          }
-        },
-        {
-          "name": "US111 — Get Flight Route History",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/routes/LIS-OPO-TP1970/history"
-          }
         }
       ]
     },
@@ -487,7 +287,7 @@
             "url": "{{baseUrl}}/api/aircrafts",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"registrationNumber\": \"CS-TUA\",\n  \"modelName\": \"A320\",\n  \"manufacturer\": \"Airbus\",\n  \"capacity\": 180\n}"
+              "raw": "{\n  \"registrationNumber\": \"CS-TVA\",\n  \"modelName\": \"A320\",\n  \"manufacturer\": \"Airbus\",\n  \"capacity\": 150\n}"
             }
           }
         },
@@ -496,52 +296,7 @@
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/aircrafts/CS-TUA"
-          }
-        },
-        {
-          "name": "Search Aircrafts",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": {
-              "raw": "{{baseUrl}}/api/aircrafts?model=A320&status=ACTIVE&year=2020",
-              "query": [
-                { "key": "model", "value": "A320" },
-                { "key": "status", "value": "ACTIVE" },
-                { "key": "year", "value": "2020" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Aircraft Status",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/aircrafts/CS-TUA/status",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"INACTIVE\",\n  \"version\": 1\n}"
-            }
-          }
-        },
-        {
-          "name": "Create Aircraft Model",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/aircraft-models",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"modelName\": \"A320\",\n  \"manufacturer\": \"Airbus\",\n  \"capacity\": 180,\n  \"engineType\": \"Jet\",\n  \"maxSpeed\": 871\n}"
-            }
+            "url": "{{baseUrl}}/api/aircrafts/CS-TVA"
           }
         }
       ]
