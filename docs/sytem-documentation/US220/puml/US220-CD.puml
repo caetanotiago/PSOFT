@@ -1,0 +1,30 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class MaintenanceController {
+  + getMaintenanceCosts(type: String): ResponseEntity<MaintenanceCostReportDto>
+}
+
+class GenerateCostReportUseCase {
+  + execute(type: String): MaintenanceCostReportDto
+}
+
+interface MaintenanceRecordRepository {
+  + calculateCostsPerAircraft(): List<CostItem>
+  + calculateCostsPerModel(): List<CostItem>
+}
+
+class MaintenanceCostReportDto {
+  - items: List<CostItemDto>
+}
+
+class CostItemDto {
+  - identifier: String
+  - totalCost: Double
+}
+
+MaintenanceController ..> GenerateCostReportUseCase
+GenerateCostReportUseCase ..> MaintenanceRecordRepository
+GenerateCostReportUseCase ..> MaintenanceCostReportDto
+MaintenanceCostReportDto *-- CostItemDto
+@enduml

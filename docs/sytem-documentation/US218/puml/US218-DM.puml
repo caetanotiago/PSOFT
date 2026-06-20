@@ -1,0 +1,15 @@
+@startuml
+hide methods
+
+entity Aircraft <<Entity>> <<Root>>
+entity MaintenanceRecord <<Entity>> <<Root>> {
+  date
+  componentCategory
+}
+
+entity Aircraft <<Entity>> <<Root>> {
+  registrationNumber
+}
+
+MaintenanceRecord "*" --> "1" Aircraft : performed on
+@enduml

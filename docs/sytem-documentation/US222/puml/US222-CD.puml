@@ -1,0 +1,32 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class MaintenanceScheduler {
+  + scheduledCheck(): void
+}
+
+class AlertService {
+  + checkMaintenanceDue(): void
+}
+
+interface AircraftRepository {
+  + findAll(): List<Aircraft>
+}
+
+class Aircraft {
+  - registration: String
+  - currentFlightHours: Double
+  - lastMaintenanceDate: LocalDate
+  + isMaintenanceDue(template: MaintenanceTemplate): Boolean
+}
+
+class Alert {
+  - id: Long
+  - message: String
+}
+
+MaintenanceScheduler ..> AlertService
+AlertService ..> AircraftRepository
+AlertService ..> Aircraft
+AlertService ..> Alert
+@enduml

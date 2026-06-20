@@ -1,0 +1,25 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class MaintenanceController {
+  + searchRecords(aircraft: String, start: LocalDate, end: LocalDate, component: String, page: Pageable): ResponseEntity<Page<MaintenanceRecordOutputDto>>
+}
+
+class SearchMaintenanceRecordsUseCase {
+  + execute(aircraft: String, start: LocalDate, end: LocalDate, component: String, page: Pageable): Page<MaintenanceRecordOutputDto>
+}
+
+interface MaintenanceRecordRepository {
+  + findByFilters(reg: String, start: LocalDate, end: LocalDate, comp: String, page: Pageable): Page<MaintenanceRecord>
+}
+
+class MaintenanceRecordOutputDto {
+  - id: Long
+  - component: String
+  - aircraftRegistration: String
+}
+
+MaintenanceController ..> SearchMaintenanceRecordsUseCase
+SearchMaintenanceRecordsUseCase ..> MaintenanceRecordRepository
+SearchMaintenanceRecordsUseCase ..> MaintenanceRecordOutputDto
+@enduml

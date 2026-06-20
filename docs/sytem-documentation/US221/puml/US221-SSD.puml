@@ -1,0 +1,10 @@
+@startuml
+autonumber
+actor "Maintenance Supervisor" as Supervisor
+participant "System" as System
+
+Supervisor -> System : requests average maintenance turnaround time per aircraft type
+activate System
+System --> Supervisor : returns average turnaround time per model
+deactivate System
+@enduml

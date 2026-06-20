@@ -1,0 +1,27 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+participant "MaintenanceController" as Ctrl
+participant "GenerateCostReportUseCase" as UseCase
+participant "MaintenanceRecordRepository" as Repo
+participant "MaintenanceCostReportDto" as Dto
+
+ATCC -> Ctrl : GET /api/maintenance-records/reports/costs?type={aircraft|model}
+activate Ctrl
+
+Ctrl -> UseCase : execute(type)
+activate UseCase
+
+UseCase -> Repo : calculateCosts(type)
+activate Repo
+note right: JPQL: SUM(cost) GROUP BY model/aircraft
+Repo --> UseCase : List<CostResult>
+deactivate Repo
+
+UseCase -> Dto ** : create(results)
+UseCase --> Ctrl : dto
+deactivate UseCase
+
+Ctrl --> ATCC : 200 OK (dto)
+deactivate Ctrl
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+hide methods
+
+entity Aircraft <<Entity>> <<Root>> {
+  currentFlightHours
+  lastMaintenanceDate
+}
+
+entity MaintenanceTemplate <<Entity>> <<Root>> {
+  hoursInterval
+  daysInterval
+}
+
+entity Alert <<Entity>> {
+  message
+  timestamp
+  readStatus
+}
+
+Aircraft "*" --> "1" MaintenanceTemplate : follows
+Alert "*" --> "1" Aircraft : notifies
+@enduml

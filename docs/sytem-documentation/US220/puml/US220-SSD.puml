@@ -1,0 +1,10 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+participant "System" as System
+
+ATCC -> System : requests maintenance cost report (filter: aircraft or aircraft model)
+activate System
+System --> ATCC : returns cost report grouped by aircraft/model
+deactivate System
+@enduml

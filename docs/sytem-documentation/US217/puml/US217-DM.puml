@@ -1,0 +1,22 @@
+@startuml
+hide methods
+
+entity Aircraft <<Entity>> <<Root>>
+entity MaintenanceTemplate <<Entity>> <<Root>>
+
+entity MaintenanceRecord <<Entity>> <<Root>> {
+  version
+}
+
+enum MaintenanceComponent <<Value Object>> {
+  ENGINE
+  AIRFRAME
+  AVIONICS
+  INTERIOR
+  EXTERIOR
+}
+
+MaintenanceRecord "*" --> "1" Aircraft : performed on
+MaintenanceRecord "*" --> "1" MaintenanceTemplate : based on
+MaintenanceRecord --> "1" MaintenanceComponent : categorized by
+@enduml

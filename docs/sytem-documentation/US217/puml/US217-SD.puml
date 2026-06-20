@@ -1,0 +1,41 @@
+@startuml
+autonumber
+actor "Maintenance Technician" as Tech
+participant "MaintenanceController" as Ctrl
+participant "CategorizeMaintenanceRecordUseCase" as UseCase
+participant "MaintenanceRecordRepository" as Repo
+participant "record: MaintenanceRecord" as Record
+participant "MaintenanceRecordAssembler" as Assembler
+
+Tech -> Ctrl : PATCH /api/maintenance-records/{id}/component\n(CategorizeRecordInputDto)
+activate Ctrl
+
+Ctrl -> UseCase : execute(id, dto, version)
+activate UseCase
+
+UseCase -> Repo : findById(id)
+activate Repo
+Repo --> UseCase : Optional<MaintenanceRecord>
+deactivate Repo
+
+UseCase -> Record : updateComponent(dto.component)
+activate Record
+Record --> UseCase :
+deactivate Record
+
+UseCase -> Repo : save(record)
+activate Repo
+Repo --> UseCase : record
+deactivate Repo
+
+UseCase -> Assembler : toDto(record)
+activate Assembler
+Assembler --> UseCase : dto
+deactivate Assembler
+
+UseCase --> Ctrl : dto
+deactivate UseCase
+
+Ctrl --> Tech : 200 OK (dto)
+deactivate Ctrl
+@enduml

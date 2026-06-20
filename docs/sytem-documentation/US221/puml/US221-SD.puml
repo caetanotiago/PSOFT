@@ -1,0 +1,27 @@
+@startuml
+autonumber
+actor "Maintenance Supervisor" as Supervisor
+participant "MaintenanceController" as Ctrl
+participant "ViewAvgTurnaroundTimeUseCase" as UseCase
+participant "MaintenanceRecordRepository" as Repo
+participant "ReportDto" as Dto
+
+Supervisor -> Ctrl : GET /api/maintenance-records/reports/turnaround-time
+activate Ctrl
+
+Ctrl -> UseCase : execute()
+activate UseCase
+
+UseCase -> Repo : findAverageTurnaroundTimePerModel()
+activate Repo
+note right: JPQL: AVG(duration) GROUP BY model
+Repo --> UseCase : List<TurnaroundResult>
+deactivate Repo
+
+UseCase -> Dto ** : create(results)
+UseCase --> Ctrl : dto
+deactivate UseCase
+
+Ctrl --> Supervisor : 200 OK (dto)
+deactivate Ctrl
+@enduml

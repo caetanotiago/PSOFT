@@ -1,0 +1,25 @@
+@startuml
+autonumber
+participant "MaintenanceScheduler" as Scheduler
+participant "AlertService" as Service
+participant "AircraftRepository" as Repo
+participant "Alert" as Alert
+
+Scheduler -> Service : checkMaintenanceDue()
+activate Service
+
+Service -> Repo : findAllAircraft()
+activate Repo
+Repo --> Service : List<Aircraft>
+deactivate Repo
+
+loop for each aircraft
+    Service -> Service : verify thresholds (hours/days)
+    alt isDue(aircraft)
+        Service -> Alert ** : create(message)
+    end
+end
+
+Service --> Scheduler : done
+deactivate Service
+@enduml
