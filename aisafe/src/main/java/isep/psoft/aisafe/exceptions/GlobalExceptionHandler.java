@@ -1,6 +1,7 @@
 package isep.psoft.aisafe.exceptions;
 
 import isep.psoft.aisafe.airports.domain.AirportNotFoundException;
+import isep.psoft.aisafe.airports.domain.DuplicateFacilityException;
 import isep.psoft.aisafe.airports.domain.DuplicateIATACodeException;
 import isep.psoft.aisafe.airports.domain.InvalidStatusTransitionException;
 import isep.psoft.aisafe.airports.domain.ModelAlreadyCertifiedException;
@@ -54,6 +55,14 @@ public class GlobalExceptionHandler {
     // Aircraft model already certified for this airport → 409 Conflict
     @ExceptionHandler(ModelAlreadyCertifiedException.class)
     public ResponseEntity<Map<String, String>> handleModelAlreadyCertified(ModelAlreadyCertifiedException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    // Duplicate facility (type, identifier) on the same airport (US207) → 409 Conflict
+    @ExceptionHandler(DuplicateFacilityException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateFacility(DuplicateFacilityException ex) {
         Map<String, String> response = new HashMap<>();
         response.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);

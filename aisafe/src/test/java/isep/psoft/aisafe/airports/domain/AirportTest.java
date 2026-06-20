@@ -110,4 +110,75 @@ class AirportTest {
         assertThrows(InvalidStatusTransitionException.class,
                 () -> airport.changeStatus(AirportState.CLOSED));
     }
+
+    // ─── addFacility / addPhoto (US207) ───────────────────────────────────────────
+
+    @Test
+    void addFacility_succeeds_for_new_type_and_identifier() {
+        airport.addFacility(new Facility("TERMINAL", "Terminal 1", null));
+        assertEquals(1, airport.getFacilities().size());
+    }
+
+    @Test
+    void addFacility_throws_when_duplicate_type_and_identifier() {
+        Facility facility = new Facility("TERMINAL", "Terminal 1", null);
+        airport.addFacility(facility);
+        assertThrows(DuplicateFacilityException.class, () -> airport.addFacility(facility));
+    }
+
+    @Test
+    void addFacility_allows_same_type_with_different_identifier() {
+        airport.addFacility(new Facility("GATE", "A12", null));
+        airport.addFacility(new Facility("GATE", "A13", null));
+        assertEquals(2, airport.getFacilities().size());
+    }
+
+    @Test
+    void airport_starts_with_no_facilities_or_photos() {
+        assertTrue(airport.getFacilities().isEmpty());
+        assertTrue(airport.getPhotos().isEmpty());
+    }
+
+    @Test
+    void addPhoto_appends_to_photo_list() {
+        airport.addPhoto(new Photo("https://example.com/lis.jpg", "Terminal view"));
+        assertEquals(1, airport.getPhotos().size());
+    }
+
+    @Test
+    void addPhoto_allows_multiple_photos() {
+        airport.addPhoto(new Photo("https://example.com/1.jpg", null));
+        airport.addPhoto(new Photo("https://example.com/2.jpg", null));
+        assertEquals(2, airport.getPhotos().size());
+    }
+
+    // ─── updateOperatingHours / updateContacts (US208) ────────────────────────────
+
+    @Test
+    void updateOperatingHours_replaces_previous_value() {
+        airport.updateOperatingHours(new OperatingHours(true, null, null));
+        assertTrue(airport.getOperatingHours().isOperates24Hours());
+
+        airport.updateOperatingHours(new OperatingHours(false,
+                java.time.LocalTime.of(6, 0), java.time.LocalTime.of(23, 0)));
+        assertFalse(airport.getOperatingHours().isOperates24Hours());
+    }
+
+    @Test
+    void updateContacts_replaces_whole_list() {
+        airport.updateContacts(List.of(new AirportContact("PHONE", "+351221234567", null)));
+        assertEquals(1, airport.getContacts().size());
+
+        airport.updateContacts(List.of(
+                new AirportContact("PHONE", "+351221234567", null),
+                new AirportContact("EMAIL", "ops@lis.example", "Operations")));
+        assertEquals(2, airport.getContacts().size());
+    }
+
+    @Test
+    void updateContacts_with_empty_list_clears_contacts() {
+        airport.updateContacts(List.of(new AirportContact("PHONE", "+351221234567", null)));
+        airport.updateContacts(List.of());
+        assertTrue(airport.getContacts().isEmpty());
+    }
 }

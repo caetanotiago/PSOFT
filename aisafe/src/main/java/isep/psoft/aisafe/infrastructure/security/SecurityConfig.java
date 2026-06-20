@@ -51,6 +51,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,  "/airports/*/certifications").hasRole("BACKOFFICE_OPERATOR")
                         .requestMatchers(HttpMethod.PATCH, "/airports/*/status").hasRole("BACKOFFICE_OPERATOR")
 
+                        //Regras para o WP#2B (Enhanced Airport Features)
+                        .requestMatchers(HttpMethod.POST,  "/airports/*/facilities").hasRole("BACKOFFICE_OPERATOR")
+                        .requestMatchers(HttpMethod.POST,  "/airports/*/photos").hasRole("BACKOFFICE_OPERATOR")
+                        .requestMatchers(HttpMethod.PATCH, "/airports/*/details").hasRole("BACKOFFICE_OPERATOR")
+                        .requestMatchers(HttpMethod.GET,   "/airports/statistics/busiest").hasRole("BACKOFFICE_OPERATOR")
+                        // GET /airports/grouped is already covered by the broader "/airports/*" rule above
+
                         //Regras para o WP#3A (FlightRoutes)
                         .requestMatchers(HttpMethod.POST,  "/api/routes").hasRole("ATCC")
                         .requestMatchers(HttpMethod.PATCH, "/api/routes/*").hasAnyRole("ATCC", "BACKOFFICE_OPERATOR")

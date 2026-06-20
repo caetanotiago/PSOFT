@@ -43,13 +43,13 @@ class RegisterAirportUseCaseImplTest {
     @Test
     void registers_airport_successfully() {
         when(airportRepository.existsById(any(IATACode.class))).thenReturn(false);
-        when(airportFactory.create(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        when(airportFactory.create(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(stubAirport("LIS"));
         when(airportRepository.save(any(Airport.class))).thenAnswer(i -> i.getArgument(0));
 
         Airport result = useCase.registerAirport(
                 "LIS", "Humberto Delgado", "Lisbon", "Portugal",
-                "Europe", "Europe/Lisbon", 38.77, -9.13, RUNWAYS);
+                "Europe", "Europe/Lisbon", 38.77, -9.13, RUNWAYS, null, null);
 
         assertEquals("LIS", result.getIataCode().getCode());
         assertEquals(AirportState.OPERATIONAL, result.getStatus());
@@ -63,23 +63,23 @@ class RegisterAirportUseCaseImplTest {
         DuplicateIATACodeException ex = assertThrows(DuplicateIATACodeException.class, () ->
                 useCase.registerAirport(
                         "LIS", "Humberto Delgado", "Lisbon", "Portugal",
-                        "Europe", "Europe/Lisbon", 38.77, -9.13, RUNWAYS));
+                        "Europe", "Europe/Lisbon", 38.77, -9.13, RUNWAYS, null, null));
         assertTrue(ex.getMessage().contains("LIS"));
 
         verify(airportRepository, never()).save(any());
-        verify(airportFactory, never()).create(any(), any(), any(), any(), any(), any(), any(), any(), any());
+        verify(airportFactory, never()).create(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void iata_code_is_uppercased_before_lookup() {
         when(airportRepository.existsById(new IATACode("LIS"))).thenReturn(false);
-        when(airportFactory.create(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        when(airportFactory.create(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(stubAirport("LIS"));
         when(airportRepository.save(any(Airport.class))).thenAnswer(i -> i.getArgument(0));
 
         Airport result = useCase.registerAirport(
                 "lis", "Lisbon", "Lisbon", "Portugal",
-                "Europe", "Europe/Lisbon", 38.77, -9.13, RUNWAYS);
+                "Europe", "Europe/Lisbon", 38.77, -9.13, RUNWAYS, null, null);
 
         assertEquals("LIS", result.getIataCode().getCode());
     }

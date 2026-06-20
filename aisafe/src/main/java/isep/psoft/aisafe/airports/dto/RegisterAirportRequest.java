@@ -27,5 +27,9 @@ public record RegisterAirportRequest(
         Double longitude,
 
         @NotEmpty(message = "At least one runway is required")
-        @Valid List<RunwayRequest> runways
+        @Valid List<RunwayRequest> runways,
+
+        // US207: optional, structured facilities/photos that may be supplied at registration time.
+        @Valid List<FacilityRequest> facilities,
+        @Valid List<PhotoRequest> photos
 ) {}

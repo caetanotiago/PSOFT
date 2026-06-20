@@ -16,6 +16,7 @@ import isep.psoft.aisafe.flightroutes.services.ListActiveRoutesService;
 import isep.psoft.aisafe.flightroutes.services.SearchAlternativeRoutesService;
 import isep.psoft.aisafe.flightroutes.services.SearchFlightRoutesService;
 import isep.psoft.aisafe.flightroutes.services.UpdateFlightRouteService;
+import isep.psoft.aisafe.flightroutes.services.ViewRoutesByAirportService;
 import isep.psoft.aisafe.infrastructure.security.JwtTokenProvider;
 import isep.psoft.aisafe.infrastructure.security.SecurityConfig;
 import jakarta.persistence.EntityNotFoundException;
@@ -62,6 +63,9 @@ class FlightRouteControllerTest {
     @MockitoBean private CalculateNetworkDistanceService networkDistanceService;
     @MockitoBean private SearchAlternativeRoutesService searchAlternativeRoutesService;
     @MockitoBean private ItineraryAssembler itineraryAssembler;
+
+    // WP#2B (US209)
+    @MockitoBean private ViewRoutesByAirportService viewRoutesByAirportService;
 
     // Exigidos pelo JwtAuthenticationFilter que a slice MVC instancia
     @MockitoBean private JwtTokenProvider jwtTokenProvider;

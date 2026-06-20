@@ -2,9 +2,16 @@ package isep.psoft.aisafe.airports.controllers;
 
 import isep.psoft.aisafe.airports.dto.*;
 import isep.psoft.aisafe.airports.domain.Airport;
+import isep.psoft.aisafe.airports.domain.AirportGroup;
+import isep.psoft.aisafe.airports.domain.AirportRouteCount;
 import isep.psoft.aisafe.airports.services.AddCertificationUseCase;
+import isep.psoft.aisafe.airports.services.AddFacilityUseCase;
+import isep.psoft.aisafe.airports.services.AddPhotoUseCase;
+import isep.psoft.aisafe.airports.services.GroupAirportsUseCase;
+import isep.psoft.aisafe.airports.services.ListBusiestAirportsUseCase;
 import isep.psoft.aisafe.airports.services.RegisterAirportUseCase;
 import isep.psoft.aisafe.airports.services.SearchAirportsUseCase;
+import isep.psoft.aisafe.airports.services.UpdateAirportDetailsUseCase;
 import isep.psoft.aisafe.airports.services.UpdateAirportStatusUseCase;
 import isep.psoft.aisafe.airports.services.ViewAirportDetailsUseCase;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,17 +42,32 @@ public class AirportController {
     private final SearchAirportsUseCase searchAirportsUseCase;
     private final AddCertificationUseCase addCertificationUseCase;
     private final UpdateAirportStatusUseCase updateAirportStatusUseCase;
+    private final AddFacilityUseCase addFacilityUseCase;
+    private final AddPhotoUseCase addPhotoUseCase;
+    private final UpdateAirportDetailsUseCase updateAirportDetailsUseCase;
+    private final ListBusiestAirportsUseCase listBusiestAirportsUseCase;
+    private final GroupAirportsUseCase groupAirportsUseCase;
 
     public AirportController(RegisterAirportUseCase registerAirportUseCase,
                              ViewAirportDetailsUseCase viewAirportDetailsUseCase,
                              SearchAirportsUseCase searchAirportsUseCase,
                              AddCertificationUseCase addCertificationUseCase,
-                             UpdateAirportStatusUseCase updateAirportStatusUseCase) {
+                             UpdateAirportStatusUseCase updateAirportStatusUseCase,
+                             AddFacilityUseCase addFacilityUseCase,
+                             AddPhotoUseCase addPhotoUseCase,
+                             UpdateAirportDetailsUseCase updateAirportDetailsUseCase,
+                             ListBusiestAirportsUseCase listBusiestAirportsUseCase,
+                             GroupAirportsUseCase groupAirportsUseCase) {
         this.registerAirportUseCase = registerAirportUseCase;
         this.viewAirportDetailsUseCase = viewAirportDetailsUseCase;
         this.searchAirportsUseCase = searchAirportsUseCase;
         this.addCertificationUseCase = addCertificationUseCase;
         this.updateAirportStatusUseCase = updateAirportStatusUseCase;
+        this.addFacilityUseCase = addFacilityUseCase;
+        this.addPhotoUseCase = addPhotoUseCase;
+        this.updateAirportDetailsUseCase = updateAirportDetailsUseCase;
+        this.listBusiestAirportsUseCase = listBusiestAirportsUseCase;
+        this.groupAirportsUseCase = groupAirportsUseCase;
     }
 
     // ─── US106 — Register Airport ───────────────────────────────────────────────
@@ -65,7 +87,7 @@ public class AirportController {
                 request.iataCode(), request.name(), request.city(), request.country(),
                 request.region(), request.timezone(),
                 request.latitude(), request.longitude(),
-                request.runways());
+                request.runways(), request.facilities(), request.photos());
 
         EntityModel<AirportDetailsResponseDTO> model = buildDetailModel(airport);
 
@@ -160,6 +182,114 @@ public class AirportController {
         return ResponseEntity.ok(buildDetailModel(airport));
     }
 
+    // ─── US207 — Add Facility / Add Photo ────────────────────────────────────────
+
+    @PostMapping("/{iataCode}/facilities")
+    @PreAuthorize("hasRole('BACKOFFICE_OPERATOR')")
+    @Operation(summary = "Add a facility to an airport", description = "US207 — returns 200 with the updated Airport (no new sub-resource URL)")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Facility added, updated Airport returned"),
+        @ApiResponse(responseCode = "404", description = "Airport not found"),
+        @ApiResponse(responseCode = "409", description = "Duplicate facility (type, identifier)")
+    })
+    public ResponseEntity<EntityModel<AirportDetailsResponseDTO>> addFacility(
+            @PathVariable String iataCode,
+            @Valid @RequestBody FacilityRequest request) {
+
+        Airport airport = addFacilityUseCase.addFacility(
+                iataCode, request.type(), request.identifier(), request.description());
+        return ResponseEntity.ok(buildDetailModel(airport));
+    }
+
+    @PostMapping("/{iataCode}/photos")
+    @PreAuthorize("hasRole('BACKOFFICE_OPERATOR')")
+    @Operation(summary = "Add a photo to an airport", description = "US207 — returns 200 with the updated Airport (no new sub-resource URL)")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Photo added, updated Airport returned"),
+        @ApiResponse(responseCode = "404", description = "Airport not found")
+    })
+    public ResponseEntity<EntityModel<AirportDetailsResponseDTO>> addPhoto(
+            @PathVariable String iataCode,
+            @Valid @RequestBody PhotoRequest request) {
+
+        Airport airport = addPhotoUseCase.addPhoto(iataCode, request.url(), request.caption());
+        return ResponseEntity.ok(buildDetailModel(airport));
+    }
+
+    // ─── US208 — Update Airport Details (operating hours / contacts) ────────────
+
+    @PatchMapping("/{iataCode}/details")
+    @PreAuthorize("hasRole('BACKOFFICE_OPERATOR')")
+    @Operation(summary = "Update operating hours and/or contact information", description = "US208 — PATCH; at least one of operatingHours/contacts must be supplied")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Details updated"),
+        @ApiResponse(responseCode = "400", description = "Neither field supplied, or invalid values"),
+        @ApiResponse(responseCode = "404", description = "Airport not found"),
+        @ApiResponse(responseCode = "409", description = "Concurrent modification")
+    })
+    public ResponseEntity<EntityModel<AirportDetailsResponseDTO>> updateDetails(
+            @PathVariable String iataCode,
+            @Valid @RequestBody UpdateAirportDetailsRequest request) {
+
+        Airport airport = updateAirportDetailsUseCase.updateDetails(
+                iataCode, request.operatingHours(), request.contacts());
+        return ResponseEntity.ok(buildDetailModel(airport));
+    }
+
+    // ─── US210 — Busiest Airports Statistics ─────────────────────────────────────
+
+    @GetMapping("/statistics/busiest")
+    @PreAuthorize("hasRole('BACKOFFICE_OPERATOR')")
+    @Operation(summary = "List airports ranked by number of routes", description = "US210 — sorted descending; optional ?limit= for Top-N")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Ranked list of airports"),
+        @ApiResponse(responseCode = "400", description = "Invalid limit value")
+    })
+    public ResponseEntity<CollectionModel<EntityModel<AirportRouteCountDTO>>> listBusiestAirports(
+            @RequestParam(required = false) Integer limit) {
+
+        List<EntityModel<AirportRouteCountDTO>> items = listBusiestAirportsUseCase.listBusiest(limit)
+                .stream()
+                .map(c -> EntityModel.of(
+                        AirportRouteCountDTO.from(c),
+                        linkTo(methodOn(AirportController.class).getAirportDetails(c.getAirport().getIataCode().getCode())).withSelfRel()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(CollectionModel.of(
+                items,
+                linkTo(methodOn(AirportController.class).listBusiestAirports(limit)).withSelfRel()
+        ));
+    }
+
+    // ─── US211 — Airports Grouped by Region or Country ───────────────────────────
+
+    @GetMapping("/grouped")
+    @PreAuthorize("hasAnyRole('BACKOFFICE_OPERATOR', 'ATCC')")
+    @Operation(summary = "View airports grouped by region or country", description = "US211 — ?by=region|country")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Airports partitioned into groups"),
+        @ApiResponse(responseCode = "400", description = "Invalid or missing 'by' value")
+    })
+    public ResponseEntity<CollectionModel<AirportGroupDTO>> groupAirports(@RequestParam String by) {
+
+        List<AirportGroupDTO> groups = groupAirportsUseCase.groupBy(by).stream()
+                .map(group -> new AirportGroupDTO(
+                        group.getGroupKey(),
+                        group.getAirports().stream()
+                                .map(a -> EntityModel.of(
+                                        AirportSummaryResponseDTO.from(a),
+                                        linkTo(methodOn(AirportController.class).getAirportDetails(a.getIataCode().getCode())).withSelfRel()
+                                ))
+                                .toList()))
+                .toList();
+
+        return ResponseEntity.ok(CollectionModel.of(
+                groups,
+                linkTo(methodOn(AirportController.class).groupAirports(by)).withSelfRel()
+        ));
+    }
+
     // ─── Helper ──────────────────────────────────────────────────────────────────
 
     private EntityModel<AirportDetailsResponseDTO> buildDetailModel(Airport airport) {
@@ -169,6 +299,9 @@ public class AirportController {
                 linkTo(methodOn(AirportController.class).getAirportDetails(code)).withSelfRel(),
                 linkTo(methodOn(AirportController.class).updateStatus(code, null)).withRel("update-status"),
                 linkTo(methodOn(AirportController.class).addCertification(code, null)).withRel("add-certification"),
+                linkTo(methodOn(AirportController.class).addFacility(code, null)).withRel("add-facility"),
+                linkTo(methodOn(AirportController.class).addPhoto(code, null)).withRel("add-photo"),
+                linkTo(methodOn(AirportController.class).updateDetails(code, null)).withRel("update-details"),
                 linkTo(methodOn(AirportController.class).searchAirports(null, null, null)).withRel("search")
         );
     }

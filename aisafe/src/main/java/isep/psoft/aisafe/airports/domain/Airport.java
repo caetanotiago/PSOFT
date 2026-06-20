@@ -38,7 +38,30 @@ public class Airport {
             joinColumns = @JoinColumn(name = "airport_iata_code", referencedColumnName = "iata_code"))
     private Set<ModelDesignation> certifiedModels = new HashSet<>();
 
-    // @Version garante optimistic locking para US109 (PATCH status).
+    // US207: optional, structured facility/photo data — both collections may stay empty.
+    @ElementCollection
+    @CollectionTable(
+            name = "airport_facilities",
+            joinColumns = @JoinColumn(name = "airport_iata_code", referencedColumnName = "iata_code"))
+    private List<Facility> facilities = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(
+            name = "airport_photos",
+            joinColumns = @JoinColumn(name = "airport_iata_code", referencedColumnName = "iata_code"))
+    private List<Photo> photos = new ArrayList<>();
+
+    // US208: optional operating hours and contact list.
+    @Embedded
+    private OperatingHours operatingHours;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "airport_contacts",
+            joinColumns = @JoinColumn(name = "airport_iata_code", referencedColumnName = "iata_code"))
+    private List<AirportContact> contacts = new ArrayList<>();
+
+    // @Version garante optimistic locking para US109 (PATCH status), reutilizado em US208.
     @Version
     private Long version;
 
@@ -70,10 +93,36 @@ public class Airport {
         this.status = newState;
     }
 
+    // US207: adds a Facility; rejects a duplicate (type, identifier) pair (Information Expert).
+    public void addFacility(Facility facility) {
+        if (facilities.contains(facility))
+            throw new DuplicateFacilityException(facility.getType(), facility.getIdentifier());
+        facilities.add(facility);
+    }
+
+    // US207: adds a Photo. No uniqueness invariant — an airport may have several photos.
+    public void addPhoto(Photo photo) {
+        photos.add(photo);
+    }
+
+    // US208: replaces the operating hours as a whole value.
+    public void updateOperatingHours(OperatingHours newOperatingHours) {
+        this.operatingHours = newOperatingHours;
+    }
+
+    // US208 / Conversation 014: replaces the entire contact list (full replace, not merge).
+    public void updateContacts(List<AirportContact> newContacts) {
+        this.contacts = new ArrayList<>(newContacts);
+    }
+
     public IATACode getIataCode() { return iataCode; }
     public AirportDetails getDetails() { return details; }
     public AirportState getStatus() { return status; }
     public List<Runway> getRunways() { return List.copyOf(runways); }
     public Set<ModelDesignation> getCertifiedModels() { return Set.copyOf(certifiedModels); }
+    public List<Facility> getFacilities() { return List.copyOf(facilities); }
+    public List<Photo> getPhotos() { return List.copyOf(photos); }
+    public OperatingHours getOperatingHours() { return operatingHours; }
+    public List<AirportContact> getContacts() { return List.copyOf(contacts); }
     public Long getVersion() { return version; }
 }

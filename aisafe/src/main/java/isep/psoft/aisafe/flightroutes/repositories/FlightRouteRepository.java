@@ -42,4 +42,16 @@ public interface FlightRouteRepository extends CrudRepository<FlightRoute, Strin
     // US215 - distância total das rotas ativas. COALESCE garante 0 quando não há rotas.
     @Query("SELECT COALESCE(SUM(r.distance.distance), 0) FROM FlightRoute r WHERE r.status.state = 'ACTIVE'")
     double sumActiveRoutesDistance();
+
+    // US209 - rotas que partem de ou chegam a um aeroporto (origem OU destino), independentemente do status.
+    @Query("SELECT r FROM FlightRoute r WHERE r.origin.iataCode.code = :iata OR r.destination.iataCode.code = :iata")
+    List<FlightRoute> findByOriginOrDestination(@Param("iata") String iataCode);
+
+    // US210 - contagem de rotas agrupadas por aeroporto de origem.
+    @Query("SELECT r.origin.iataCode.code, COUNT(r) FROM FlightRoute r GROUP BY r.origin.iataCode.code")
+    List<Object[]> countByOrigin();
+
+    // US210 - contagem de rotas agrupadas por aeroporto de destino.
+    @Query("SELECT r.destination.iataCode.code, COUNT(r) FROM FlightRoute r GROUP BY r.destination.iataCode.code")
+    List<Object[]> countByDestination();
 }

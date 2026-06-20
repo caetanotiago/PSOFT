@@ -17,7 +17,11 @@ public record AirportDetailsResponseDTO(
         Double longitude,
         String status,
         List<RunwayDTO> runways,
-        Set<ModelDesignationDTO> certifiedModels
+        Set<ModelDesignationDTO> certifiedModels,
+        List<FacilityDTO> facilities,
+        List<PhotoDTO> photos,
+        OperatingHoursDTO operatingHours,
+        List<AirportContactDTO> contacts
 ) {
     public static AirportDetailsResponseDTO from(Airport airport) {
         return new AirportDetailsResponseDTO(
@@ -31,7 +35,11 @@ public record AirportDetailsResponseDTO(
                 airport.getDetails().getCoordinates().getLongitude(),
                 airport.getStatus().name(),                // AirportState diretamente (T9 Option A)
                 airport.getRunways().stream().map(RunwayDTO::from).collect(Collectors.toList()),
-                airport.getCertifiedModels().stream().map(ModelDesignationDTO::from).collect(Collectors.toSet())
+                airport.getCertifiedModels().stream().map(ModelDesignationDTO::from).collect(Collectors.toSet()),
+                airport.getFacilities().stream().map(FacilityDTO::from).collect(Collectors.toList()),
+                airport.getPhotos().stream().map(PhotoDTO::from).collect(Collectors.toList()),
+                airport.getOperatingHours() != null ? OperatingHoursDTO.from(airport.getOperatingHours()) : null,
+                airport.getContacts().stream().map(AirportContactDTO::from).collect(Collectors.toList())
         );
     }
 }

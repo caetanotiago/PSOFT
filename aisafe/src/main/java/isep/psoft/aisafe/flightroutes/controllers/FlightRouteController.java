@@ -19,6 +19,7 @@ import isep.psoft.aisafe.flightroutes.services.ListActiveRoutesService;
 import isep.psoft.aisafe.flightroutes.services.SearchAlternativeRoutesService;
 import isep.psoft.aisafe.flightroutes.services.SearchFlightRoutesService;
 import isep.psoft.aisafe.flightroutes.services.UpdateFlightRouteService;
+import isep.psoft.aisafe.flightroutes.services.ViewRoutesByAirportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -45,6 +46,9 @@ public class FlightRouteController {
     private final CalculateNetworkDistanceService networkDistanceService;
     private final SearchAlternativeRoutesService searchAlternativeRoutesService;
 
+    // WP#2B (US209)
+    private final ViewRoutesByAirportService viewRoutesByAirportService;
+
     private final FlightRouteAssembler assembler;
     private final ItineraryAssembler itineraryAssembler;
 
@@ -70,8 +74,16 @@ public class FlightRouteController {
     public ResponseEntity<List<FlightRouteDTO>> searchRoutes(
             @RequestParam(required = false) String origin,
             @RequestParam(required = false) String dest) {
-        
+
         List<FlightRoute> routes = searchService.searchRoutes(origin, dest);
+        return ResponseEntity.ok(assembler.toDTOList(routes));
+    }
+
+    // US209: Ver todas as rotas que partem de ou chegam a um aeroporto específico (origin OR destination)
+    @GetMapping("/by-airport/{iataCode}")
+    @Operation(summary = "US209 — View all routes that depart from or arrive at a specific airport")
+    public ResponseEntity<List<FlightRouteDTO>> getRoutesByAirport(@PathVariable String iataCode) {
+        List<FlightRoute> routes = viewRoutesByAirportService.findRoutesByAirport(iataCode);
         return ResponseEntity.ok(assembler.toDTOList(routes));
     }
 
