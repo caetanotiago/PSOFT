@@ -1,0 +1,67 @@
+@startuml US211-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +groupAirports(by: String): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class AirportGroupDTO <<record>> {
+        +groupKey: String
+        +airports: List<AirportSummaryResponseDTO>
+    }
+    class AirportSummaryResponseDTO <<record>> {
+        +iataCode: String
+        +name: String
+        +city: String
+        +country: String
+        +status: String
+    }
+}
+
+package "Application Layer" {
+    interface GroupAirportsUseCase {
+        +groupBy(criterion: String): List<AirportGroupDTO>
+    }
+    class GroupAirportsUseCaseImpl {
+        +groupBy(criterion: String): List<AirportGroupDTO>
+    }
+    GroupAirportsUseCaseImpl ..|> GroupAirportsUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -details: AirportDetails
+    }
+    class AirportDetails <<Value Object>> {
+        -region: String
+        -country: String
+    }
+    interface AirportRepository {
+        +findAll(): List<Airport>
+    }
+    note bottom of GroupAirportsUseCaseImpl
+      Groups in-memory via
+      Collectors.groupingBy(); "region"
+      or "country" selects which
+      AirportDetails getter is used
+      as the classifier function.
+      No Strategy Pattern needed —
+      only two fixed criteria.
+    end note
+}
+
+AirportController ..> GroupAirportsUseCase
+AirportController ..> AirportGroupDTO
+
+GroupAirportsUseCaseImpl ..> AirportRepository
+GroupAirportsUseCaseImpl ..> AirportSummaryResponseDTO
+
+Airport *-- "1" AirportDetails
+
+@enduml

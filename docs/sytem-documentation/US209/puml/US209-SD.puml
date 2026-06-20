@@ -1,0 +1,55 @@
+@startuml US209-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "ATCC" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "FlightRouteController" as Controller
+participant "ViewRoutesByAirportService" as Service
+participant "AirportRepository" as AirportRepo
+participant "FlightRouteRepository" as RouteRepo
+participant "FlightRouteAssembler" as Assembler
+
+autonumber
+
+Actor -> Filter : GET /api/routes/by-airport/LIS
+activate Filter
+
+note right of Filter
+  Required role(s) for this US: ATCC
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> Service : findRoutesByAirport(iataCode)
+activate Service
+
+Service -> AirportRepo : existsById(iataCode)
+activate AirportRepo
+AirportRepo --> Service : boolean
+deactivate AirportRepo
+
+alt airport does not exist
+    Service --> Controller : throw AirportNotFoundException
+    Controller --> Actor : 404 Not Found
+else airport exists
+    Service -> RouteRepo : findByOriginOrDestination(iataCode)
+    activate RouteRepo
+    RouteRepo --> Service : List<FlightRoute>
+    deactivate RouteRepo
+
+    Service --> Controller : List<FlightRoute>
+    deactivate Service
+
+    Controller -> Assembler : toDTOList(routes)
+    activate Assembler
+    Assembler --> Controller : List<FlightRouteDTO>
+    deactivate Assembler
+
+    Controller --> Actor : 200 OK\n{ "_embedded": { "routes": [...] }, "_links": {...} }
+end
+
+deactivate Controller
+@enduml

@@ -1,0 +1,30 @@
+@startuml US208-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode       : IATACode
+        - operatingHours : OperatingHours
+        - contacts       : List<AirportContact>
+        - version        : Long
+    }
+    class OperatingHours <<Value Object>> {
+        - operates24Hours : Boolean
+        - opens           : LocalTime
+        - closes          : LocalTime
+        ' opens must be strictly before closes, unless operates24Hours = true
+    }
+    class AirportContact <<Value Object>> {
+        - type        : String
+        - value       : String
+        - description : String
+    }
+
+    Airport *-- "0..1" OperatingHours
+    Airport *-- "0..*" AirportContact
+}
+
+note "Both operatingHours and contacts\nare replaced as whole values/lists\n(full replace, not merge) on update.\n@Version reused from US109 for\noptimistic locking." as N1
+
+@enduml

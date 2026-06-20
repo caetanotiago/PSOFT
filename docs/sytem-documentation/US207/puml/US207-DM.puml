@@ -1,0 +1,29 @@
+@startuml US207-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode   : IATACode
+        - details    : AirportDetails
+        - facilities : List<Facility>
+        - photos     : List<Photo>
+    }
+    class Facility <<Value Object>> {
+        - type        : String
+        - identifier  : String
+        - description : String
+        ' (type, identifier) must be unique within an Airport
+    }
+    class Photo <<Value Object>> {
+        - url     : String
+        - caption : String
+    }
+
+    Airport *-- "0..*" Facility
+    Airport *-- "0..*" Photo
+}
+
+note "Both collections are optional.\nAn Airport is valid with zero\nfacilities and zero photos\n(Conversation 008)." as N1
+
+@enduml

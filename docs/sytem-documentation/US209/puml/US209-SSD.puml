@@ -1,0 +1,18 @@
+@startuml US209-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "ATCC" as ATCC
+participant ":System" as SYS
+
+autonumber
+
+ATCC -> SYS : GET /api/routes/by-airport/{iataCode}
+
+alt airport does not exist
+    SYS --> ATCC : 404 Not Found
+else success
+    SYS --> ATCC : 200 OK\n( List<FlightRoute> where airport is origin OR destination + HATEOAS links )
+end
+
+@enduml

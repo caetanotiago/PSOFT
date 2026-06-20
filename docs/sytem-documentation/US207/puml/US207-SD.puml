@@ -1,0 +1,62 @@
+@startuml US207-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "AddFacilityUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+participant "Airport" as Airport
+
+autonumber
+
+Actor -> Filter : POST /airports/LIS/facilities\n{ "type": "TERMINAL", "identifier": "Terminal 1" }
+activate Filter
+
+note right of Filter
+  Required role(s) for this US: BACKOFFICE_OPERATOR
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : addFacility(iataCode, type, identifier, description)
+activate UseCase
+
+UseCase -> Repo : findById(iataCode)
+activate Repo
+Repo --> UseCase : Optional<Airport>
+deactivate Repo
+
+alt airport not found
+    UseCase --> Controller : throw AirportNotFoundException
+    Controller --> Actor : 404 Not Found
+else airport found
+    UseCase -> Airport : addFacility(new Facility(type, identifier, description))
+    activate Airport
+
+    alt duplicate (type, identifier)
+        Airport --> UseCase : throw DuplicateFacilityException
+        deactivate Airport
+        UseCase --> Controller : propagate exception
+        Controller --> Actor : 409 Conflict
+    else facility added
+        Airport --> UseCase : void
+        deactivate Airport
+
+        UseCase -> Repo : save(airport)
+        activate Repo
+        Repo --> UseCase : Airport (persisted)
+        deactivate Repo
+
+        UseCase --> Controller : Airport
+        deactivate UseCase
+
+        Controller --> Actor : 200 OK\n{ "facilities": [ { "type": "TERMINAL", ... } ], "_links": {...} }
+    end
+end
+
+deactivate Controller
+@enduml

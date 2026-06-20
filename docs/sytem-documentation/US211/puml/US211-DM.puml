@@ -1,0 +1,24 @@
+@startuml US211-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+        - details  : AirportDetails
+    }
+    class AirportDetails <<Value Object>> {
+        - name    : String
+        - city    : String
+        - country : String
+        - region  : String
+        ' region and country are the grouping
+        ' attributes used by US211
+    }
+
+    Airport *-- AirportDetails
+}
+
+note "Multi-aggregate query.\nGrouping key = AirportDetails.region\nor AirportDetails.country (caller's choice).\nAirports with a blank region are placed\nin a sentinel 'Unspecified' group." as N1
+
+@enduml

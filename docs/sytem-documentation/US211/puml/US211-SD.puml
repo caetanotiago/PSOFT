@@ -1,0 +1,49 @@
+@startuml US211-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "ATCC / Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "GroupAirportsUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+
+autonumber
+
+Actor -> Filter : GET /airports/grouped?by=region
+activate Filter
+
+note right of Filter
+  Required role(s) for this US: BACKOFFICE_OPERATOR, ATCC
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : groupBy("region")
+activate UseCase
+
+alt by is neither "region" nor "country"
+    UseCase --> Controller : throw IllegalArgumentException
+    Controller --> Actor : 400 Bad Request
+else valid criterion
+    UseCase -> Repo : findAll()
+    activate Repo
+    Repo --> UseCase : List<Airport>
+    deactivate Repo
+
+    note over UseCase
+      Collectors.groupingBy(airport ->
+        details.getRegion() or "Unspecified"),
+      then sorts group keys alphabetically.
+    end note
+
+    UseCase --> Controller : List<AirportGroupDTO>
+    deactivate UseCase
+
+    Controller --> Actor : 200 OK\n{ "_embedded": { "groups": [ { "groupKey":"Europe", "airports":[...] }, ... ] } }
+end
+
+deactivate Controller
+@enduml

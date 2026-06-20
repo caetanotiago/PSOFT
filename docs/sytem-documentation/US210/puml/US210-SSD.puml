@@ -1,0 +1,18 @@
+@startuml US210-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as BO
+participant ":System" as SYS
+
+autonumber
+
+BO -> SYS : GET /airports/statistics/busiest?limit=N
+
+alt invalid limit (non-positive)
+    SYS --> BO : 400 Bad Request
+else success
+    SYS --> BO : 200 OK\n( List<AirportRouteCount> sorted descending + HATEOAS links )
+end
+
+@enduml

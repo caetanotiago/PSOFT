@@ -1,0 +1,72 @@
+@startuml US208-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "UpdateAirportDetailsUseCaseImpl" as UseCase
+participant "AirportRepository" as Repo
+participant "Airport" as Airport
+
+autonumber
+
+Actor -> Filter : PATCH /airports/OPO/details\n{ "operatingHours": {...}, "contacts": [...] }
+activate Filter
+
+note right of Filter
+  Required role(s) for this US: BACKOFFICE_OPERATOR
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : updateDetails(iataCode, operatingHours, contacts)
+activate UseCase
+
+alt both operatingHours and contacts are null
+    UseCase --> Controller : throw IllegalArgumentException
+    Controller --> Actor : 400 Bad Request
+else at least one field present
+    UseCase -> Repo : findById(iataCode)
+    activate Repo
+    Repo --> UseCase : Optional<Airport>
+    deactivate Repo
+
+    alt airport not found
+        UseCase --> Controller : throw AirportNotFoundException
+        Controller --> Actor : 404 Not Found
+    else airport found
+        opt operatingHours present
+            UseCase -> Airport : updateOperatingHours(operatingHours)
+            activate Airport
+            Airport --> UseCase : void
+            deactivate Airport
+        end
+
+        opt contacts present
+            UseCase -> Airport : updateContacts(contacts)
+            activate Airport
+            Airport --> UseCase : void
+            deactivate Airport
+        end
+
+        UseCase -> Repo : save(airport)
+        activate Repo
+        alt stale version (concurrent modification)
+            Repo --> UseCase : throw ObjectOptimisticLockingFailureException
+            UseCase --> Controller : propagate exception
+            Controller --> Actor : 409 Conflict
+        else persisted
+            Repo --> UseCase : Airport (persisted)
+            deactivate Repo
+            UseCase --> Controller : Airport
+            deactivate UseCase
+            Controller --> Actor : 200 OK\n{ "operatingHours": {...}, "contacts": [...], "_links": {...} }
+        end
+    end
+end
+
+deactivate Controller
+@enduml

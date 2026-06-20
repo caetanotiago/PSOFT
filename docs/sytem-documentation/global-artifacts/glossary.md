@@ -35,10 +35,13 @@
 | **Model Designation** | **Designação do Modelo** | The manufacturer and commercial model name that identifies an Aircraft Model (e.g., Boeing 737). |
 | **Model Specifications** | **Especificações do Modelo** | Technical parameters of an Aircraft Model: base seating capacity, fuel capacity, maximum range, cruising speed. |
 | **Network** | **Rede** | The comprehensive set of active flight routes operated by the company. |
+| **Operating Hours** | **Horário de Funcionamento** | The hours during which an airport is operational for flights — either a fixed opening/closing time, or a 24-hour flag. |
 | **Part Number** | **Número da Peça** | The unique identifier for a specific Maintenance Part in the inventory. |
+| **Photo** | **Fotografia** | An optional image (URL and caption) associated with an Airport, used to illustrate it visually. |
 | **Record Details** | **Detalhes do Registo** | Core information of a Maintenance Record: description, start date, and expected duration. |
 | **Region** | **Região** | A broad geographical zone (e.g., Europe, North America) used to group airports, larger than a country. |
 | **Registration Number** | **Número de Registo** | A unique alphanumeric code that identifies a specific aircraft (e.g., CS-TKY). |
+| **Route Count (Busiest Airport metric)** | **Nº de Rotas (Métrica de Aeroporto mais Movimentado)** | A derived metric: the number of Flight Routes where a given Airport is either the origin or the destination, used to rank airports by usage. |
 | **Route Distance** | **Distância da Rota** | The total fixed distance between the origin and destination airports of a route. |
 | **Route ID** | **ID da Rota** | Unique system-generated identifier assigned to a Flight Route. |
 | **Route Popularity (Usage Count)** | **Popularidade da Rota (Nº de Utilizações)** | A derived metric: the number of times a route has been used, i.e. the count of Scheduled Flights created on that route. |
