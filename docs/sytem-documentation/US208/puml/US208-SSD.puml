@@ -1,0 +1,22 @@
+@startuml US208-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as BO
+participant ":System" as SYS
+
+autonumber
+
+BO -> SYS : PATCH /airports/{iataCode}/details\n( operatingHours?, contacts[ ]? )
+
+alt airport does not exist
+    SYS --> BO : 404 Not Found
+else both fields absent
+    SYS --> BO : 400 Bad Request
+else concurrent modification
+    SYS --> BO : 409 Conflict
+else success
+    SYS --> BO : 200 OK\n( Airport resource incl. operatingHours, contacts[ ] + HATEOAS links )
+end
+
+@enduml

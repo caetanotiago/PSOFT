@@ -1,0 +1,65 @@
+@startuml US209-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class FlightRouteController {
+        +getRoutesByAirport(iataCode: String): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class FlightRouteDTO <<record>> {
+        +id: String
+        +origin: String
+        +destination: String
+        +distance: Double
+        +status: String
+    }
+}
+
+package "Application Layer" {
+    class ViewRoutesByAirportService {
+        +findRoutesByAirport(iataCode: String): List<FlightRoute>
+    }
+    class FlightRouteAssembler {
+        +toDTOList(routes: List<FlightRoute>): List<FlightRouteDTO>
+    }
+}
+
+package "Domain Layer (flightroutes)" {
+    class FlightRoute <<Entity>> {
+        -id: String
+        -origin: Airport
+        -destination: Airport
+    }
+    interface FlightRouteRepository {
+        +findByOriginOrDestination(iataCode: String): List<FlightRoute>
+    }
+    note bottom of FlightRouteRepository
+      JPQL: WHERE r.origin.iataCode.code = :iata
+             OR r.destination.iataCode.code = :iata
+    end note
+}
+
+package "Domain Layer (airports)" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+    }
+    interface AirportRepository {
+        +existsById(iataCode: IATACode): boolean
+    }
+}
+
+FlightRouteController ..> ViewRoutesByAirportService
+FlightRouteController ..> FlightRouteAssembler
+FlightRouteController ..> FlightRouteDTO
+
+ViewRoutesByAirportService ..> AirportRepository
+ViewRoutesByAirportService ..> FlightRouteRepository
+
+FlightRoute --> "1" Airport : origin >
+FlightRoute --> "1" Airport : destination >
+
+@enduml

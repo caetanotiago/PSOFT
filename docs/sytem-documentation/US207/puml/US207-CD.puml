@@ -1,0 +1,95 @@
+@startuml US207-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +addFacility(iataCode: String, request: AddFacilityRequest): ResponseEntity
+        +addPhoto(iataCode: String, request: AddPhotoRequest): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class AddFacilityRequest <<record>> {
+        +type: String
+        +identifier: String
+        +description: String
+    }
+    class AddPhotoRequest <<record>> {
+        +url: String
+        +caption: String
+    }
+    class FacilityDTO <<record>> {
+        +type: String
+        +identifier: String
+        +description: String
+    }
+    class PhotoDTO <<record>> {
+        +url: String
+        +caption: String
+    }
+    class AirportDetailsResponseDTO <<record>> {
+        +facilities: List<FacilityDTO>
+        +photos: List<PhotoDTO>
+        +{static} from(airport: Airport): AirportDetailsResponseDTO
+    }
+}
+
+package "Application Layer" {
+    interface AddFacilityUseCase {
+        +addFacility(iataCode: String, type: String, identifier: String, description: String): Airport
+    }
+    class AddFacilityUseCaseImpl {
+        +addFacility(iataCode: String, type: String, identifier: String, description: String): Airport
+    }
+    AddFacilityUseCaseImpl ..|> AddFacilityUseCase
+
+    interface AddPhotoUseCase {
+        +addPhoto(iataCode: String, url: String, caption: String): Airport
+    }
+    class AddPhotoUseCaseImpl {
+        +addPhoto(iataCode: String, url: String, caption: String): Airport
+    }
+    AddPhotoUseCaseImpl ..|> AddPhotoUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -facilities: List<Facility>
+        -photos: List<Photo>
+        +addFacility(facility: Facility): void
+        +addPhoto(photo: Photo): void
+    }
+    class Facility <<Value Object>> {
+        -type: String
+        -identifier: String
+        -description: String
+    }
+    class Photo <<Value Object>> {
+        -url: String
+        -caption: String
+    }
+    class DuplicateFacilityException <<exception>> {
+    }
+    interface AirportRepository {
+        +findById(iataCode: IATACode): Optional<Airport>
+        +save(airport: Airport): Airport
+    }
+}
+
+AirportController ..> AddFacilityUseCase
+AirportController ..> AddPhotoUseCase
+AirportController ..> AddFacilityRequest
+AirportController ..> AddPhotoRequest
+
+AddFacilityUseCaseImpl ..> AirportRepository
+AddFacilityUseCaseImpl ..> Airport
+AddPhotoUseCaseImpl ..> AirportRepository
+
+Airport ..> DuplicateFacilityException : throws
+Airport *-- "0..*" Facility
+Airport *-- "0..*" Photo
+
+@enduml

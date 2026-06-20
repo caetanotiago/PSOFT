@@ -1,0 +1,60 @@
+@startuml US210-SD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as Actor
+participant "«filter»\nJwtAuthenticationFilter" as Filter
+participant "AirportController" as Controller
+participant "ListBusiestAirportsUseCaseImpl" as UseCase
+participant "AirportRepository" as AirportRepo
+participant "FlightRouteRepository" as RouteRepo
+
+autonumber
+
+Actor -> Filter : GET /airports/statistics/busiest?limit=5
+activate Filter
+
+note right of Filter
+  Required role(s) for this US: BACKOFFICE_OPERATOR
+end note
+
+Filter -> Controller : forward authenticated request
+deactivate Filter
+activate Controller
+
+Controller -> UseCase : listBusiest(limit)
+activate UseCase
+
+alt limit is non-positive
+    UseCase --> Controller : throw IllegalArgumentException
+    Controller --> Actor : 400 Bad Request
+else limit valid or absent
+    UseCase -> AirportRepo : findAll()
+    activate AirportRepo
+    AirportRepo --> UseCase : List<Airport>
+    deactivate AirportRepo
+
+    UseCase -> RouteRepo : countByOrigin()
+    activate RouteRepo
+    RouteRepo --> UseCase : List<Object[ ]> (iataCode, count)
+    deactivate RouteRepo
+
+    UseCase -> RouteRepo : countByDestination()
+    activate RouteRepo
+    RouteRepo --> UseCase : List<Object[ ]> (iataCode, count)
+    deactivate RouteRepo
+
+    note over UseCase
+      Merges both count lists per IATA code
+      (sum), defaults missing airports to 0,
+      sorts descending, applies limit.
+    end note
+
+    UseCase --> Controller : List<AirportRouteCount>
+    deactivate UseCase
+
+    Controller --> Actor : 200 OK\n{ "_embedded": { "airports": [ { "iataCode":"LIS", "routeCount": 7 }, ... ] } }
+end
+
+deactivate Controller
+@enduml

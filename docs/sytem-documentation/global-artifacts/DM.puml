@@ -10,7 +10,9 @@ package "Airport Aggregate" {
         - status : AirportStatus
         - runways : List<Runway>
         - facilities : List<Facility>
+        - photos : List<Photo>
         - contacts : List<AirportContact>
+        - operatingHours : OperatingHours
     }
     class IATACode <<Value Object>> {
         - code : String
@@ -37,15 +39,26 @@ package "Airport Aggregate" {
         - identifier : String
         - description : String
     }
+    class Photo <<Value Object>> {
+        - url : String
+        - caption : String
+    }
+    class OperatingHours <<Value Object>> {
+        - operates24Hours : Boolean
+        - opens : LocalTime
+        - closes : LocalTime
+    }
     class AirportStatus <<Value Object>> {
         - state : String
     }
-    
+
     Airport *-- IATACode
     Airport *-- AirportDetails
     Airport *-- Runway
     Airport *-- AirportContact
     Airport *-- Facility
+    Airport *-- Photo
+    Airport *-- OperatingHours
     Airport *-- AirportStatus
 }
 

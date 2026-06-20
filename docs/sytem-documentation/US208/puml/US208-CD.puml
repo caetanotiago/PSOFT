@@ -1,0 +1,83 @@
+@startuml US208-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +updateDetails(iataCode: String, request: UpdateAirportDetailsRequest): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class UpdateAirportDetailsRequest <<record>> {
+        +operatingHours: OperatingHoursRequest
+        +contacts: List<AirportContactRequest>
+    }
+    class OperatingHoursDTO <<record>> {
+        +operates24Hours: Boolean
+        +opens: LocalTime
+        +closes: LocalTime
+    }
+    class AirportContactDTO <<record>> {
+        +type: String
+        +value: String
+        +description: String
+    }
+    class AirportDetailsResponseDTO <<record>> {
+        +operatingHours: OperatingHoursDTO
+        +contacts: List<AirportContactDTO>
+        +{static} from(airport: Airport): AirportDetailsResponseDTO
+    }
+}
+
+package "Application Layer" {
+    interface UpdateAirportDetailsUseCase {
+        +updateDetails(iataCode: String, operatingHours: OperatingHours, contacts: List<AirportContact>): Airport
+    }
+    class UpdateAirportDetailsUseCaseImpl {
+        +updateDetails(iataCode: String, operatingHours: OperatingHours, contacts: List<AirportContact>): Airport
+    }
+    UpdateAirportDetailsUseCaseImpl ..|> UpdateAirportDetailsUseCase
+}
+
+package "Domain Layer" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+        -operatingHours: OperatingHours
+        -contacts: List<AirportContact>
+        -version: Long
+        +updateOperatingHours(hours: OperatingHours): void
+        +updateContacts(contacts: List<AirportContact>): void
+    }
+    class OperatingHours <<Value Object>> {
+        -operates24Hours: boolean
+        -opens: LocalTime
+        -closes: LocalTime
+    }
+    class AirportContact <<Value Object>> {
+        -type: String
+        -value: String
+        -description: String
+    }
+    interface AirportRepository {
+        +findById(iataCode: IATACode): Optional<Airport>
+        +save(airport: Airport): Airport
+    }
+    note bottom of AirportRepository
+      save() relies on the existing
+      @Version field for optimistic
+      locking (reused from US109).
+    end note
+}
+
+AirportController ..> UpdateAirportDetailsUseCase
+AirportController ..> UpdateAirportDetailsRequest
+
+UpdateAirportDetailsUseCaseImpl ..> AirportRepository
+UpdateAirportDetailsUseCaseImpl ..> Airport
+
+Airport *-- "0..1" OperatingHours
+Airport *-- "0..*" AirportContact
+
+@enduml

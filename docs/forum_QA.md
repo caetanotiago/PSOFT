@@ -2,7 +2,7 @@
 
 > **Project:** AISafe Flight Management System
 > **Client:** Nuno Pereira NAP
-> **Last updated:** 2026-04-27
+> **Last updated:** 2026-04-28
 
 ---
 
@@ -25,7 +25,7 @@
 | [013](#conversation-013) | 2026-04-01 | US216 - Search for alternative routes between airports | Resolved | SILVA 1241131 |
 | [014](#conversation-014) | 2026-04-01 | US208 - Update Airport details and contact information | Resolved | SILVA 1241131 |
 | [015](#conversation-015) | 2026-04-01 | US226 - Maintenance Part relationships | Resolved | Diogo Nogueira 1241692 |
-| [016](#conversation-016) | 2026-04-08 | US222 - Scheduled maintenance triggers and intervals | Resolved | Diogo Nogueira 1241692 |
+| [016](#conversation-016) | 2026-04-08 (updated 2026-04-28) | US222 - Scheduled maintenance triggers and intervals | Resolved | Diogo Nogueira 1241692 |
 | [017](#conversation-017) | 2026-04-26 | US101 - Aircraft manufacturer details | Resolved | Diogo Nogueira 1241692 |
 
 ---
@@ -546,16 +546,24 @@
 **Received on:** 2026-04-10
 **Responded by:** Nuno Pereira NAP
 
+> Hi. Apologies for the delay, I missed this one.
+>
+> Let's say the trigger is manual for now. That is, there is some option the user can select to trigger the check.
+
+**Received on:** 2026-04-28
+**Responded by:** Nuno Pereira NAP
+
 ### Notes & Clarifications
 
 - Os intervalos de manutenção (horas de voo e dias de calendário) são atributos da **Maintenance Template**.
 - O sistema verifica os limites do template e envia alertas quando uma aeronave os atinge.
 - Exemplo: template "100-hour inspection" com limite de 100 horas de voo → alerta automático.
+- **Atualização (2026-04-28):** O trigger da verificação é **manual** por agora — deve existir uma opção que o utilizador seleciona para disparar a verificação, em vez de ser automático/periódico.
 
 ### Action Items
 
 - [x] Adicionar `flightHoursInterval` e `calendarDaysInterval` à entidade MaintenanceTemplate
-- [x] Implementar lógica de verificação e alerta de manutenção com base nesses campos
+- [x] Implementar lógica de verificação de manutenção acionada manualmente pelo utilizador (não automática)
 
 ---
 

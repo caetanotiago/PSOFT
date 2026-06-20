@@ -1,0 +1,31 @@
+@startuml US210-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+        - details  : AirportDetails
+    }
+}
+
+package "Flight Route & Schedule Aggregate" {
+    class FlightRoute <<Entity>> {
+        - id : RouteID
+    }
+}
+
+class AirportRouteCount <<Read Projection>> {
+    - airport    : Airport
+    - routeCount : long
+    ' Not persisted. Derived at query time, exactly
+    ' like RouteUsage (US214) for route popularity.
+}
+
+AirportRouteCount --> "1" Airport
+FlightRoute --> "1" Airport : origin >
+FlightRoute --> "1" Airport : destination >
+
+note "routeCount(airport) =\n  count(FlightRoute WHERE origin = airport)\n+ count(FlightRoute WHERE destination = airport)" as N1
+
+@enduml

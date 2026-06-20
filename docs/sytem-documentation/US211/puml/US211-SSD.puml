@@ -1,0 +1,18 @@
+@startuml US211-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "ATCC" as ATCC
+participant ":System" as SYS
+
+autonumber
+
+ATCC -> SYS : GET /airports/grouped?by=region|country
+
+alt invalid or missing "by" value
+    SYS --> ATCC : 400 Bad Request
+else success
+    SYS --> ATCC : 200 OK\n( List<AirportGroupDTO> sorted by groupKey + HATEOAS links )
+end
+
+@enduml

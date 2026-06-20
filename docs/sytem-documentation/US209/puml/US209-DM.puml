@@ -1,0 +1,24 @@
+@startuml US209-DM
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Flight Route & Schedule Aggregate" {
+    class FlightRoute <<Entity>> {
+        - id          : RouteID
+        - distance    : RouteDistance
+        - status      : RouteStatus
+    }
+}
+
+package "Airport Aggregate" {
+    class Airport <<Entity>> <<Root>> {
+        - iataCode : IATACode
+    }
+}
+
+FlightRoute --> "1" Airport : origin >
+FlightRoute --> "1" Airport : destination >
+
+note "This US is a read-only, cross-aggregate query:\nit selects FlightRoute instances where the\ngiven Airport is either endpoint (OR), regardless\nof RouteStatus (active or inactive)." as N1
+
+@enduml

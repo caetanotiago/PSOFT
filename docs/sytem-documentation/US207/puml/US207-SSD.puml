@@ -1,0 +1,20 @@
+@startuml US207-SSD
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Backoffice Operator" as BO
+participant ":System" as SYS
+
+autonumber
+
+BO -> SYS : POST /airports/{iataCode}/facilities\n( type, identifier, description )
+
+alt airport does not exist
+    SYS --> BO : 404 Not Found
+else duplicate (type, identifier)
+    SYS --> BO : 409 Conflict
+else success
+    SYS --> BO : 200 OK\n( Airport resource incl. facilities[ ] + HATEOAS links )
+end
+
+@enduml

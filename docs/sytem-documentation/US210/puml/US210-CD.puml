@@ -1,0 +1,64 @@
+@startuml US210-CD
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "REST Layer" {
+    class AirportController {
+        +listBusiestAirports(limit: Integer): ResponseEntity
+    }
+}
+
+package "DTO" {
+    class AirportRouteCountDTO <<record>> {
+        +iataCode: String
+        +name: String
+        +routeCount: long
+    }
+}
+
+package "Application Layer" {
+    interface ListBusiestAirportsUseCase {
+        +listBusiest(limit: Integer): List<AirportRouteCount>
+    }
+    class ListBusiestAirportsUseCaseImpl {
+        +listBusiest(limit: Integer): List<AirportRouteCount>
+    }
+    ListBusiestAirportsUseCaseImpl ..|> ListBusiestAirportsUseCase
+}
+
+package "Domain Layer (airports)" {
+    class Airport <<Entity>> <<Root>> {
+        -iataCode: IATACode
+    }
+    class AirportRouteCount <<Read Projection>> {
+        -airport: Airport
+        -routeCount: long
+    }
+    interface AirportRepository {
+        +findAll(): List<Airport>
+    }
+    AirportRouteCount --> "1" Airport
+}
+
+package "Domain Layer (flightroutes)" {
+    interface FlightRouteRepository {
+        +countByOrigin(): List<Object[ ]>
+        +countByDestination(): List<Object[ ]>
+    }
+    note bottom of FlightRouteRepository
+      Two grouped COUNT queries;
+      merged per IATA code in the
+      use case (no single-query GROUP
+      BY across two FK columns).
+    end note
+}
+
+AirportController ..> ListBusiestAirportsUseCase
+AirportController ..> AirportRouteCountDTO
+
+ListBusiestAirportsUseCaseImpl ..> AirportRepository
+ListBusiestAirportsUseCaseImpl ..> FlightRouteRepository
+ListBusiestAirportsUseCaseImpl ..> AirportRouteCount
+
+@enduml
