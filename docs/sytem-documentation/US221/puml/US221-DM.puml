@@ -1,0 +1,17 @@
+@startuml
+hide methods
+
+entity AircraftModel <<Entity>> <<Root>>
+entity Aircraft <<Entity>> <<Root>>
+entity MaintenanceRecord <<Entity>> <<Root>> {
+  expectedDurationMinutes
+}
+
+Aircraft "*" --> "1" AircraftModel : is of type
+MaintenanceRecord "*" --> "1" Aircraft : performed on
+
+note bottom of MaintenanceRecord
+  The turnaround time is the
+  duration of COMPLETED records.
+end note
+@enduml

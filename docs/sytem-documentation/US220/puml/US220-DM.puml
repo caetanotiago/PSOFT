@@ -1,0 +1,18 @@
+@startuml
+hide methods
+
+entity AircraftModel <<Entity>> <<Root>>
+entity Aircraft <<Entity>> <<Root>>
+entity MaintenanceRecord <<Entity>> <<Root>> {
+  cost: Double
+}
+
+Aircraft "*" --> "1" AircraftModel : is of type
+MaintenanceRecord "*" --> "1" Aircraft : performed on
+
+note bottom of MaintenanceRecord
+  The cost attribute tracks the
+  financial impact of each maintenance
+  operation.
+end note
+@enduml

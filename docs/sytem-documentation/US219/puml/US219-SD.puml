@@ -1,0 +1,30 @@
+@startuml
+autonumber
+actor "Maintenance Supervisor" as Supervisor
+participant "MaintenanceController" as Ctrl
+participant "ViewOngoingMaintenanceUseCase" as UseCase
+participant "MaintenanceRecordRepository" as Repo
+participant "MaintenanceRecordAssembler" as Assembler
+
+Supervisor -> Ctrl : GET /api/maintenance-records/ongoing
+activate Ctrl
+
+Ctrl -> UseCase : execute()
+activate UseCase
+
+UseCase -> Repo : findByStatus(MaintenanceStatus.ONGOING)
+activate Repo
+Repo --> UseCase : List<MaintenanceRecord>
+deactivate Repo
+
+UseCase -> Assembler : toDtoList(list)
+activate Assembler
+Assembler --> UseCase : List<MaintenanceRecordOutputDto>
+deactivate Assembler
+
+UseCase --> Ctrl : dtoList
+deactivate UseCase
+
+Ctrl --> Supervisor : 200 OK (dtoList)
+deactivate Ctrl
+@enduml

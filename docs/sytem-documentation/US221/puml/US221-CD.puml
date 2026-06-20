@@ -1,0 +1,29 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class MaintenanceController {
+  + getAverageTurnaroundTime(): ResponseEntity<TurnaroundReportDto>
+}
+
+class ViewAvgTurnaroundTimeUseCase {
+  + execute(): TurnaroundReportDto
+}
+
+interface MaintenanceRecordRepository {
+  + findAverageTurnaroundTimePerModel(): List<TurnaroundItem>
+}
+
+class TurnaroundReportDto {
+  - items: List<TurnaroundItemDto>
+}
+
+class TurnaroundItemDto {
+  - modelName: String
+  - avgMinutes: Double
+}
+
+MaintenanceController ..> ViewAvgTurnaroundTimeUseCase
+ViewAvgTurnaroundTimeUseCase ..> MaintenanceRecordRepository
+ViewAvgTurnaroundTimeUseCase ..> TurnaroundReportDto
+TurnaroundReportDto *-- TurnaroundItemDto
+@enduml

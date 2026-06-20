@@ -1,0 +1,52 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class MaintenanceController {
+  + categorizeMaintenanceRecord(id: Long, dto: CategorizeRecordInputDto, ifMatch: String): ResponseEntity<MaintenanceRecordOutputDto>
+}
+
+class CategorizeMaintenanceRecordUseCase {
+  + execute(id: Long, dto: CategorizeRecordInputDto, version: String): MaintenanceRecordOutputDto
+}
+
+interface MaintenanceRecordRepository {
+  + findById(id: Long): Optional<MaintenanceRecord>
+  + save(record: MaintenanceRecord): MaintenanceRecord
+}
+
+class MaintenanceRecord {
+  - id: Long
+  - version: Long
+  - component: MaintenanceComponent
+  + updateComponent(componentStr: String): void
+}
+
+class CategorizeRecordInputDto {
+  - component: String
+}
+
+enum MaintenanceComponent {
+  ENGINE
+  AIRFRAME
+  AVIONICS
+  INTERIOR
+  EXTERIOR
+}
+
+class MaintenanceRecordAssembler {
+  + toDto(record: MaintenanceRecord): MaintenanceRecordOutputDto
+}
+
+class MaintenanceRecordOutputDto {
+  - id: Long
+  - component: String
+}
+
+MaintenanceController ..> CategorizeMaintenanceRecordUseCase
+MaintenanceController ..> CategorizeRecordInputDto
+CategorizeMaintenanceRecordUseCase ..> MaintenanceRecordRepository
+CategorizeMaintenanceRecordUseCase ..> MaintenanceRecord
+CategorizeMaintenanceRecordUseCase ..> MaintenanceRecordAssembler
+MaintenanceRecord --> MaintenanceComponent
+MaintenanceRecordAssembler ..> MaintenanceRecordOutputDto : creates >
+@enduml

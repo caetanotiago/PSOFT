@@ -1,0 +1,10 @@
+@startuml
+autonumber
+actor "System" as System
+actor "ATCC" as ATCC
+
+System -> System : periodic check of maintenance limits
+activate System
+System -> ATCC : sends alert (maintenance due for aircraft X)
+deactivate System
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+autonumber
+actor "Maintenance Technician" as Tech
+participant "MaintenanceController" as Ctrl
+participant "SearchMaintenanceRecordsUseCase" as UseCase
+participant "MaintenanceRecordRepository" as Repo
+participant "MaintenanceRecordAssembler" as Assembler
+
+Tech -> Ctrl : GET /api/maintenance-records?aircraft={reg}&start={date}&end={date}&component={cat}
+activate Ctrl
+
+Ctrl -> UseCase : execute(reg, start, end, cat, pageable)
+activate UseCase
+
+UseCase -> Repo : findByFilters(reg, start, end, cat, pageable)
+activate Repo
+Repo --> UseCase : Page<MaintenanceRecord>
+deactivate Repo
+
+UseCase -> Assembler : toDtoPage(page)
+activate Assembler
+Assembler --> UseCase : Page<MaintenanceRecordOutputDto>
+deactivate Assembler
+
+UseCase --> Ctrl : dtoPage
+deactivate UseCase
+
+Ctrl --> Tech : 200 OK (dtoPage)
+deactivate Ctrl
+@enduml

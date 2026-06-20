@@ -1,0 +1,10 @@
+@startuml
+autonumber
+actor "Maintenance Technician" as Tech
+participant "System" as System
+
+Tech -> System : requests to categorize a maintenance record (record id, component category)
+activate System
+System --> Tech : returns success and the updated operation details
+deactivate System
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class MaintenanceController {
+  + getOngoingMaintenance(): ResponseEntity<List<MaintenanceRecordOutputDto>>
+}
+
+class ViewOngoingMaintenanceUseCase {
+  + execute(): List<MaintenanceRecordOutputDto>
+}
+
+interface MaintenanceRecordRepository {
+  + findByStatus(status: MaintenanceStatus): List<MaintenanceRecord>
+}
+
+class MaintenanceRecordOutputDto {
+  - id: Long
+  - status: String
+  - aircraftRegistration: String
+}
+
+MaintenanceController ..> ViewOngoingMaintenanceUseCase
+ViewOngoingMaintenanceUseCase ..> MaintenanceRecordRepository
+ViewOngoingMaintenanceUseCase ..> MaintenanceRecordOutputDto
+@enduml
