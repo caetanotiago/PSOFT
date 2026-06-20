@@ -1,0 +1,60 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant "Aircraft\nController" as CTRL
+participant "ViewCompatibleRoutes\nService" as SRV
+participant "Aircraft\nRepository" as AREPO
+participant "aircraft : Aircraft" as ENTITY
+participant "FlightRoute\nRepository" as FREPO
+participant "PagedResources\nAssembler" as PAG_ASM
+participant "FlightRoute\nAssembler" as ASM
+
+activate ATCC
+ATCC -> CTRL : GET /api/aircrafts/{registration}/compatible-routes
+activate CTRL
+
+CTRL -> SRV : getCompatibleRoutes(registration, pageable)
+activate SRV
+
+SRV -> AREPO : findById(registration)
+activate AREPO
+AREPO --> SRV : Optional<Aircraft>
+deactivate AREPO
+
+SRV -> ENTITY : getSeatingCapacity()
+activate ENTITY
+ENTITY --> SRV : capacity
+deactivate ENTITY
+
+SRV -> ENTITY : getModel().getSpecifications().getMaximumRange()
+activate ENTITY
+ENTITY --> SRV : range
+deactivate ENTITY
+
+note right of SRV
+  Service delegates the matching 
+  logic to the DB layer for performance
+end note
+
+SRV -> FREPO : findCompatibleRoutes(capacity, range, pageable)
+activate FREPO
+FREPO --> SRV : Page<FlightRoute>
+deactivate FREPO
+
+SRV --> CTRL : Page<FlightRoute>
+deactivate SRV
+
+CTRL -> PAG_ASM : toModel(Page<FlightRoute>, assembler)
+activate PAG_ASM
+PAG_ASM -> ASM : toModel(route)
+activate ASM
+ASM --> PAG_ASM : RouteDTO
+deactivate ASM
+PAG_ASM --> CTRL : PagedModel<RouteDTO>
+deactivate PAG_ASM
+
+CTRL --> ATCC : 200 OK (PagedModel<RouteDTO>)
+deactivate CTRL
+deactivate ATCC
+@enduml

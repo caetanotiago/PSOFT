@@ -1,0 +1,12 @@
+@startuml
+autonumber
+actor "Backoffice Operator" as BO
+participant "System" as SYS
+
+activate BO
+BO -> SYS : POST /api/aircraft-models \n(body: CreateModelDTO with optional image)
+activate SYS
+SYS --> BO : 201 Created (Returns new Aircraft Model details)
+deactivate SYS
+deactivate BO
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class AircraftController {
+  + getOperationalHours(pageable: Pageable): ResponseEntity<PagedModel<AircraftOperationalHoursDTO>>
+}
+
+class CalculateOperationalHoursService {
+  + calculateOperationalHours(pageable: Pageable): Page<AircraftOperationalHoursDTO>
+}
+
+interface AircraftRepository <<Repository>> {
+  + findOperationalHoursPerAircraft(pageable: Pageable): Page<AircraftOperationalHoursDTO>
+}
+
+class AircraftOperationalHoursDTO <<DTO>> {
+  - registration : String
+  - totalHours : Double
+  + AircraftOperationalHoursDTO(registration: String, totalHours: Double)
+}
+
+AircraftController ..> CalculateOperationalHoursService
+AircraftController ..> AircraftOperationalHoursDTO
+CalculateOperationalHoursService ..> AircraftRepository
+CalculateOperationalHoursService ..> AircraftOperationalHoursDTO
+AircraftRepository ..> AircraftOperationalHoursDTO
+
+note right of AircraftRepository
+  The repository directly projects
+  the aggregated query results into
+  the DTO for maximum performance.
+end note
+
+@enduml

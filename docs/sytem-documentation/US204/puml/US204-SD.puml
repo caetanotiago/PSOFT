@@ -1,0 +1,40 @@
+@startuml
+autonumber
+actor "Backoffice Operator" as BO
+
+participant "AircraftModel\nController" as CTRL
+participant "ViewTopUtilized\nModelsService" as SRV
+participant "AircraftModel\nRepository" as REPO
+
+activate BO
+BO -> CTRL : GET /api/aircraft-models/top-utilized?metric=hours
+activate CTRL
+
+CTRL -> SRV : getTopUtilizedModels("hours")
+activate SRV
+
+note right of SRV
+  Service creates a Pageable request
+  with size = 5 to enforce DB limitation.
+end note
+
+alt metric == "flight_hours"
+    SRV -> REPO : findTopModelsByFlightHours(PageRequest.of(0,5))
+    activate REPO
+    note right of REPO: Executes JPQL: \nSELECT model, SUM(time)\nGROUP BY model\nORDER BY SUM DESC
+    REPO --> SRV : List<AircraftModelUtilizationDTO>
+    deactivate REPO
+else metric == "assignments"
+    SRV -> REPO : findTopModelsByAssignments(PageRequest.of(0,5))
+    activate REPO
+    REPO --> SRV : List<AircraftModelUtilizationDTO>
+    deactivate REPO
+end
+
+SRV --> CTRL : List<AircraftModelUtilizationDTO>
+deactivate SRV
+
+CTRL --> BO : 200 OK (List<AircraftModelUtilizationDTO>)
+deactivate CTRL
+deactivate BO
+@enduml

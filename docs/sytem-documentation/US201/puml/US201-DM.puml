@@ -1,0 +1,25 @@
+@startuml
+hide methods
+left to right direction
+skinparam classAttributeIconSize 0
+
+class AircraftModel <<Aggregate Root>> <<Entity>> {
+  - version : Long
+}
+
+class ModelDesignation <<Value Object>> <<ID>> {
+  - manufacturer : String
+  - modelName : String
+}
+
+class ModelSpecifications <<Value Object>> {
+  - standardSeatingCapacity : Integer
+  - fuelCapacity : Double
+  - maximumRange : Double
+  - cruisingSpeed : Double
+}
+
+AircraftModel "1" --> "1" ModelDesignation : identified by >
+AircraftModel "1" --> "1" ModelSpecifications : described by >
+
+@enduml

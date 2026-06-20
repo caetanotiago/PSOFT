@@ -1,0 +1,55 @@
+@startuml
+autonumber
+actor "Backoffice Operator" as BO
+
+participant "AircraftModel\nController" as CTRL
+participant "UpdateAircraft\nModelService" as SRV
+participant "AircraftModel\nRepository" as REPO
+participant "model : AircraftModel" as ENTITY
+participant "newSpecs : ModelSpecifications" as VO
+participant "AircraftModel\nAssembler" as ASM
+
+activate BO
+BO -> CTRL : PATCH /api/aircraft-models/{designation}/specifications \n(body: dto, header: If-Match)
+activate CTRL
+
+CTRL -> SRV : updateSpecifications(designation, dto, version)
+activate SRV
+
+SRV -> REPO : findById(designation)
+activate REPO
+REPO --> SRV : Optional<AircraftModel>
+deactivate REPO
+
+note right of SRV
+  Service manually checks if
+  model.getVersion() == version.
+  If not, throws Exception (409 Conflict).
+end note
+
+SRV -> VO** : create(dto.capacity, dto.fuel, ...)
+note right of VO: Value Object self-validates\npositive ranges upon creation
+
+SRV -> ENTITY : updateSpecifications(newSpecs)
+activate ENTITY
+ENTITY --> SRV : success
+deactivate ENTITY
+
+SRV -> REPO : save(model)
+activate REPO
+note right of REPO: JPA increments @Version
+REPO --> SRV : updatedModel
+deactivate REPO
+
+SRV --> CTRL : updatedModel
+deactivate SRV
+
+CTRL -> ASM : toModel(updatedModel)
+activate ASM
+ASM --> CTRL : modelDTO
+deactivate ASM
+
+CTRL --> BO : 200 OK (modelDTO)
+deactivate CTRL
+deactivate BO
+@enduml

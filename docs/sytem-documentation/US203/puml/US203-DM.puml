@@ -1,0 +1,37 @@
+@startuml
+hide methods
+left to right direction
+skinparam classAttributeIconSize 0
+
+class Aircraft <<Aggregate Root>> <<Entity>> {}
+class AircraftModel <<Aggregate Root>> <<Entity>> {}
+class FlightRoute <<Aggregate Root>> <<Entity>> {}
+
+class SeatingCapacity <<Value Object>> {
+  - capacity : Integer
+}
+
+class ModelSpecifications <<Value Object>> {
+  - maximumRange : Double
+}
+
+class RouteDistance <<Value Object>> {
+  - distance : Double
+}
+
+class RouteRequirements <<Value Object>> {
+  - requiredCapacity : Integer
+}
+
+Aircraft "1" --> "1" SeatingCapacity : has >
+Aircraft "1" --> "1" AircraftModel : based on >
+AircraftModel "1" --> "1" ModelSpecifications : described by >
+
+FlightRoute "1" --> "1" RouteDistance : covers >
+FlightRoute "1" --> "1" RouteRequirements : enforces >
+
+note "Compatibility Rule:\nSeatingCapacity >= RouteRequirements.requiredCapacity\nModelSpecifications.maximumRange >= RouteDistance.distance" as N1
+Aircraft .. N1
+N1 .. FlightRoute
+
+@enduml

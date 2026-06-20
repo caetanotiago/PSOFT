@@ -1,0 +1,12 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+participant "System" as SYS
+
+activate ATCC
+ATCC -> SYS : GET /api/aircrafts/{registrationNumber}/compatible-routes \n(params: page, size)
+activate SYS
+SYS --> ATCC : 200 OK (Returns paginated list of compatible routes)
+deactivate SYS
+deactivate ATCC
+@enduml
