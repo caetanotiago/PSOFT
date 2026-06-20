@@ -1,7 +1,9 @@
 package isep.psoft.aisafe.maintenance.controllers;
 
+import isep.psoft.aisafe.maintenance.dto.CategorizeRecordInputDto;
 import isep.psoft.aisafe.maintenance.dto.CompleteRecordInputDto;
 import isep.psoft.aisafe.maintenance.dto.CreateRecordDTO;
+import isep.psoft.aisafe.maintenance.dto.MaintenanceCostReportDto;
 import isep.psoft.aisafe.maintenance.dto.MaintenanceRecordOutputDto;
 import isep.psoft.aisafe.maintenance.dto.TotalMaintenanceHoursDto;
 import isep.psoft.aisafe.maintenance.services.common.ViewMaintenanceRecordByIdUseCase;
@@ -9,6 +11,10 @@ import isep.psoft.aisafe.maintenance.services.us115a.CreateMaintenanceRecordUseC
 import isep.psoft.aisafe.maintenance.services.us116.ViewAircraftMaintenanceRecordsUseCase;
 import isep.psoft.aisafe.maintenance.services.us117.ViewTotalMaintenanceHoursUseCase;
 import isep.psoft.aisafe.maintenance.services.us119.CompleteMaintenanceRecordUseCase;
+import isep.psoft.aisafe.maintenance.services.us217.CategorizeMaintenanceRecordUseCase;
+import isep.psoft.aisafe.maintenance.services.us218.SearchMaintenanceRecordsUseCase;
+import isep.psoft.aisafe.maintenance.services.us219.ViewOngoingMaintenanceUseCase;
+import isep.psoft.aisafe.maintenance.services.us220.GenerateCostReportUseCase;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +34,12 @@ public class MaintenanceController {
     @Autowired private ViewTotalMaintenanceHoursUseCase viewTotalHoursUseCase;
     @Autowired private CompleteMaintenanceRecordUseCase completeRecordUseCase;
     @Autowired private ViewMaintenanceRecordByIdUseCase viewByIdUseCase;
+    @Autowired private CategorizeMaintenanceRecordUseCase categorizeUseCase;
+    @Autowired private SearchMaintenanceRecordsUseCase searchUseCase;
+    @Autowired private ViewOngoingMaintenanceUseCase viewOngoingUseCase;
+
+    // Injeção do novo Use Case da US220
+    @Autowired private GenerateCostReportUseCase generateCostReportUseCase;
 
     /**
      * US115A: Create a Maintenance Record
@@ -50,12 +62,12 @@ public class MaintenanceController {
      * US116: View Maintenance Records of a Specific Aircraft
      */
     @GetMapping("/aircraft/{registration}")
-    // CORREÇÃO: O teu Bootstrapper não cria nenhum MANAGER. Tem de ser SUPERVISOR ou TECHNICIAN.
     @PreAuthorize("hasRole('MAINTENANCE_SUPERVISOR') or hasRole('MAINTENANCE_TECHNICIAN')")
     public ResponseEntity<List<MaintenanceRecordOutputDto>> getRecordsByAircraft(@PathVariable String registration) {
         List<MaintenanceRecordOutputDto> records = viewRecordsUseCase.execute(registration);
         return ResponseEntity.ok(records);
     }
+
     /**
      * US117: View Total Maintenance Hours for the Fleet
      */
@@ -73,9 +85,61 @@ public class MaintenanceController {
     @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN')")
     public ResponseEntity<MaintenanceRecordOutputDto> completeMaintenanceRecord(@PathVariable Long id,
                                                                                 @Valid @RequestBody CompleteRecordInputDto dto,
-                                                                                @RequestHeader("If-Match") String ifMatch) {
+                                                                                @RequestHeader(value = "If-Match", required = false) String ifMatch) {
         MaintenanceRecordOutputDto updatedRecord = completeRecordUseCase.execute(id, dto, ifMatch);
         return ResponseEntity.ok(updatedRecord);
+    }
+
+    /**
+     * US217: Categorize a Maintenance Record Component
+     */
+    @PatchMapping("/{id}/component")
+    @PreAuthorize("hasRole('MAINTENANCE_TECHNICIAN') or hasRole('MAINTENANCE_SUPERVISOR')")
+    public ResponseEntity<MaintenanceRecordOutputDto> categorizeComponent(
+            @PathVariable Long id,
+            @Valid @RequestBody CategorizeRecordInputDto inputDto,
+            @RequestHeader(value = "If-Match", required = false) Long version) {
+
+        MaintenanceRecordOutputDto updatedRecord = categorizeUseCase.execute(id, inputDto.getCategory(), version);
+
+        return ResponseEntity.ok(updatedRecord);
+    }
+
+    /**
+     * US218: Search Maintenance Records by optional filters
+     */
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('ATCC')")
+    public ResponseEntity<List<MaintenanceRecordOutputDto>> searchRecords(
+            @RequestParam(required = false) String aircraft,
+            @RequestParam(required = false) String component,
+            @RequestParam(required = false) String status) {
+
+        List<MaintenanceRecordOutputDto> records = searchUseCase.execute(aircraft, component, status);
+
+        return ResponseEntity.ok(records);
+    }
+
+    /**
+     * US219: View all ongoing maintenance activities in the fleet
+     */
+    @GetMapping("/ongoing")
+    @PreAuthorize("hasRole('MAINTENANCE_SUPERVISOR')")
+    public ResponseEntity<List<MaintenanceRecordOutputDto>> getOngoingMaintenance() {
+        List<MaintenanceRecordOutputDto> records = viewOngoingUseCase.execute();
+        return ResponseEntity.ok(records);
+    }
+
+    /**
+     * US220: Generate reports on maintenance costs
+     */
+    @GetMapping("/reports/costs")
+    @PreAuthorize("hasRole('ATCC')")
+    public ResponseEntity<MaintenanceCostReportDto> getMaintenanceCostReport(
+            @RequestParam(name = "type", required = true) String type) {
+
+        MaintenanceCostReportDto report = generateCostReportUseCase.execute(type);
+        return ResponseEntity.ok(report);
     }
 
     /**

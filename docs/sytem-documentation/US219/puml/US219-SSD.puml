@@ -5,6 +5,6 @@ participant "System" as System
 
 Supervisor -> System : requests list of ongoing maintenance activities
 activate System
-System --> Supervisor : returns list of records with status ONGOING
+System --> Supervisor : returns list of records without completion notes (ongoing)
 deactivate System
 @enduml

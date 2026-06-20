@@ -5,6 +5,6 @@ actor "ATCC" as ATCC
 
 System -> System : periodic check of maintenance limits
 activate System
-System -> ATCC : sends alert (maintenance due for aircraft X)
+System -> ATCC : issues alert (aircraft X due for template Y)
 deactivate System
 @enduml

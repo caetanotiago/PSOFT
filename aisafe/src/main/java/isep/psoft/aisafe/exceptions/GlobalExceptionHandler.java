@@ -110,4 +110,9 @@ public class GlobalExceptionHandler {
         response.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
     }
+
+    @ExceptionHandler(isep.psoft.aisafe.maintenance.domain.MaintenanceRecordNotFoundException.class)
+    public ResponseEntity<String> handleMaintenanceRecordNotFound(isep.psoft.aisafe.maintenance.domain.MaintenanceRecordNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }

@@ -46,6 +46,17 @@ public class MaintenanceRecord {
         this.completionNotes = notes;
     }
 
+    // --- NOVA LÓGICA PARA A US217 ---
+    public void updateComponent(MaintenanceComponent newComponent) {
+        if (newComponent == null) {
+            throw new IllegalArgumentException("The maintenance component cannot be null.");
+        }
+        if (this.completionNotes != null) {
+            throw new IllegalStateException("Cannot categorize a maintenance record that is already completed.");
+        }
+        this.component = newComponent;
+    }
+
     public Long getId() { return id; }
     public Long getVersion() { return version; }
     public String getAircraftRegistration() { return aircraftRegistration; }

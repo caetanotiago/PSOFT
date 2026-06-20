@@ -2,21 +2,41 @@
 autonumber
 participant "MaintenanceScheduler" as Scheduler
 participant "AlertService" as Service
-participant "AircraftRepository" as Repo
+participant "AircraftRepository" as AircraftRepo
+participant "MaintenanceTemplateRepository" as TemplateRepo
+participant "MaintenanceRecordRepository" as RecordRepo
+participant "AlertRepository" as AlertRepo
 participant "Alert" as Alert
 
-Scheduler -> Service : checkMaintenanceDue()
+Scheduler -> Service : checkFleetMaintenance()
 activate Service
 
-Service -> Repo : findAllAircraft()
-activate Repo
-Repo --> Service : List<Aircraft>
-deactivate Repo
+Service -> AircraftRepo : findAll()
+activate AircraftRepo
+AircraftRepo --> Service : List<Aircraft>
+deactivate AircraftRepo
+
+Service -> TemplateRepo : findAll()
+activate TemplateRepo
+TemplateRepo --> Service : List<MaintenanceTemplate>
+deactivate TemplateRepo
 
 loop for each aircraft
-    Service -> Service : verify thresholds (hours/days)
-    alt isDue(aircraft)
-        Service -> Alert ** : create(message)
+    loop for each template
+        Service -> RecordRepo : findLatestCompletedRecord(aircraftReg, templateId)
+        activate RecordRepo
+        RecordRepo --> Service : latestRecord
+        deactivate RecordRepo
+
+        Service -> Service : isMaintenanceDue(aircraft, template, latestRecord)
+
+        alt maintenance is due
+            Service -> Alert ** : create(message)
+            Service -> AlertRepo : save(alert)
+            activate AlertRepo
+            AlertRepo --> Service : savedAlert
+            deactivate AlertRepo
+        end
     end
 end
 
