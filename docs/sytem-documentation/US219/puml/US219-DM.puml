@@ -1,18 +1,16 @@
 @startuml
 hide methods
 
-entity MaintenanceRecord <<Entity>> <<Root>> {
-  version
-  status: MaintenanceStatus
+entity MaintenanceRecord <<Entity>> <<Root>>
+class CompletionNotes <<Value Object>> {
+  notes
+  completionDate
 }
 
-enum MaintenanceStatus <<Value Object>> {
-  PLANNED
-  ONGOING
-  PAUSED
-  COMPLETED
-  CANCELLED
-}
+MaintenanceRecord "1" --> "0..1" CompletionNotes : concluded with
 
-MaintenanceRecord --> "1" MaintenanceStatus
+note right of MaintenanceRecord
+  If CompletionNotes is null,
+  the maintenance is considered ONGOING.
+end note
 @enduml

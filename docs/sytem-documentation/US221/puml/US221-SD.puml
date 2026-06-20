@@ -4,7 +4,7 @@ actor "Maintenance Supervisor" as Supervisor
 participant "MaintenanceController" as Ctrl
 participant "ViewAvgTurnaroundTimeUseCase" as UseCase
 participant "MaintenanceRecordRepository" as Repo
-participant "ReportDto" as Dto
+participant "TurnaroundReportDto" as Dto
 
 Supervisor -> Ctrl : GET /api/maintenance-records/reports/turnaround-time
 activate Ctrl
@@ -14,8 +14,11 @@ activate UseCase
 
 UseCase -> Repo : findAverageTurnaroundTimePerModel()
 activate Repo
-note right: JPQL: AVG(duration) GROUP BY model
-Repo --> UseCase : List<TurnaroundResult>
+note right
+  JPQL handles implicit JOIN via registration
+  and applies AVG(actualDurationMinutes)
+end note
+Repo --> UseCase : List<TurnaroundItem>
 deactivate Repo
 
 UseCase -> Dto ** : create(results)

@@ -2,16 +2,27 @@
 hide methods
 
 entity AircraftModel <<Entity>> <<Root>>
-entity Aircraft <<Entity>> <<Root>>
+entity Aircraft <<Entity>> <<Root>> {
+  registrationNumber
+}
+
 entity MaintenanceRecord <<Entity>> <<Root>> {
-  expectedDurationMinutes
+  aircraftRegistration
+}
+
+class CompletionNotes <<Value Object>> {
+  notes
+  completionDate
+  cost: Double
+  actualDurationMinutes: Integer
 }
 
 Aircraft "*" --> "1" AircraftModel : is of type
-MaintenanceRecord "*" --> "1" Aircraft : performed on
+MaintenanceRecord "1" --> "0..1" CompletionNotes : concluded with
+MaintenanceRecord ..> Aircraft : references via registration
 
-note bottom of MaintenanceRecord
-  The turnaround time is the
-  duration of COMPLETED records.
+note right of CompletionNotes
+  'actualDurationMinutes' tracks the true
+  turnaround time for the report.
 end note
 @enduml

@@ -12,7 +12,7 @@ activate Ctrl
 Ctrl -> UseCase : execute()
 activate UseCase
 
-UseCase -> Repo : findByStatus(MaintenanceStatus.ONGOING)
+UseCase -> Repo : findByCompletionNotesIsNull()
 activate Repo
 Repo --> UseCase : List<MaintenanceRecord>
 deactivate Repo

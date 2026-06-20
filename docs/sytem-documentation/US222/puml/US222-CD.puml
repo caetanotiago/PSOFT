@@ -2,31 +2,41 @@
 skinparam classAttributeIconSize 0
 
 class MaintenanceScheduler {
-  + scheduledCheck(): void
+  + runMaintenanceCheck(): void
 }
 
 class AlertService {
-  + checkMaintenanceDue(): void
+  + checkFleetMaintenance(): void
+  - isMaintenanceDue(...): boolean
 }
 
 interface AircraftRepository {
   + findAll(): List<Aircraft>
 }
 
-class Aircraft {
-  - registration: String
-  - currentFlightHours: Double
-  - lastMaintenanceDate: LocalDate
-  + isMaintenanceDue(template: MaintenanceTemplate): Boolean
+interface MaintenanceTemplateRepository {
+  + findAll(): List<MaintenanceTemplate>
+}
+
+interface MaintenanceRecordRepository {
+  + findTopByAircraftRegistrationAndMaintenanceTemplateIdAndCompletionNotesIsNotNullOrderByCompletionNotes_CompletionDateDesc(...)
+}
+
+interface AlertRepository {
+  + save(alert: Alert): Alert
 }
 
 class Alert {
   - id: Long
   - message: String
+  - createdAt: LocalDate
+  - isRead: boolean
 }
 
 MaintenanceScheduler ..> AlertService
 AlertService ..> AircraftRepository
-AlertService ..> Aircraft
+AlertService ..> MaintenanceTemplateRepository
+AlertService ..> MaintenanceRecordRepository
+AlertService ..> AlertRepository
 AlertService ..> Alert
 @enduml

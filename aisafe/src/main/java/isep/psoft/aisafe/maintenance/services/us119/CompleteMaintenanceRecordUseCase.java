@@ -48,7 +48,7 @@ public class CompleteMaintenanceRecordUseCase {
             throw new OptimisticLockException("The resource was modified by another user. Please refresh and try again.");
         }
 
-        CompletionNotes notes = new CompletionNotes(dto.getNotes(), LocalDate.now());
+        CompletionNotes notes = new CompletionNotes(LocalDate.now(), dto.getNotes());
         record.complete(notes);
 
         MaintenanceRecord savedRecord = repository.save(record);

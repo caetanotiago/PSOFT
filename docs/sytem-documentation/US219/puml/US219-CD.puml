@@ -10,13 +10,13 @@ class ViewOngoingMaintenanceUseCase {
 }
 
 interface MaintenanceRecordRepository {
-  + findByStatus(status: MaintenanceStatus): List<MaintenanceRecord>
+  + findByCompletionNotesIsNull(): List<MaintenanceRecord>
 }
 
 class MaintenanceRecordOutputDto {
   - id: Long
-  - status: String
   - aircraftRegistration: String
+  - status: String
 }
 
 MaintenanceController ..> ViewOngoingMaintenanceUseCase

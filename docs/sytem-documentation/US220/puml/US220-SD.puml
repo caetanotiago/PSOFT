@@ -14,8 +14,12 @@ activate UseCase
 
 UseCase -> Repo : calculateCosts(type)
 activate Repo
-note right: JPQL: SUM(cost) GROUP BY model/aircraft
-Repo --> UseCase : List<CostResult>
+note right
+  JPQL handles the implicit JOIN between
+  MaintenanceRecord.aircraftRegistration
+  and Aircraft.registrationNumber
+end note
+Repo --> UseCase : List<CostItem>
 deactivate Repo
 
 UseCase -> Dto ** : create(results)

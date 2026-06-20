@@ -2,21 +2,39 @@
 hide methods
 
 entity Aircraft <<Entity>> <<Root>> {
-  currentFlightHours
-  lastMaintenanceDate
+  registrationNumber
+  accumulatedFlightHours: Double
 }
 
-entity MaintenanceTemplate <<Entity>> <<Root>> {
-  hoursInterval
-  daysInterval
+entity MaintenanceTemplate <<Entity>> <<Root>>
+class MaintenanceInterval <<Value Object>> {
+  flightHours
+  calendarDays
 }
 
-entity Alert <<Entity>> {
+entity MaintenanceRecord <<Entity>> <<Root>> {
+  aircraftRegistration
+  maintenanceTemplateId
+}
+
+class CompletionNotes <<Value Object>> {
+  completionDate
+  aircraftFlightHoursAtCompletion: Double
+}
+
+entity Alert <<Entity>> <<Root>> {
   message
-  timestamp
-  readStatus
+  createdAt
+  isRead
 }
 
-Aircraft "*" --> "1" MaintenanceTemplate : follows
-Alert "*" --> "1" Aircraft : notifies
+MaintenanceTemplate "1" --> "1" MaintenanceInterval : defines
+MaintenanceRecord "1" --> "0..1" CompletionNotes : concluded with
+Alert "*" --> "1" Aircraft : targets
+
+note bottom of MaintenanceRecord
+  The Scheduler checks the gap between
+  Aircraft's current hours/date and the
+  latest Record's CompletionNotes.
+end note
 @enduml

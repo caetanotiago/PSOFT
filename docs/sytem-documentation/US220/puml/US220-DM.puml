@@ -2,17 +2,26 @@
 hide methods
 
 entity AircraftModel <<Entity>> <<Root>>
-entity Aircraft <<Entity>> <<Root>>
+entity Aircraft <<Entity>> <<Root>> {
+  registrationNumber
+}
+
 entity MaintenanceRecord <<Entity>> <<Root>> {
+  aircraftRegistration
+}
+
+class CompletionNotes <<Value Object>> {
+  notes
+  completionDate
   cost: Double
 }
 
 Aircraft "*" --> "1" AircraftModel : is of type
-MaintenanceRecord "*" --> "1" Aircraft : performed on
+MaintenanceRecord "1" --> "0..1" CompletionNotes : concluded with
+MaintenanceRecord ..> Aircraft : references via registration
 
-note bottom of MaintenanceRecord
-  The cost attribute tracks the
-  financial impact of each maintenance
-  operation.
+note right of CompletionNotes
+  The 'cost' attribute must be added here
+  to track financial impact upon completion.
 end note
 @enduml
