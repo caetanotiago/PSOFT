@@ -10,6 +10,10 @@ public class CreateAircraftDTO {
     private Integer seatingCapacity;
     private String status;
 
+    // NOTA: o campo "image" foi removido daqui de propósito.
+    // A entidade Aircraft não tem imagem — apenas AircraftModel tem (ModelImage, US202).
+    // Ver CreateAircraftModelDTO para o campo "image".
+
     public CreateAircraftDTO() {}
 
     public String getRegistrationNumber() {

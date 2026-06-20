@@ -9,6 +9,9 @@ public class CreateAircraftModelDTO {
     private Double maximumRange;
     private Double cruisingSpeed;
 
+    // US202 — imagem ou diagrama técnico opcional (Base64 string ou URL)
+    private String image;
+
     public CreateAircraftModelDTO() {}
 
     public String getManufacturer() {
@@ -57,5 +60,13 @@ public class CreateAircraftModelDTO {
 
     public void setCruisingSpeed(Double cruisingSpeed) {
         this.cruisingSpeed = cruisingSpeed;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
