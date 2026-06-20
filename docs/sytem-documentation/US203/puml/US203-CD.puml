@@ -1,0 +1,40 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class AircraftController {
+  + getCompatibleRoutes(registration: String, pageable: Pageable): ResponseEntity<PagedModel<FlightRouteDTO>>
+}
+
+class ViewCompatibleRoutesService {
+  + getCompatibleRoutes(registration: String, pageable: Pageable): Page<FlightRoute>
+}
+
+interface AircraftRepository <<Repository>> {
+  + findById(registration: String): Optional<Aircraft>
+}
+
+interface FlightRouteRepository <<Repository>> {
+  + findCompatibleRoutes(capacity: Integer, range: Double, pageable: Pageable): Page<FlightRoute>
+}
+
+class Aircraft <<Entity>> {
+  + getSeatingCapacity(): SeatingCapacity
+  + getModel(): AircraftModel
+}
+
+class AircraftModel <<Entity>> {
+  + getSpecifications(): ModelSpecifications
+}
+
+class FlightRouteAssembler {
+  + toModel(entity: FlightRoute): FlightRouteDTO
+}
+
+AircraftController ..> ViewCompatibleRoutesService
+AircraftController ..> FlightRouteAssembler
+ViewCompatibleRoutesService ..> AircraftRepository
+ViewCompatibleRoutesService ..> FlightRouteRepository
+ViewCompatibleRoutesService ..> Aircraft
+Aircraft --> AircraftModel : model
+
+@enduml

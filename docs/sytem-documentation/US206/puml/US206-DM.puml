@@ -1,0 +1,29 @@
+@startuml
+hide methods
+left to right direction
+skinparam classAttributeIconSize 0
+
+class Aircraft <<Aggregate Root>> <<Entity>> {}
+
+class RegistrationNumber <<Value Object>> <<ID>> {
+  - registration : String
+}
+
+class FlightRecord <<Aggregate Root>> <<Entity>> {}
+
+class EstimatedFlightTime <<Value Object>> {
+  - durationMinutes : Integer
+}
+
+Aircraft "1" --> "1" RegistrationNumber : identified by >
+FlightRecord "*" --> "1" Aircraft : assigned to >
+FlightRecord "1" --> "1" EstimatedFlightTime : has >
+
+note bottom of FlightRecord
+  Represents ScheduledFlight or
+  FlightHistory (from WP#3B).
+  Duration is summed to calculate
+  total operational hours.
+end note
+
+@enduml

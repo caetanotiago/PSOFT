@@ -1,0 +1,12 @@
+@startuml
+autonumber
+actor "Backoffice Operator" as BO
+participant "System" as SYS
+
+activate BO
+BO -> SYS : GET /api/aircraft-models/top-utilized?metric={type}
+activate SYS
+SYS --> BO : 200 OK (Returns list of top 5 aircraft models)
+deactivate SYS
+deactivate BO
+@enduml

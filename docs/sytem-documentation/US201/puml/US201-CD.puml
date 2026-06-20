@@ -1,0 +1,43 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class AircraftModelController {
+  + updateSpecifications(designation: String, dto: UpdateSpecsDTO, version: Long): ResponseEntity<AircraftModelDTO>
+}
+
+class UpdateAircraftModelService {
+  + updateSpecifications(designation: String, dto: UpdateSpecsDTO, version: Long): AircraftModel
+}
+
+interface AircraftModelRepository <<Repository>> {
+  + findById(designation: String): Optional<AircraftModel>
+  + save(model: AircraftModel): AircraftModel
+}
+
+class AircraftModel <<Entity>> {
+  - version : Long
+  + getVersion(): Long
+  + updateSpecifications(specs: ModelSpecifications): void
+}
+
+class ModelSpecifications <<Value Object>> {
+  - standardSeatingCapacity : Integer
+  - fuelCapacity : Double
+  - maximumRange : Double
+  - cruisingSpeed : Double
+  + ModelSpecifications(...)
+}
+
+class AircraftModelAssembler {
+  + toModel(entity: AircraftModel): AircraftModelDTO
+}
+
+AircraftModelController ..> UpdateAircraftModelService
+AircraftModelController ..> AircraftModelAssembler
+UpdateAircraftModelService ..> AircraftModelRepository
+UpdateAircraftModelService ..> AircraftModel
+UpdateAircraftModelService ..> ModelSpecifications
+
+AircraftModel "1" --> "1" ModelSpecifications : contains >
+
+@enduml

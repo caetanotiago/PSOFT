@@ -1,0 +1,35 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class AircraftModelController {
+  + getTopUtilizedModels(metric: String): ResponseEntity<List<AircraftModelUtilizationDTO>>
+}
+
+class ViewTopUtilizedModelsService {
+  + getTopUtilizedModels(metric: String): List<AircraftModelUtilizationDTO>
+}
+
+interface AircraftModelRepository <<Repository>> {
+  + findTopModelsByFlightHours(pageable: Pageable): List<AircraftModelUtilizationDTO>
+  + findTopModelsByAssignments(pageable: Pageable): List<AircraftModelUtilizationDTO>
+}
+
+class AircraftModelUtilizationDTO <<DTO>> {
+  - modelDesignation : String
+  - metricValue : Double
+  + AircraftModelUtilizationDTO(modelDesignation: String, metricValue: Double)
+}
+
+AircraftModelController ..> ViewTopUtilizedModelsService
+AircraftModelController ..> AircraftModelUtilizationDTO
+ViewTopUtilizedModelsService ..> AircraftModelRepository
+ViewTopUtilizedModelsService ..> AircraftModelUtilizationDTO
+AircraftModelRepository ..> AircraftModelUtilizationDTO
+
+note right of AircraftModelRepository
+  The repository directly projects the 
+  aggregated query results into the DTO 
+  for maximum performance.
+end note
+
+@enduml

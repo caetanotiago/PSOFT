@@ -1,0 +1,12 @@
+@startuml
+autonumber
+actor "Backoffice Operator" as BO
+participant "System" as SYS
+
+activate BO
+BO -> SYS : PATCH /api/aircraft-models/{designation}/specifications \n(body: newSpecs, header: If-Match)
+activate SYS
+SYS --> BO : 200 OK (Returns updated Aircraft Model details)
+deactivate SYS
+deactivate BO
+@enduml
