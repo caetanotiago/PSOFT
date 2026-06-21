@@ -36,7 +36,7 @@ public class AircraftModelRestController {
         this.assembler = assembler;
     }
 
-    // US101 + US202 — criar modelo (com imagem opcional)
+    // US101 — criar modelo (BACKOFFICE)
     @PostMapping
     @RolesAllowed("ROLE_BACKOFFICE_OPERATOR")
     public ResponseEntity<EntityModel<AircraftModelDTO>> createAircraftModel(
@@ -45,7 +45,6 @@ public class AircraftModelRestController {
         return new ResponseEntity<>(assembler.toModel(saved), HttpStatus.CREATED);
     }
 
-    // GET necessário para o self-link do HATEOAS funcionar
     @GetMapping("/{modelName}")
     @RolesAllowed({"ROLE_BACKOFFICE_OPERATOR", "ROLE_ATCC"})
     public ResponseEntity<EntityModel<AircraftModelDTO>> getAircraftModel(
@@ -54,7 +53,7 @@ public class AircraftModelRestController {
         return ResponseEntity.ok(assembler.toModel(model));
     }
 
-    // US201 — atualizar specs com Optimistic Locking (If-Match header)
+    // US201 — atualizar specs (BACKOFFICE)
     @PatchMapping("/{modelName}/specifications")
     @RolesAllowed("ROLE_BACKOFFICE_OPERATOR")
     public ResponseEntity<EntityModel<AircraftModelDTO>> updateSpecifications(
@@ -65,9 +64,9 @@ public class AircraftModelRestController {
         return ResponseEntity.ok(assembler.toModel(updated));
     }
 
-    // US204 — Top 5 modelos mais utilizados
+    // US205 — Top Utilized Models (ATCC)
     @GetMapping("/top-utilized")
-    @RolesAllowed("ROLE_BACKOFFICE_OPERATOR")
+    @RolesAllowed("ROLE_ATCC")
     public ResponseEntity<List<AircraftModelUtilizationDTO>> getTopUtilizedModels(
             @RequestParam(defaultValue = "assignments") String metric) {
         List<AircraftModelUtilizationDTO> result = viewTopUtilizedModelsService

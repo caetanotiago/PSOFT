@@ -2517,41 +2517,933 @@
       ]
     },
     {
-      "name": "Aircraft Management",
+      "name": "Aircraft Management (Tiago - US201 a US206)",
+      "description": "Testes para o Sprint 2 do módulo de gestão de aeronaves (WP#1B). Ordem de execução (Collection Runner, app recém-arrancada): 0 · Setup -> US102 (setup) -> US202 -> US201 -> US203 -> US104 -> US204 -> US205 -> US206. Roles confirmadas no código (@RolesAllowed): US201, US202, US204 = BACKOFFICE_OPERATOR; US203, US104, US205, US206 = ATCC.",
       "item": [
         {
-          "name": "Create Aircraft",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
+          "name": "0 · Setup",
+          "item": [
+            {
+              "name": "Login (backoffice) — para US201, US202, US204",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                      "const token = pm.response.json().token;",
+                      "pm.test('token recebido', () => pm.expect(token).to.be.a('string').and.not.empty);",
+                      "pm.collectionVariables.set('jwtTokenBackoffice', token);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"username\": \"backoffice\", \"password\": \"bo123\" }"
+                }
               }
-            ],
-            "url": "{{baseUrl}}/api/aircrafts",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"registrationNumber\": \"CS-TVA\",\n  \"modelName\": \"A320\",\n  \"manufacturer\": \"Airbus\",\n  \"capacity\": 150\n}"
+            },
+            {
+              "name": "Login (atcc) — para US203, US104, US205, US206",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                      "const token = pm.response.json().token;",
+                      "pm.test('token recebido', () => pm.expect(token).to.be.a('string').and.not.empty);",
+                      "pm.collectionVariables.set('jwtTokenAtcc', token);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"username\": \"atcc\", \"password\": \"atcc123\" }"
+                }
+              }
+            },
+            {
+              "name": "Capturar version atual do A320 (GET model)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "pm.test('version presente', () => pm.expect(body.version).to.not.be.undefined);",
+                      "pm.collectionVariables.set('aircraftModelVersion', body.version);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenBackoffice}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircraft-models/A320"
+              }
             }
-          }
+          ]
         },
         {
-          "name": "Get Aircraft by Registration Number",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
+          "name": "Fase 1 — US101 a US105 (WP#1A)",
+          "item": [
+            {
+              "name": "US101 — Register Aircraft Model",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenBackoffice (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'backoffice', password: 'bo123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenBackoffice', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login backoffice falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 201 (Created) ou 409 (modelo já existe de um run anterior)', () => pm.expect([201, 409]).to.include(pm.response.code));",
+                      "if (pm.response.code === 201) {",
+                      "  const body = pm.response.json();",
+                      "  pm.test('manufacturer correto', () => pm.expect(body.manufacturer).to.eql('Boeing'));",
+                      "  pm.test('modelName correto', () => pm.expect(body.modelName).to.eql('B737-TEST'));",
+                      "  pm.test('version inicial presente', () => pm.expect(body.version).to.not.be.undefined);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenBackoffice}}",
+                    "description": "createAircraftModel exige ROLE_BACKOFFICE_OPERATOR"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircraft-models",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"manufacturer\": \"Boeing\",\n  \"modelName\": \"B737-TEST\",\n  \"standardCapacity\": 189,\n  \"fuelCapacity\": 26020.0,\n  \"maximumRange\": 6570.0,\n  \"cruisingSpeed\": 842.0\n}"
+                }
               }
-            ],
-            "url": "{{baseUrl}}/api/aircrafts/CS-TVA"
-          }
+            },
+            {
+              "name": "US102 — Register Aircraft Instance",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 201 (Created) ou 409 (já existe de um run anterior)', () => pm.expect([201, 409]).to.include(pm.response.code));",
+                      "if (pm.response.code === 201) {",
+                      "  const body = pm.response.json();",
+                      "  pm.test('registrationNumber correto', () => pm.expect(body.registrationNumber).to.eql('CS-US102'));",
+                      "  pm.test('status inicial = AVAILABLE', () => pm.expect(body.status).to.eql('AVAILABLE'));",
+                      "  pm.collectionVariables.set('us102AircraftReg', body.registrationNumber);",
+                      "} else {",
+                      "  pm.collectionVariables.set('us102AircraftReg', 'CS-US102');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "createAircraft exige ROLE_ATCC"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"registrationNumber\": \"CS-US102\",\n  \"modelName\": \"A320\",\n  \"manufacturingDate\": \"2023-01-15\",\n  \"seatingCapacity\": 180,\n  \"status\": \"AVAILABLE\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US103 — View Aircraft by Registration Number",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}",
+                      "",
+                      "// Garante que CS-US102 existe (depende do US102 ter corrido nesta sessão ou antes).",
+                      "let reg = pm.collectionVariables.get('us102AircraftReg');",
+                      "if (!reg) {",
+                      "  await pm.sendRequest({",
+                      "    url: pm.variables.get('baseUrl') + '/api/aircrafts',",
+                      "    method: 'POST',",
+                      "    header: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenAtcc') },",
+                      "    body: { mode: 'raw', raw: JSON.stringify({",
+                      "      registrationNumber: 'CS-US102', modelName: 'A320',",
+                      "      manufacturingDate: '2023-01-15', seatingCapacity: 180, status: 'AVAILABLE'",
+                      "    }) }",
+                      "  });",
+                      "  pm.collectionVariables.set('us102AircraftReg', 'CS-US102');",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "pm.test('registrationNumber confere', () => pm.expect(body.registrationNumber).to.eql('CS-US102'));",
+                      "pm.test('self link presente (HATEOAS)', () => pm.expect(body._links && body._links.self).to.exist);",
+                      "pm.test('link para aircraft-model presente', () => pm.expect(body._links && body._links['aircraft-model']).to.exist);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "getAircraft aceita ROLE_ATCC ou ROLE_BACKOFFICE_OPERATOR"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts/CS-US102"
+              }
+            },
+            {
+              "name": "US103 — View Aircraft, Not Found (404)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts/XX-0000"
+              }
+            },
+            {
+              "name": "US105 — Update Aircraft Operational Status",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}",
+                      "",
+                      "// Garante que CS-US102 existe e captura a sua version atual.",
+                      "let reg = pm.collectionVariables.get('us102AircraftReg');",
+                      "if (!reg) {",
+                      "  await pm.sendRequest({",
+                      "    url: pm.variables.get('baseUrl') + '/api/aircrafts',",
+                      "    method: 'POST',",
+                      "    header: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenAtcc') },",
+                      "    body: { mode: 'raw', raw: JSON.stringify({",
+                      "      registrationNumber: 'CS-US102', modelName: 'A320',",
+                      "      manufacturingDate: '2023-01-15', seatingCapacity: 180, status: 'AVAILABLE'",
+                      "    }) }",
+                      "  });",
+                      "  pm.collectionVariables.set('us102AircraftReg', 'CS-US102');",
+                      "}",
+                      "const getRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/api/aircrafts/CS-US102',",
+                      "  method: 'GET',",
+                      "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenAtcc') }",
+                      "});",
+                      "if (getRes.code === 200) {",
+                      "  pm.collectionVariables.set('us102AircraftVersion', getRes.json().version);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "pm.test('status atualizado para UNDER_MAINTENANCE', () => pm.expect(body.status).to.eql('UNDER_MAINTENANCE'));",
+                      "pm.test('version incrementou', () => pm.expect(body.version).to.not.be.undefined);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "updateAircraftStatus exige ROLE_ATCC"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts/CS-US102/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"UNDER_MAINTENANCE\",\n  \"version\": {{us102AircraftVersion}}\n}"
+                }
+              }
+            },
+            {
+              "name": "US105 — Update Status, Version Conflict (409)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 409 (version desatualizada)', () => pm.response.to.have.status(409));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts/CS-US102/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"INACTIVE\",\n  \"version\": -1\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Fase 2 — US201 a US206 (WP#1B)",
+          "item": [
+            {
+              "name": "US102 — Create Aircraft (setup p/ US203)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 201 (Created) ou 409 (já existe de um run anterior)', () => pm.expect([201, 409]).to.include(pm.response.code));",
+                      "if (pm.response.code === 201) {",
+                      "  pm.collectionVariables.set('createdAircraftReg', pm.response.json().registrationNumber);",
+                      "} else {",
+                      "  pm.collectionVariables.set('createdAircraftReg', 'CS-NEW');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "createAircraft exige ROLE_ATCC"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"registrationNumber\": \"CS-NEW\",\n  \"modelName\": \"A320\",\n  \"manufacturingDate\": \"2024-05-10\",\n  \"seatingCapacity\": 150,\n  \"status\": \"AVAILABLE\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US202 — Register Aircraft Model (with optional image)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenBackoffice (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'backoffice', password: 'bo123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenBackoffice', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login backoffice falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 201 (Created) ou 409 (modelo já existe de um run anterior)', () => pm.expect([201, 409]).to.include(pm.response.code));",
+                      "if (pm.response.code === 201) {",
+                      "  const body = pm.response.json();",
+                      "  pm.test('image presente na resposta', () => pm.expect(body.image).to.exist);",
+                      "  pm.test('version inicial presente', () => pm.expect(body.version).to.not.be.undefined);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenBackoffice}}",
+                    "description": "createAircraftModel exige ROLE_BACKOFFICE_OPERATOR"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircraft-models",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"manufacturer\": \"Airbus\",\n  \"modelName\": \"A350-TEST\",\n  \"standardCapacity\": 325,\n  \"fuelCapacity\": 138000.0,\n  \"maximumRange\": 13000.0,\n  \"cruisingSpeed\": 900.0,\n  \"image\": \"https://example.com/diagrams/a350.png\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US201 — Update Aircraft Model Specifications",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenBackoffice (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'backoffice', password: 'bo123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenBackoffice', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login backoffice falhou no prerequest, status:', loginRes.code);",
+                      "}",
+                      "",
+                      "// Captura a version ATUAL do A320 para o header If-Match (sempre fresca, nunca fixa).",
+                      "const versionRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/api/aircraft-models/A320',",
+                      "  method: 'GET',",
+                      "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenBackoffice') }",
+                      "});",
+                      "if (versionRes.code === 200) {",
+                      "  pm.collectionVariables.set('aircraftModelVersion', versionRes.json().version);",
+                      "} else {",
+                      "  console.warn('Falha ao obter version atual do A320, status:', versionRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "if (pm.response.code === 200) {",
+                      "  const body = pm.response.json();",
+                      "  pm.test('version incrementou', () => pm.expect(body.version).to.not.be.undefined);",
+                      "  pm.collectionVariables.set('aircraftModelVersion', body.version);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenBackoffice}}",
+                    "description": "updateSpecifications exige ROLE_BACKOFFICE_OPERATOR"
+                  },
+                  {
+                    "key": "If-Match",
+                    "value": "{{aircraftModelVersion}}",
+                    "description": "Optimistic Locking — versão capturada dinamicamente no passo de Setup, não fixa em 0"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircraft-models/A320/specifications",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"standardCapacity\": 180,\n  \"maximumRange\": 6000.0,\n  \"fuelCapacity\": 25000.0,\n  \"cruisingSpeed\": 850.0\n}"
+                }
+              }
+            },
+            {
+              "name": "US203 — View Compatible Routes",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}",
+                      "",
+                      "// Garante que a aircraft referida por createdAircraftReg EXISTE DE VERDADE na BD",
+                      "// (não confia só na variável — confirma com um GET antes de assumir que existe).",
+                      "let reg = pm.collectionVariables.get('createdAircraftReg') || 'CS-NEW';",
+                      "const checkRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/api/aircrafts/' + reg,",
+                      "  method: 'GET',",
+                      "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenAtcc') }",
+                      "});",
+                      "if (checkRes.code !== 200) {",
+                      "  const createRes = await pm.sendRequest({",
+                      "    url: pm.variables.get('baseUrl') + '/api/aircrafts',",
+                      "    method: 'POST',",
+                      "    header: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenAtcc') },",
+                      "    body: { mode: 'raw', raw: JSON.stringify({",
+                      "      registrationNumber: 'CS-NEW',",
+                      "      modelName: 'A320',",
+                      "      manufacturingDate: '2024-05-10',",
+                      "      seatingCapacity: 150,",
+                      "      status: 'AVAILABLE'",
+                      "    }) }",
+                      "  });",
+                      "  if (createRes.code === 201 || createRes.code === 409) {",
+                      "    pm.collectionVariables.set('createdAircraftReg', 'CS-NEW');",
+                      "  } else {",
+                      "    console.warn('Falha ao criar aircraft de apoio, status:', createRes.code);",
+                      "  }",
+                      "} else {",
+                      "  pm.collectionVariables.set('createdAircraftReg', reg);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "pm.test('Retorna uma página (pageable)', () => pm.expect(pm.response.json().content).to.exist);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "getCompatibleRoutes exige ROLE_ATCC"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts/{{createdAircraftReg}}/compatible-routes?page=0&size=10"
+              }
+            },
+            {
+              "name": "US104 — Search Aircrafts (Filtros)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "pm.test('Todos na resposta estão AVAILABLE', () => {",
+                      "  const body = pm.response.json();",
+                      "  const aircrafts = body._embedded ? body._embedded.aircraftDTOList : [];",
+                      "  pm.expect(aircrafts.every(a => a.status === 'AVAILABLE')).to.be.true;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "searchAircrafts exige ROLE_ATCC"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts?status=AVAILABLE&model=A320&page=0&size=10"
+              }
+            },
+            {
+              "name": "US204 — Top Utilized Aircraft Models",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenBackoffice (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'backoffice', password: 'bo123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenBackoffice', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login backoffice falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "pm.test('Lista devolvida', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenBackoffice}}",
+                    "description": "getTopUtilizedModels exige ROLE_BACKOFFICE_OPERATOR"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircraft-models/top-utilized"
+              }
+            },
+            {
+              "name": "US205 — View Real-Time Aircraft Status",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}",
+                      "",
+                      "// Garante que a aircraft referida por createdAircraftReg EXISTE DE VERDADE na BD",
+                      "// (não confia só na variável — confirma com um GET antes de assumir que existe).",
+                      "let reg = pm.collectionVariables.get('createdAircraftReg') || 'CS-NEW';",
+                      "const checkRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/api/aircrafts/' + reg,",
+                      "  method: 'GET',",
+                      "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenAtcc') }",
+                      "});",
+                      "if (checkRes.code !== 200) {",
+                      "  const createRes = await pm.sendRequest({",
+                      "    url: pm.variables.get('baseUrl') + '/api/aircrafts',",
+                      "    method: 'POST',",
+                      "    header: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + pm.collectionVariables.get('jwtTokenAtcc') },",
+                      "    body: { mode: 'raw', raw: JSON.stringify({",
+                      "      registrationNumber: 'CS-NEW',",
+                      "      modelName: 'A320',",
+                      "      manufacturingDate: '2024-05-10',",
+                      "      seatingCapacity: 150,",
+                      "      status: 'AVAILABLE'",
+                      "    }) }",
+                      "  });",
+                      "  if (createRes.code === 201 || createRes.code === 409) {",
+                      "    pm.collectionVariables.set('createdAircraftReg', 'CS-NEW');",
+                      "  } else {",
+                      "    console.warn('Falha ao criar aircraft de apoio, status:', createRes.code);",
+                      "  }",
+                      "} else {",
+                      "  pm.collectionVariables.set('createdAircraftReg', reg);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "const body = pm.response.json();",
+                      "pm.test('registrationNumber presente', () => pm.expect(body.registrationNumber).to.exist);",
+                      "pm.test('status é um dos 4 valores válidos', () => {",
+                      "  pm.expect(['AVAILABLE','IN_FLIGHT','UNDER_MAINTENANCE','INACTIVE']).to.include(body.status);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "getAircraftStatus exige ROLE_ATCC"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts/{{createdAircraftReg}}/status"
+              }
+            },
+            {
+              "name": "US206 — Total Operational Hours per Aircraft",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Login fresco para jwtTokenAtcc (evita tokens expirados de sessões anteriores).",
+                      "const loginRes = await pm.sendRequest({",
+                      "  url: pm.variables.get('baseUrl') + '/auth/login',",
+                      "  method: 'POST',",
+                      "  header: { 'Content-Type': 'application/json' },",
+                      "  body: { mode: 'raw', raw: JSON.stringify({ username: 'atcc', password: 'atcc123' }) }",
+                      "});",
+                      "if (loginRes.code === 200) {",
+                      "  pm.collectionVariables.set('jwtTokenAtcc', loginRes.json().token);",
+                      "} else {",
+                      "  console.warn('Login atcc falhou no prerequest, status:', loginRes.code);",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 (Success)', () => pm.response.to.have.status(200));",
+                      "pm.test('Conteúdo presente (content)', () => pm.expect(pm.response.json().content).to.exist);",
+                      "pm.test('totalHours presente em cada item', () => {",
+                      "  const content = pm.response.json().content;",
+                      "  pm.expect(content.every(c => c.totalHours !== undefined)).to.be.true;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtTokenAtcc}}",
+                    "description": "getOperationalHours exige ROLE_ATCC"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/aircrafts/operational-hours?page=0&size=10"
+              }
+            }
+          ]
         }
       ]
     }

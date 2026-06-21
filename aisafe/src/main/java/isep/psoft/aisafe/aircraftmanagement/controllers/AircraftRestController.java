@@ -56,13 +56,15 @@ public class AircraftRestController {
         this.assembler = assembler;
     }
 
+    // US202 — Criar Avião (BACKOFFICE)
     @PostMapping
-    @RolesAllowed("ROLE_ATCC")
+    @RolesAllowed("ROLE_BACKOFFICE_OPERATOR")
     public ResponseEntity<EntityModel<AircraftDTO>> createAircraft(@RequestBody CreateAircraftDTO dto) {
         Aircraft savedAircraft = createAircraftService.createAircraft(dto);
         return new ResponseEntity<>(assembler.toModel(savedAircraft), HttpStatus.CREATED);
     }
 
+    // Consulta Geral - Deixei ambos para não dar erro se o ATCC precisar de ver detalhes
     @GetMapping("/{registrationNumber}")
     @RolesAllowed({"ROLE_ATCC", "ROLE_BACKOFFICE_OPERATOR"})
     public ResponseEntity<EntityModel<AircraftDTO>> getAircraft(@PathVariable String registrationNumber) {
@@ -70,8 +72,9 @@ public class AircraftRestController {
         return ResponseEntity.ok(assembler.toModel(aircraft));
     }
 
+    // US204 — Pesquisar Aviões (BACKOFFICE)
     @GetMapping
-    @RolesAllowed("ROLE_ATCC")
+    @RolesAllowed("ROLE_BACKOFFICE_OPERATOR")
     public ResponseEntity<PagedModel<EntityModel<AircraftDTO>>> searchAircrafts(
             @RequestParam(required = false) String model,
             @RequestParam(required = false) String status,
@@ -83,15 +86,16 @@ public class AircraftRestController {
     }
 
     @GetMapping("/{registrationNumber}/status")
-    @RolesAllowed("ROLE_ATCC")
+    @RolesAllowed({"ROLE_ATCC", "ROLE_BACKOFFICE_OPERATOR"})
     public ResponseEntity<AircraftStatusDTO> getAircraftStatus(
             @PathVariable String registrationNumber) {
         AircraftStatusDTO dto = viewAircraftStatusService.getAircraftStatus(registrationNumber);
         return ResponseEntity.ok(dto);
     }
 
+    // Atualizar Status (Normalmente quem gere a frota é o BACKOFFICE)
     @PatchMapping("/{registrationNumber}/status")
-    @RolesAllowed("ROLE_ATCC")
+    @RolesAllowed("ROLE_BACKOFFICE_OPERATOR")
     public ResponseEntity<EntityModel<AircraftDTO>> updateAircraftStatus(
             @PathVariable String registrationNumber,
             @RequestBody UpdateAircraftStatusDTO dto) {
@@ -100,7 +104,7 @@ public class AircraftRestController {
         return ResponseEntity.ok(assembler.toModel(updatedAircraft));
     }
 
-    // US203 — Ver rotas compatíveis com uma aeronave
+    // US203 — Ver rotas compatíveis com uma aeronave (ATCC)
     @GetMapping("/{registrationNumber}/compatible-routes")
     @RolesAllowed("ROLE_ATCC")
     public ResponseEntity<Page<FlightRouteDTO>> getCompatibleRoutes(
@@ -111,11 +115,10 @@ public class AircraftRestController {
         return ResponseEntity.ok(routes);
     }
 
-    // US206 — Horas operacionais totais por aeronave
+    // US206 — Horas operacionais totais por aeronave (ATCC)
     @GetMapping("/operational-hours")
     @RolesAllowed("ROLE_ATCC")
     public ResponseEntity<Page<AircraftOperationalHoursDTO>> getOperationalHours(Pageable pageable) {
-        // CORREÇÃO: O método correto no serviço é calculateOperationalHours
         Page<AircraftOperationalHoursDTO> result = calculateOperationalHoursService
                 .calculateOperationalHours(pageable); 
         return ResponseEntity.ok(result);
