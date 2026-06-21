@@ -18,8 +18,7 @@ public class ViewAircraftStatusServiceImpl implements ViewAircraftStatusService 
 
     @Override
     public AircraftStatusDTO getAircraftStatus(String registrationNumber) {
-        RegistrationNumber regNum = new RegistrationNumber(registrationNumber);
-        Aircraft aircraft = aircraftRepository.findById(regNum)
+        Aircraft aircraft = aircraftRepository.findByRegistration_Registration(registrationNumber)
                 .orElseThrow(() -> new AircraftNotFoundException(registrationNumber));
         return new AircraftStatusDTO(
                 aircraft.getRegistrationNumber().getNumber(),

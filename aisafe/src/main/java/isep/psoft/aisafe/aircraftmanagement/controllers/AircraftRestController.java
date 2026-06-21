@@ -115,8 +115,9 @@ public class AircraftRestController {
     @GetMapping("/operational-hours")
     @RolesAllowed("ROLE_ATCC")
     public ResponseEntity<Page<AircraftOperationalHoursDTO>> getOperationalHours(Pageable pageable) {
+        // CORREÇÃO: O método correto no serviço é calculateOperationalHours
         Page<AircraftOperationalHoursDTO> result = calculateOperationalHoursService
-                .getOperationalHours(pageable);
+                .calculateOperationalHours(pageable); 
         return ResponseEntity.ok(result);
     }
 }

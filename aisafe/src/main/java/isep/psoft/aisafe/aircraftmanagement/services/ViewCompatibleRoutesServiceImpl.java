@@ -32,8 +32,7 @@ public class ViewCompatibleRoutesServiceImpl implements ViewCompatibleRoutesServ
 
     @Override
     public Page<FlightRouteDTO> getCompatibleRoutes(String registrationNumber, Pageable pageable) {
-        RegistrationNumber regNum = new RegistrationNumber(registrationNumber);
-        Aircraft aircraft = aircraftRepository.findById(regNum)
+        Aircraft aircraft = aircraftRepository.findByRegistration_Registration(registrationNumber)
                 .orElseThrow(() -> new AircraftNotFoundException(registrationNumber));
 
         Double range = aircraft.getModel().getSpecifications().getMaximumRange();

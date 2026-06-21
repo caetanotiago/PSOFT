@@ -17,8 +17,7 @@ public class ViewAircraftServiceImpl implements ViewAircraftService {
 
     @Override
     public Aircraft getAircraftByRegistrationNumber(String registrationNumber) {
-        RegistrationNumber regNum = new RegistrationNumber(registrationNumber);
-        return aircraftRepository.findById(regNum)
+        return aircraftRepository.findByRegistration_Registration(registrationNumber)
                 .orElseThrow(() -> new AircraftNotFoundException(registrationNumber));
     }
 }

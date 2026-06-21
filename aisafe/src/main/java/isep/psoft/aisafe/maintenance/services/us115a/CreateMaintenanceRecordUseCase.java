@@ -34,7 +34,7 @@ public class CreateMaintenanceRecordUseCase {
 
         RegistrationNumber regNum = new RegistrationNumber(dto.getAircraftRegistration());
 
-        if (!aircraftRepository.existsByRegistrationNumber(regNum)) {
+        if (aircraftRepository.findByRegistration_Registration(dto.getAircraftRegistration()).isEmpty()) {
             throw new IllegalArgumentException("Aircraft with registration " + dto.getAircraftRegistration() + " does not exist.");
         }
 

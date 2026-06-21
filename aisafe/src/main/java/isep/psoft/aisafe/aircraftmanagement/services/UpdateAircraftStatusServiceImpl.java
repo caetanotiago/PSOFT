@@ -25,7 +25,7 @@ public class UpdateAircraftStatusServiceImpl implements UpdateAircraftStatusServ
 
         // CORRIGIDO: era "new RuntimeException(...)" — agora usa a exceção de domínio
         // já existente no projeto, que o GlobalExceptionHandler mapeia para 404.
-        Aircraft aircraft = aircraftRepository.findById(regNum)
+        Aircraft aircraft = aircraftRepository.findByRegistration_Registration(registrationNumber)
                 .orElseThrow(() -> new AircraftNotFoundException(registrationNumber));
 
         // Validação manual de Optimistic Locking. Garante que o utilizador está

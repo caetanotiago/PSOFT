@@ -27,7 +27,7 @@ public class ViewAircraftMaintenanceRecordsUseCase {
     @Transactional(readOnly = true)
     public List<MaintenanceRecordOutputDto> execute(String aircraftRegistration) {
 
-        if (!aircraftRepository.existsById(new RegistrationNumber(aircraftRegistration))) {
+        if (aircraftRepository.findByRegistration_Registration(aircraftRegistration).isEmpty()) {
             throw new IllegalArgumentException("Aircraft not found: " + aircraftRegistration);
         }
 

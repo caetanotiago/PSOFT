@@ -34,7 +34,7 @@ public class CreateScheduledFlightService {
     @Transactional
     public ScheduledFlight create(CreateScheduledFlightDTO dto) {
         // 404 - aircraft must exist
-        Aircraft aircraft = aircraftRepository.findById(new RegistrationNumber(dto.getAircraftRegistration()))
+        Aircraft aircraft = aircraftRepository.findByRegistration_Registration(dto.getAircraftRegistration())
                 .orElseThrow(() -> new EntityNotFoundException("Aircraft not found: " + dto.getAircraftRegistration()));
 
         // 404 - route must exist

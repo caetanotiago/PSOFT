@@ -24,7 +24,7 @@ public class CreateAircraftServiceImpl implements CreateAircraftService {
         RegistrationNumber regNum = new RegistrationNumber(dto.getRegistrationNumber());
 
         // 1. Validar se a matrícula já existe
-        if (aircraftRepository.existsByRegistrationNumber(regNum)) {
+        if (aircraftRepository.findByRegistration_Registration(dto.getRegistrationNumber()).isPresent()) {
             throw new AircraftAlreadyExistsException(dto.getRegistrationNumber());
         }
 

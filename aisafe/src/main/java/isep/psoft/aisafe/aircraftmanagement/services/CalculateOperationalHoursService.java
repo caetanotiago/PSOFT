@@ -5,6 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CalculateOperationalHoursService {
-
-    Page<AircraftOperationalHoursDTO> getOperationalHours(Pageable pageable);
+    Page<AircraftOperationalHoursDTO> calculateOperationalHours(Pageable pageable);
 }

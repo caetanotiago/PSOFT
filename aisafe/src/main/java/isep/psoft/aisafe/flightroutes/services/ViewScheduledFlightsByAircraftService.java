@@ -24,7 +24,7 @@ public class ViewScheduledFlightsByAircraftService {
     @Transactional(readOnly = true)
     public Page<ScheduledFlight> viewByAircraft(String registration, Pageable pageable) {
         // 404 - aircraft must exist
-        if (!aircraftRepository.existsByRegistrationNumber(new RegistrationNumber(registration))) {
+        if (aircraftRepository.findByRegistration_Registration(registration).isEmpty()) {
             throw new EntityNotFoundException("Aircraft not found: " + registration);
         }
         return scheduledFlightRepository.findByAircraftRegistration(registration, pageable);

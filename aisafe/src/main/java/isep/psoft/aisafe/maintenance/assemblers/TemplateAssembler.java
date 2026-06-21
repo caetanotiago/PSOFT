@@ -17,8 +17,7 @@ public class TemplateAssembler {
 
     public TemplateDTO toDTO(MaintenanceTemplate template) {
 
-        // CORREÇÃO: Em vez de adivinharmos o nome do método do teu colega,
-        // vamos usar o getId() e convertê-lo para String. Assim nunca falha!
+
         List<String> modelDesignations = template.getApplicableModels().stream()
                 .map(model -> String.valueOf(model.getId()))
                 .collect(Collectors.toList());

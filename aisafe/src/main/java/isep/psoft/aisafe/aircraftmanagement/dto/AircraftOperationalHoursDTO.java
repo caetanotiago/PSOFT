@@ -4,9 +4,6 @@ public class AircraftOperationalHoursDTO {
 
     private String registrationNumber;
 
-    // Mantemos o valor interno em minutos (é o que o JPQL agrega via SUM),
-    // mas a API pública expõe "horas", para bater certo com a US206
-    // ("calculate the total operational hours") e com o nome do endpoint.
     private Long totalMinutes;
 
     public AircraftOperationalHoursDTO() {}
