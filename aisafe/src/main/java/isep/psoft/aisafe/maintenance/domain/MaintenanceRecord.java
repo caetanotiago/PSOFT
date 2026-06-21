@@ -38,7 +38,6 @@ public class MaintenanceRecord {
         this.completionNotes = null;
     }
 
-    // Lógica de negócio para concluir o registo
     public void complete(CompletionNotes notes) {
         if (this.completionNotes != null) {
             throw new IllegalStateException("This maintenance record has already been completed.");
@@ -46,7 +45,6 @@ public class MaintenanceRecord {
         this.completionNotes = notes;
     }
 
-    // --- NOVA LÓGICA PARA A US217 ---
     public void updateComponent(MaintenanceComponent newComponent) {
         if (newComponent == null) {
             throw new IllegalArgumentException("The maintenance component cannot be null.");

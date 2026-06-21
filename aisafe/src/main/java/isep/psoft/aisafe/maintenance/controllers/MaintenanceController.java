@@ -42,7 +42,6 @@ public class MaintenanceController {
     private final ViewOngoingMaintenanceUseCase viewOngoingUseCase;
     private final GenerateCostReportUseCase generateCostReportUseCase;
 
-    // Injeção do novo Use Case da US221
     private final ViewAvgTurnaroundTimeUseCase viewAvgTurnaroundTimeUseCase;
 
     /**

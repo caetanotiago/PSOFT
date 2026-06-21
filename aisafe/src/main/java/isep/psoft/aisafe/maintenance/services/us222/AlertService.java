@@ -45,7 +45,6 @@ public class AlertService {
         }
     }
 
-    // Regra matemática apenas para DIAS (para não interferir com o código do teu colega)
     public boolean isMaintenanceDue(MaintenanceTemplate template, MaintenanceRecord lastRecord) {
         LocalDate currentDate = LocalDate.now();
         LocalDate baseDate;
@@ -53,7 +52,7 @@ public class AlertService {
         if (lastRecord != null && lastRecord.getCompletionNotes() != null) {
             baseDate = lastRecord.getCompletionNotes().getCompletionDate();
         } else {
-            // Se nunca teve manutenção, usamos uma data antiga para não dar erro
+
             baseDate = LocalDate.now().minusYears(1);
         }
 
@@ -64,6 +63,6 @@ public class AlertService {
             }
         }
 
-        return false; // As horas de voo virão para aqui no futuro!
+        return false;
     }
 }

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CostItemDto {
 
-    // O identificador pode ser a matrícula (AIRCRAFT) ou o nome do modelo (MODEL)
     private String identifier;
 
     private Double totalCost;

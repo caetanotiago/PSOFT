@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface AlertRepository extends JpaRepository<Alert, Long> {
 
-    // Método útil caso o ATCC queira ver apenas os alertas que ainda não leu
     List<Alert> findByIsReadFalse();
 }

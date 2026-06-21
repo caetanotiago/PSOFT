@@ -20,12 +20,10 @@ public class ViewOngoingMaintenanceUseCaseImpl implements ViewOngoingMaintenance
     @Override
     public List<MaintenanceRecordOutputDto> execute() {
 
-        // 1. Procurar na Base de Dados apenas os registos que não têm notas de conclusão
         List<MaintenanceRecord> ongoingRecords = repository.findByCompletionNotesIsNull();
 
-        // 2. Converter a lista de Entidades (MaintenanceRecord) para uma lista de DTOs
         return ongoingRecords.stream()
-                .map(assembler::toModel) // Usamos o método toModel do teu assembler
+                .map(assembler::toModel)
                 .collect(Collectors.toList());
     }
 }

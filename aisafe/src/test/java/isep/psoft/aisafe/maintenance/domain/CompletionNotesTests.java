@@ -37,7 +37,6 @@ class CompletionNotesTests {
         String notes = "All tasks completed successfully.";
         LocalDate date = LocalDate.now();
 
-        // Act - Ordem corrigida: Primeiro a Data, depois o Texto
         CompletionNotes completionNotes = new CompletionNotes(date, notes);
 
         // Assert

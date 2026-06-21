@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MaintenanceCostReportDto {
 
-    private String reportType; // Guardará "AIRCRAFT" ou "MODEL"
+    private String reportType;
     private List<CostItemDto> items;
 
 }

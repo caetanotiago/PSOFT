@@ -47,10 +47,8 @@ class CreateMaintenanceRecordUseCaseTests {
         MaintenanceRecord savedRecord = mock(MaintenanceRecord.class);
         MaintenanceRecordOutputDto outputDto = mock(MaintenanceRecordOutputDto.class);
 
-        // Criamos o avião fictício para o Mock não dar erro
         Aircraft mockAircraft = mock(Aircraft.class);
 
-        // CORREÇÃO: Usamos o método da matrícula em vez do existsById
         when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.of(mockAircraft));
         when(templateRepository.existsById(dto.getTemplateId())).thenReturn(true);
         when(recordRepository.save(any(MaintenanceRecord.class))).thenReturn(savedRecord);
@@ -81,7 +79,6 @@ class CreateMaintenanceRecordUseCaseTests {
     void whenAircraftDoesNotExist_shouldThrowException() {
         CreateRecordDTO dto = new CreateRecordDTO("CS-XXX", 1L, "Non-existent aircraft test", LocalDate.now(), 60, "STRUCTURE");
 
-        // Simulamos que o avião não existe na BD
         when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(dto))

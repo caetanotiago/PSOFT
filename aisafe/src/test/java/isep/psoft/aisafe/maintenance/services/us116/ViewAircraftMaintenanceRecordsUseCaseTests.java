@@ -42,10 +42,8 @@ class ViewAircraftMaintenanceRecordsUseCaseTests {
         MaintenanceRecord record1 = mock(MaintenanceRecord.class);
         MaintenanceRecordOutputDto dto1 = mock(MaintenanceRecordOutputDto.class);
 
-        // Criamos um mock de um avião para a pesquisa não dar erro
         Aircraft mockAircraft = mock(Aircraft.class);
 
-        // CORREÇÃO: Usamos o método da matrícula que retorna um Optional!
         when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.of(mockAircraft));
 
         when(repository.findAllByAircraftRegistration(registration)).thenReturn(List.of(record1));
@@ -78,7 +76,6 @@ class ViewAircraftMaintenanceRecordsUseCaseTests {
     void whenAircraftDoesNotExist_shouldThrowException() {
         String ghostRegistration = "CS-XYZ";
 
-        // Simulamos que o avião não foi encontrado (devolve Optional vazio)
         when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(ghostRegistration))

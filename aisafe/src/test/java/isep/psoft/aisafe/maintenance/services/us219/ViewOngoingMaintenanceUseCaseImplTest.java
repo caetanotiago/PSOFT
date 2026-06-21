@@ -41,29 +41,27 @@ class ViewOngoingMaintenanceUseCaseImplTest {
 
     @Test
     void whenViewingOngoingMaintenance_withRecords_shouldReturnList() {
-        // CORRIGIDO AQUI: Colocámos o método exato que criaste no teu código
+
         when(repository.findByCompletionNotesIsNull()).thenReturn(List.of(mockRecord));
         when(assembler.toModel(mockRecord)).thenReturn(mockDto);
 
-        // CORRIGIDO AQUI: A tua classe devolve uma List e não Iterable
         List<MaintenanceRecordOutputDto> result = useCase.execute();
 
         assertNotNull(result);
-        assertFalse(result.isEmpty()); // A lista não pode vir vazia
+        assertFalse(result.isEmpty());
         verify(assembler, times(1)).toModel(mockRecord);
     }
 
     @Test
     void whenViewingOngoingMaintenance_withNoRecords_shouldReturnEmptyList() {
-        // Simula uma base de dados onde não há manutenções a decorrer (lista vazia)
+
         when(repository.findByCompletionNotesIsNull()).thenReturn(List.of());
 
         List<MaintenanceRecordOutputDto> result = useCase.execute();
 
         assertNotNull(result);
-        assertTrue(result.isEmpty()); // A lista tem de vir vazia
+        assertTrue(result.isEmpty());
 
-        // Verifica que o assembler nunca tentou converter registos (porque não havia nenhum)
         verify(assembler, never()).toModel(any());
     }
 }

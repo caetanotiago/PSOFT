@@ -8,7 +8,7 @@ public class CategorizeRecordInputDto {
     private String category;
 
     protected CategorizeRecordInputDto() {
-        // Construtor vazio necessário para o Spring/Jackson conseguir converter o JSON
+
     }
 
     public CategorizeRecordInputDto(String category) {

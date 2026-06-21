@@ -27,10 +27,8 @@ public class CreateRecordDTO {
 
     private String componentCategory;
 
-    // Construtor vazio (Obrigatório para o Postman não dar o Erro 400)
     public CreateRecordDTO() {}
 
-    // NOVO: Construtor completo (Para resolver os erros vermelhos dos teus Testes!)
     public CreateRecordDTO(String aircraftRegistration, Long templateId, String description, LocalDate startDate, Integer expectedDurationMinutes, String componentCategory) {
         this.aircraftRegistration = aircraftRegistration;
         this.templateId = templateId;

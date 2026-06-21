@@ -17,7 +17,6 @@ public class GenerateCostReportUseCaseImpl implements GenerateCostReportUseCase 
     @Override
     public MaintenanceCostReportDto execute(String reportType) {
 
-        // 1. Validar se o tipo de relatório foi enviado
         if (reportType == null || reportType.trim().isEmpty()) {
             throw new IllegalArgumentException("O tipo de relatório (reportType) é obrigatório ('AIRCRAFT' ou 'MODEL').");
         }
@@ -25,7 +24,6 @@ public class GenerateCostReportUseCaseImpl implements GenerateCostReportUseCase 
         String normalizedType = reportType.trim().toUpperCase();
         List<CostItemDto> items;
 
-        // 2. Escolher a query certa consoante o tipo de agregação pedida
         switch (normalizedType) {
             case "AIRCRAFT":
                 items = repository.calculateCostsPerAircraft();
@@ -37,7 +35,6 @@ public class GenerateCostReportUseCaseImpl implements GenerateCostReportUseCase 
                 throw new IllegalArgumentException("Tipo de relatório inválido. Deve ser 'AIRCRAFT' ou 'MODEL'.");
         }
 
-        // 3. Montar o Relatório Final e devolver
         return new MaintenanceCostReportDto(normalizedType, items);
     }
 }

@@ -24,7 +24,6 @@ class CategorizeMaintenanceRecordUseCaseImplTest {
     @Mock
     private MaintenanceRecordRepository recordRepository;
 
-    // AQUI ESTÁ A CORREÇÃO: Damos um "Fantoche" do Assembler ao teste
     @Mock
     private MaintenanceRecordAssembler assembler;
 
@@ -48,12 +47,10 @@ class CategorizeMaintenanceRecordUseCaseImplTest {
         when(recordRepository.findById(recordId)).thenReturn(Optional.of(mockRecord));
         when(recordRepository.save(any(MaintenanceRecord.class))).thenReturn(mockRecord);
 
-        // Executamos o Use Case
         useCase.execute(recordId, category, version);
 
-        // Validamos que a bd guardou
         verify(recordRepository, times(1)).save(mockRecord);
-        // Validamos que o assembler também foi chamado corretamente!
+
         verify(assembler, times(1)).toModel(mockRecord);
     }
 

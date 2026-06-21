@@ -23,7 +23,7 @@ public class MaintenanceTemplateRestController {
     private final ViewMaintenanceTemplateByIdUseCase viewByIdUseCase;
 
     @PostMapping
-    // CORREÇÃO: Passou para BACKOFFICE_OPERATOR para não chocar com o SecurityConfig
+
     @PreAuthorize("hasRole('BACKOFFICE_OPERATOR')")
     public ResponseEntity<TemplateDTO> createTemplate(@Valid @RequestBody CreateTemplateDTO createDto) {
 
@@ -38,7 +38,7 @@ public class MaintenanceTemplateRestController {
     }
 
     @GetMapping("/{id}")
-    // CORREÇÃO: Passou para BACKOFFICE_OPERATOR ou SUPERVISOR
+
     @PreAuthorize("hasRole('BACKOFFICE_OPERATOR') or hasRole('MAINTENANCE_SUPERVISOR')")
     public ResponseEntity<TemplateDTO> getTemplateById(@PathVariable Long id) {
         return viewByIdUseCase.execute(id)

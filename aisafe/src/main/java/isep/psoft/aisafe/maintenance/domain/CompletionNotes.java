@@ -6,7 +6,6 @@ import java.time.LocalDate;
 @Embeddable
 public class CompletionNotes {
 
-    // APAGADOS OS @Column(nullable = false) para a Base de Dados aceitar Manutenções "A Decorrer" (Nulas)
     private LocalDate completionDate;
     private String notes;
     private Double cost;
@@ -15,7 +14,6 @@ public class CompletionNotes {
 
     protected CompletionNotes() {}
 
-    // Construtores antigos (para manter a compatibilidade com a US119, 220 e 221)
     public CompletionNotes(LocalDate completionDate, String notes) {
         this(completionDate, notes, 0.0, 0, 0.0);
     }
@@ -28,7 +26,6 @@ public class CompletionNotes {
         this(completionDate, notes, cost, actualDurationMinutes, 0.0);
     }
 
-    // Construtor principal
     public CompletionNotes(LocalDate completionDate, String notes, Double cost, Integer actualDurationMinutes, Double aircraftFlightHoursAtCompletion) {
         if (completionDate == null) throw new IllegalArgumentException("The completion date cannot be null.");
         if (notes == null || notes.trim().isEmpty()) throw new IllegalArgumentException("Completion notes cannot be null or blank.");
