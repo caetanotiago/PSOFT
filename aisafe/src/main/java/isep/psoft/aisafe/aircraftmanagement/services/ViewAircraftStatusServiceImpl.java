@@ -3,22 +3,27 @@ package isep.psoft.aisafe.aircraftmanagement.services;
 import isep.psoft.aisafe.aircraftmanagement.domain.Aircraft;
 import isep.psoft.aisafe.aircraftmanagement.domain.AircraftNotFoundException;
 import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
+import isep.psoft.aisafe.aircraftmanagement.dto.AircraftStatusDTO;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ViewAircraftServiceImpl implements ViewAircraftService {
+public class ViewAircraftStatusServiceImpl implements ViewAircraftStatusService {
 
     private final AircraftRepository aircraftRepository;
 
-    public ViewAircraftServiceImpl(AircraftRepository aircraftRepository) {
+    public ViewAircraftStatusServiceImpl(AircraftRepository aircraftRepository) {
         this.aircraftRepository = aircraftRepository;
     }
 
     @Override
-    public Aircraft getAircraftByRegistrationNumber(String registrationNumber) {
+    public AircraftStatusDTO getAircraftStatus(String registrationNumber) {
         RegistrationNumber regNum = new RegistrationNumber(registrationNumber);
-        return aircraftRepository.findById(regNum)
+        Aircraft aircraft = aircraftRepository.findById(regNum)
                 .orElseThrow(() -> new AircraftNotFoundException(registrationNumber));
+        return new AircraftStatusDTO(
+                aircraft.getRegistrationNumber().getNumber(),
+                aircraft.getStatus().getState()
+        );
     }
 }

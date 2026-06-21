@@ -9,6 +9,8 @@ public class AircraftModelDTO {
     private Double fuelCapacity;
     private Double maximumRange;
     private Double cruisingSpeed;
+    private Long version;
+    private String image;
 
     public AircraftModelDTO() {}
 
@@ -66,5 +68,21 @@ public class AircraftModelDTO {
 
     public void setCruisingSpeed(Double cruisingSpeed) {
         this.cruisingSpeed = cruisingSpeed;
+    }
+
+    public Long getVersion() { 
+        return version; 
+    }
+
+    public void setVersion(Long version) { 
+        this.version = version; 
+    }
+
+    public String getImage() { 
+        return image; 
+    }
+
+    public void setImage(String image) { 
+        this.image = image; 
     }
 }
