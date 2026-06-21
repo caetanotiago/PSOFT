@@ -55,10 +55,10 @@ public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRe
      * US220: Calculate total maintenance costs grouped by Aircraft Model.
      * Uses a cross-aggregate join between MaintenanceRecord and Aircraft entities.
      */
-    @Query("SELECT new isep.psoft.aisafe.maintenance.dto.CostItemDto(a.model.modelName, SUM(m.completionNotes.cost)) " +
+    @Query("SELECT new isep.psoft.aisafe.maintenance.dto.CostItemDto(a.model.designation.modelName, SUM(m.completionNotes.cost)) " +
             "FROM MaintenanceRecord m, Aircraft a " +
             "WHERE m.aircraftRegistration = a.registrationNumber.number " +
             "AND m.completionNotes IS NOT NULL " +
-            "GROUP BY a.model.modelName")
+            "GROUP BY a.model.designation.modelName")
     List<CostItemDto> calculateCostsPerModel();
 }
