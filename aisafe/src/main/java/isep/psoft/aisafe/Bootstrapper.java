@@ -143,7 +143,8 @@ public class Bootstrapper implements CommandLineRunner {
             airportRepository.save(new Airport(new IATACode("OPO"), new AirportDetails("Francisco Sá Carneiro", "Porto", "Portugal", "Europa", "Europe/Lisbon", new Coordinates(41.2481, -8.6814)), AirportState.OPERATIONAL, List.of(new Runway("17", 3480.0, "N"), new Runway("35", 3480.0, "S"))));
             airportRepository.save(new Airport(new IATACode("FAO"), new AirportDetails("Faro", "Faro", "Portugal", "Europa", "Europe/Lisbon", new Coordinates(37.0144, -7.9659)), AirportState.OPERATIONAL, List.of(new Runway("10", 2490.0, "E"))));
             airportRepository.save(new Airport(new IATACode("MAD"), new AirportDetails("Adolfo Suárez Madrid-Barajas", "Madrid", "Espanha", "Europa", "Europe/Madrid", new Coordinates(40.4936, -3.5668)), AirportState.OPERATIONAL, List.of(new Runway("18L", 4350.0, "N"), new Runway("32R", 4100.0, "NW"))));
-            System.out.println("WP#2A: Aeroportos LIS, OPO, FAO, MAD injetados.");
+            airportRepository.save(new Airport(new IATACode("BCN"), new AirportDetails("Josep Tarradellas Barcelona-El Prat", "Barcelona", "Espanha", "Europa", "Europe/Madrid", new Coordinates(41.2974, 2.0833)), AirportState.OPERATIONAL, List.of(new Runway("07L", 3352.0, "E"), new Runway("25R", 3352.0, "W"))));
+            System.out.println("WP#2A: Aeroportos LIS, OPO, FAO, MAD, BCN injetados.");
         }
 
         // Manutenção (WP#4A) - Templates
@@ -186,18 +187,28 @@ public class Bootstrapper implements CommandLineRunner {
             Airport opo = airportRepository.findById(new IATACode("OPO")).orElseThrow();
             Airport mad = airportRepository.findById(new IATACode("MAD")).orElseThrow();
             Airport fao = airportRepository.findById(new IATACode("FAO")).orElseThrow();
+            Airport bcn = airportRepository.findById(new IATACode("BCN")).orElseThrow();
 
             FlightRoute lisOpo = flightRouteRepository.save(flightRouteFactory.createRoute(lis, opo, 313.0, 1000.0, 100, 60));
             FlightRoute opoMad = flightRouteRepository.save(flightRouteFactory.createRoute(opo, mad, 421.0, 1000.0, 100, 75));
-            flightRouteRepository.save(flightRouteFactory.createRoute(lis, fao, 278.0, 1000.0, 100, 55));
-            System.out.println("WP#3A: Rotas LIS-OPO, OPO-MAD, LIS-FAO injetadas.");
+            FlightRoute lisFao = flightRouteRepository.save(flightRouteFactory.createRoute(lis, fao, 278.0, 1000.0, 100, 55));
+            // Segunda alternativa para LIS→MAD (via FAO): US216 mostra logo 2 itinerários por default.
+            FlightRoute faoMad = flightRouteRepository.save(flightRouteFactory.createRoute(fao, mad, 525.0, 1000.0, 100, 70));
+            // Rota INATIVA: BCN só tem entrada por esta rota, logo LIS→BCN é IMPOSSÍVEL até ser ativada (demo US216/US112).
+            FlightRoute madBcn = flightRouteFactory.createRoute(mad, bcn, 485.0, 1000.0, 100, 65);
+            madBcn.changeStatus("INACTIVE");
+            flightRouteRepository.save(madBcn);
+            System.out.println("WP#3A: Rotas LIS-OPO, OPO-MAD, LIS-FAO, FAO-MAD (ativas) e MAD-BCN (INATIVA) injetadas.");
 
             if (scheduledFlightRepository.count() == 0) {
-                String reg = "CS-TVA";
-                scheduledFlightRepository.save(new ScheduledFlight(reg, lisOpo, new FlightSchedule(LocalDate.now().plusDays(1), LocalTime.of(10, 0))));
-                scheduledFlightRepository.save(new ScheduledFlight(reg, lisOpo, new FlightSchedule(LocalDate.now().plusDays(2), LocalTime.of(14, 30))));
-                scheduledFlightRepository.save(new ScheduledFlight(reg, opoMad, new FlightSchedule(LocalDate.now().plusDays(3), LocalTime.of(9, 15))));
-                System.out.println("WP#3B: Voos agendados injetados (popularidade: LIS-OPO=2, OPO-MAD=1, LIS-FAO=0).");
+                String regA = "CS-TVA";
+                scheduledFlightRepository.save(new ScheduledFlight(regA, lisOpo, new FlightSchedule(LocalDate.now().plusDays(1), LocalTime.of(10, 0))));
+                scheduledFlightRepository.save(new ScheduledFlight(regA, lisOpo, new FlightSchedule(LocalDate.now().plusDays(2), LocalTime.of(14, 30))));
+                scheduledFlightRepository.save(new ScheduledFlight(regA, opoMad, new FlightSchedule(LocalDate.now().plusDays(3), LocalTime.of(9, 15))));
+                String regB = "CS-TVB";
+                scheduledFlightRepository.save(new ScheduledFlight(regB, lisFao, new FlightSchedule(LocalDate.now().plusDays(4), LocalTime.of(8, 0))));
+                scheduledFlightRepository.save(new ScheduledFlight(regB, faoMad, new FlightSchedule(LocalDate.now().plusDays(5), LocalTime.of(12, 0))));
+                System.out.println("WP#3B: Voos agendados injetados (popularidade: LIS-OPO=2, OPO-MAD=1, LIS-FAO=1, FAO-MAD=1).");
             }
         }
         System.out.println("✅ Bootstrapping concluído com sucesso!");

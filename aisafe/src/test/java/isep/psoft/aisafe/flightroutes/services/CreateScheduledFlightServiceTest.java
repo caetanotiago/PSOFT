@@ -74,7 +74,7 @@ class CreateScheduledFlightServiceTest {
 
         when(aircraft.getModel().getSpecifications().getMaximumRange()).thenReturn(6000.0);
         when(aircraft.getSeatingCapacity().getTotalSeats()).thenReturn(180);
-        when(aircraft.getStatus().getState()).thenReturn("ACTIVE");
+        when(aircraft.getStatus().getState()).thenReturn("AVAILABLE");
         when(aircraft.getRegistrationNumber().getNumber()).thenReturn(REG);
 
         when(route.getRequirements()).thenReturn(requirements);

@@ -2,6 +2,7 @@ package isep.psoft.aisafe.flightroutes.services;
 
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
 import isep.psoft.aisafe.flightroutes.repositories.FlightRouteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,10 @@ public class SearchFlightRoutesService {
 
     private final FlightRouteRepository routeRepository;
 
-    // Para a US113
+    // Para a US113 — "not found" devolve 404 (consistente com US111/US112).
     public FlightRoute getRouteById(String id) {
         return routeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Flight Route not found: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Flight Route not found: " + id));
     }
 
     // Para a US114
