@@ -261,10 +261,23 @@
       ]
     },
     {
-      "name": "WP#2A — Airports",
+      "name": "Airports (WP#2A + WP#2B)",
       "item": [
         {
-          "name": "US106 — Register Airport",
+          "name": "US106 — Register Airport (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('iataCode returned', () => pm.expect(b.iataCode).to.eql('TST'));",
+                  "pm.test('self link present', () => pm.expect(b._links.self).to.exist);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -279,7 +292,48 @@
           }
         },
         {
-          "name": "US107 — View Airport LIS",
+          "name": "US106 — Register Duplicate (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"iataCode\": \"LIS\",\n  \"name\": \"Test\",\n  \"city\": \"Lisbon\",\n  \"country\": \"Portugal\",\n  \"timezone\": \"Europe/Lisbon\",\n  \"latitude\": 38.7,\n  \"longitude\": -9.1,\n  \"runways\": [{ \"name\": \"03/21\", \"length\": 3805.0, \"orientation\": \"030/210\" }]\n}"
+            }
+          }
+        },
+        {
+          "name": "US107 — View Airport LIS (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('iataCode = LIS',   () => pm.expect(b.iataCode).to.eql('LIS'));",
+                  "pm.test('status field',     () => pm.expect(b.status).to.be.a('string'));",
+                  "pm.test('runways array',    () => pm.expect(b.runways).to.be.an('array'));",
+                  "pm.test('self link',        () => pm.expect(b._links.self).to.exist);",
+                  "pm.test('update-status lk', () => pm.expect(b._links['update-status']).to.exist);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
@@ -287,7 +341,36 @@
           }
         },
         {
-          "name": "US108 — Search by city=Lisbon",
+          "name": "US107 — Airport Not Found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": "{{baseUrl}}/airports/XXX"
+          }
+        },
+        {
+          "name": "US108 — Search by city=Lisbon (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('self link', () => pm.expect(pm.response.json()._links.self).to.exist);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
@@ -298,7 +381,37 @@
           }
         },
         {
-          "name": "US106a — Add Certification LIS",
+          "name": "US108 — Search no criteria (empty list ok)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 — never 404 on search', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": "{{baseUrl}}/airports"
+          }
+        },
+        {
+          "name": "US106a — Add Certification LIS (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('certifiedModels not empty', () => pm.expect(b.certifiedModels.length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -313,7 +426,43 @@
           }
         },
         {
-          "name": "US109 — Update Status CLOSED",
+          "name": "US106a — Duplicate Certification (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/LIS/certifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"manufacturer\": \"Airbus\", \"modelName\": \"A320\" }"
+            }
+          }
+        },
+        {
+          "name": "US109 — Update Status CLOSED (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200',      () => pm.response.to.have.status(200));",
+                  "pm.test('status = CLOSED',  () => pm.expect(pm.response.json().status).to.eql('CLOSED'));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -324,6 +473,303 @@
             "body": {
               "mode": "raw",
               "raw": "{ \"state\": \"CLOSED\" }"
+            }
+          }
+        },
+        {
+          "name": "US109 — Invalid Transition (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/LIS/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"state\": \"OPERATIONAL\" }"
+            }
+          }
+        },
+        {
+          "name": "US109 — Invalid State Value (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/LIS/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"state\": \"FLYING\" }"
+            }
+          }
+        },
+        {
+          "name": "US207 — Add Facility (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('facility added', () => pm.expect(b.facilities.some(f => f.identifier === 'P3')).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/LIS/facilities",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"type\": \"parking\", \"identifier\": \"P3\", \"description\": \"Parque de estacionamento coberto\" }"
+            }
+          }
+        },
+        {
+          "name": "US207 — Duplicate Facility (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/LIS/facilities",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"type\": \"parking\", \"identifier\": \"P3\", \"description\": \"Parque de estacionamento coberto\" }"
+            }
+          }
+        },
+        {
+          "name": "US207 — Add Photo (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('photos not empty', () => pm.expect(b.photos.length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/LIS/photos",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"url\": \"https://example.com/lis-terminal1.jpg\", \"caption\": \"Terminal 1\" }"
+            }
+          }
+        },
+        {
+          "name": "US207 — Add Photo, Airport Not Found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/ZZZ/photos",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"url\": \"https://example.com/zzz.jpg\", \"caption\": \"N/A\" }"
+            }
+          }
+        },
+        {
+          "name": "US208 — Update Operating Hours and Contacts (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('operatingHours present', () => pm.expect(b.operatingHours).to.exist);",
+                  "pm.test('contacts present', () => pm.expect(b.contacts.length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/FAO/details",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operatingHours\": { \"operates24Hours\": false, \"opens\": \"06:00:00\", \"closes\": \"23:30:00\" },\n  \"contacts\": [\n    { \"type\": \"phone\", \"value\": \"+351 289 800 800\", \"description\": \"Linha geral\" },\n    { \"type\": \"email\", \"value\": \"info@aeroportofaro.pt\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "US208 — Update Details, Empty Body (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": "{{baseUrl}}/airports/FAO/details",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "US210 — Busiest Airports, Top 2 (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "const list = b._embedded ? Object.values(b._embedded)[0] : [];",
+                  "pm.test('at most 2 results', () => pm.expect(list.length).to.be.at.most(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/airports/statistics/busiest?limit=2",
+              "query": [{ "key": "limit", "value": "2" }]
+            }
+          }
+        },
+        {
+          "name": "US210 — Busiest Airports, Invalid Limit (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/airports/statistics/busiest?limit=abc",
+              "query": [{ "key": "limit", "value": "abc" }]
+            }
+          }
+        },
+        {
+          "name": "US211 — Group Airports by Country (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "const groups = b._embedded ? Object.values(b._embedded)[0] : [];",
+                  "pm.test('groups present', () => pm.expect(groups.length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/airports/grouped?by=country",
+              "query": [{ "key": "by", "value": "country" }]
+            }
+          }
+        },
+        {
+          "name": "US211 — Group Airports, Invalid Criterion (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/airports/grouped?by=planeta",
+              "query": [{ "key": "by", "value": "planeta" }]
             }
           }
         }
