@@ -8,7 +8,7 @@
       "name": "Auth",
       "item": [
         {
-          "name": "Login (technician) - PARA A TUA PARTE",
+          "name": "Login (technician)",
           "event": [
             {
               "listen": "test",
@@ -106,6 +106,16 @@
       "item": [
         {
           "name": "US115 — Create a Maintenance Template",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if(pm.response.code === 201) { pm.environment.set('templateId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -129,6 +139,16 @@
         },
         {
           "name": "US115A — Create a Maintenance Record",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if(pm.response.code === 201) { pm.environment.set('recordId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -138,7 +158,7 @@
             "url": "{{baseUrl}}/api/maintenance-records",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"aircraftRegistration\": \"CS-TVA\",\n  \"templateId\": 1,\n  \"description\": \"Inspecao de Rotina\",\n  \"startDate\": \"2026-06-10\",\n  \"expectedDurationMinutes\": 180,\n  \"componentCategory\": \"Engines\"\n}"
+              "raw": "{\n  \"aircraftRegistration\": \"CS-TVB\",\n  \"templateId\": {{templateId}},\n  \"description\": \"Inspecao de Rotina\",\n  \"startDate\": \"2026-12-01\",\n  \"expectedDurationMinutes\": 180,\n  \"componentCategory\": \"ENGINE\"\n}"
             }
           }
         },
@@ -147,7 +167,7 @@
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-records/aircraft/CS-TVA"
+            "url": "{{baseUrl}}/api/maintenance-records/aircraft/CS-TVB"
           }
         },
         {
@@ -159,27 +179,83 @@
           }
         },
         {
+          "name": "Get Maintenance Record by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": "{{baseUrl}}/api/maintenance-records/{{recordId}}"
+          }
+        },
+        {
+          "name": "US217 — Categorize a Maintenance Record Component",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
+              { "key": "If-Match", "value": "0" }
+            ],
+            "url": "{{baseUrl}}/api/maintenance-records/{{recordId}}/component",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"EXTERIOR\"\n}"
+            }
+          }
+        },
+        {
           "name": "US119 — Complete a Maintenance Record",
           "request": {
             "method": "PATCH",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
-              { "key": "If-Match", "value": "\"0\"" }
+              { "key": "If-Match", "value": "1" }
             ],
-            "url": "{{baseUrl}}/api/maintenance-records/1/complete",
+            "url": "{{baseUrl}}/api/maintenance-records/{{recordId}}/complete",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"notes\": \"Inspecao terminada com sucesso. Todos os componentes verificados e validados.\"\n}"
+              "raw": "{\n  \"notes\": \"Inspecao terminada com sucesso.\",\n  \"cost\": 1500.50,\n  \"actualDurationMinutes\": 195,\n  \"aircraftFlightHoursAtCompletion\": 3200.0\n}"
             }
           }
         },
         {
-          "name": "Get Maintenance Record by ID",
+          "name": "US218 — Search Maintenance Records (Filters)",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
-            "url": "{{baseUrl}}/api/maintenance-records/1"
+            "url": "{{baseUrl}}/api/maintenance-records/search?status=COMPLETED&component=EXTERIOR"
+          }
+        },
+        {
+          "name": "US219 — View Ongoing Maintenance Activities",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": "{{baseUrl}}/api/maintenance-records/ongoing"
+          }
+        },
+        {
+          "name": "US220 — Generate Costs Report (By Aircraft)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": "{{baseUrl}}/api/maintenance-records/reports/costs?type=aircraft"
+          }
+        },
+        {
+          "name": "US220 — Generate Costs Report (By Model)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": "{{baseUrl}}/api/maintenance-records/reports/costs?type=model"
+          }
+        },
+        {
+          "name": "US221 — View Average Turnaround Time",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": "{{baseUrl}}/api/maintenance-records/reports/turnaround-time"
           }
         }
       ]

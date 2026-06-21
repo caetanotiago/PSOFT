@@ -1,5 +1,6 @@
 package isep.psoft.aisafe.maintenance.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,24 +11,26 @@ public class CreateRecordDTO {
     @NotBlank(message = "Aircraft registration cannot be blank")
     private String aircraftRegistration;
 
-    @NotNull(message = "Template ID is required")
+    @NotNull(message = "Template ID cannot be null")
     private Long templateId;
 
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "Description cannot be blank")
     private String description;
 
-    @NotNull(message = "Start date is required")
+    @NotNull(message = "Start date cannot be null")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
-    @NotNull(message = "Expected duration is required")
-    @Min(value = 1, message = "Duration must be at least 1 minute")
+    @NotNull(message = "Expected duration cannot be null")
+    @Min(value = 1, message = "Expected duration must be at least 1 minute")
     private Integer expectedDurationMinutes;
 
-    @NotBlank(message = "Component category is required")
     private String componentCategory;
 
+    // Construtor vazio (Obrigatório para o Postman não dar o Erro 400)
     public CreateRecordDTO() {}
 
+    // NOVO: Construtor completo (Para resolver os erros vermelhos dos teus Testes!)
     public CreateRecordDTO(String aircraftRegistration, Long templateId, String description, LocalDate startDate, Integer expectedDurationMinutes, String componentCategory) {
         this.aircraftRegistration = aircraftRegistration;
         this.templateId = templateId;

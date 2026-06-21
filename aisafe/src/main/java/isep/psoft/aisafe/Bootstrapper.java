@@ -14,9 +14,8 @@ import isep.psoft.aisafe.flightroutes.domain.ScheduledFlight;
 import isep.psoft.aisafe.flightroutes.factories.FlightRouteFactory;
 import isep.psoft.aisafe.flightroutes.repositories.FlightRouteRepository;
 import isep.psoft.aisafe.flightroutes.repositories.ScheduledFlightRepository;
-import isep.psoft.aisafe.maintenance.domain.MaintenanceInterval;
-import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
-import isep.psoft.aisafe.maintenance.domain.TemplateType;
+import isep.psoft.aisafe.maintenance.domain.*;
+import isep.psoft.aisafe.maintenance.repositories.MaintenanceRecordRepository;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
 
 import org.springframework.boot.CommandLineRunner;
@@ -37,6 +36,7 @@ public class Bootstrapper implements CommandLineRunner {
     private final AircraftRepository aircraftRepository;
     private final AirportRepository airportRepository;
     private final MaintenanceTemplateRepository maintenanceTemplateRepository;
+    private final MaintenanceRecordRepository maintenanceRecordRepository; // NOVO
     private final FlightRouteRepository flightRouteRepository;
     private final ScheduledFlightRepository scheduledFlightRepository;
     private final FlightRouteFactory flightRouteFactory;
@@ -47,6 +47,7 @@ public class Bootstrapper implements CommandLineRunner {
                         AircraftRepository aircraftRepository,
                         AirportRepository airportRepository,
                         MaintenanceTemplateRepository maintenanceTemplateRepository,
+                        MaintenanceRecordRepository maintenanceRecordRepository, // NOVO
                         FlightRouteRepository flightRouteRepository,
                         ScheduledFlightRepository scheduledFlightRepository,
                         FlightRouteFactory flightRouteFactory) {
@@ -56,6 +57,7 @@ public class Bootstrapper implements CommandLineRunner {
         this.aircraftRepository = aircraftRepository;
         this.airportRepository = airportRepository;
         this.maintenanceTemplateRepository = maintenanceTemplateRepository;
+        this.maintenanceRecordRepository = maintenanceRecordRepository; // NOVO
         this.flightRouteRepository = flightRouteRepository;
         this.scheduledFlightRepository = scheduledFlightRepository;
         this.flightRouteFactory = flightRouteFactory;
@@ -110,56 +112,41 @@ public class Bootstrapper implements CommandLineRunner {
             System.out.println("WP#1A: Aircraft Models injetados.");
         }
 
-        // Aeronaves Físicas - Injetar Avião para Manutenção
+        // Aeronaves Físicas
         if (aircraftRepository.count() == 0) {
             AircraftModel modeloBase = aircraftModelRepository.findAll().iterator().next();
 
-            // CORREÇÃO 1: Adicionado o 5º argumento (AircraftStatus)
-            Aircraft aircraft = new Aircraft(
+            Aircraft aircraft1 = new Aircraft(
                     new RegistrationNumber("CS-TVA"),
                     modeloBase,
                     new ManufacturingDate(LocalDate.of(2020, 1, 1)),
                     new SeatingCapacity(150),
-                    new AircraftStatus("ACTIVE") // Assumindo que o construtor recebe uma String
+                    new AircraftStatus("ACTIVE")
             );
-            aircraftRepository.save(aircraft);
-            System.out.println("WP#1A: Aeronave 'CS-TVA' injetada.");
+            aircraftRepository.save(aircraft1);
+
+            Aircraft aircraft2 = new Aircraft(
+                    new RegistrationNumber("CS-TVB"),
+                    modeloBase,
+                    new ManufacturingDate(LocalDate.of(2022, 5, 10)),
+                    new SeatingCapacity(150),
+                    new AircraftStatus("ACTIVE")
+            );
+            aircraftRepository.save(aircraft2);
+
+            System.out.println("WP#1A: Aeronaves 'CS-TVA' e 'CS-TVB' injetadas.");
         }
 
         // Aeroportos (WP#2A)
         if (airportRepository.count() == 0) {
-            airportRepository.save(new Airport(
-                new IATACode("LIS"),
-                new AirportDetails("Humberto Delgado", "Lisboa", "Portugal", "Europa", "Europe/Lisbon",
-                    new Coordinates(38.7756, -9.1354)),
-                AirportState.OPERATIONAL,
-                List.of(new Runway("03", 3805.0, "N"), new Runway("21", 3805.0, "S"))
-            ));
-            airportRepository.save(new Airport(
-                new IATACode("OPO"),
-                new AirportDetails("Francisco Sá Carneiro", "Porto", "Portugal", "Europa", "Europe/Lisbon",
-                    new Coordinates(41.2481, -8.6814)),
-                AirportState.OPERATIONAL,
-                List.of(new Runway("17", 3480.0, "N"), new Runway("35", 3480.0, "S"))
-            ));
-            airportRepository.save(new Airport(
-                new IATACode("FAO"),
-                new AirportDetails("Faro", "Faro", "Portugal", "Europa", "Europe/Lisbon",
-                    new Coordinates(37.0144, -7.9659)),
-                AirportState.OPERATIONAL,
-                List.of(new Runway("10", 2490.0, "E"))
-            ));
-            airportRepository.save(new Airport(
-                new IATACode("MAD"),
-                new AirportDetails("Adolfo Suárez Madrid-Barajas", "Madrid", "Espanha", "Europa", "Europe/Madrid",
-                    new Coordinates(40.4936, -3.5668)),
-                AirportState.OPERATIONAL,
-                List.of(new Runway("18L", 4350.0, "N"), new Runway("32R", 4100.0, "NW"))
-            ));
+            airportRepository.save(new Airport(new IATACode("LIS"), new AirportDetails("Humberto Delgado", "Lisboa", "Portugal", "Europa", "Europe/Lisbon", new Coordinates(38.7756, -9.1354)), AirportState.OPERATIONAL, List.of(new Runway("03", 3805.0, "N"), new Runway("21", 3805.0, "S"))));
+            airportRepository.save(new Airport(new IATACode("OPO"), new AirportDetails("Francisco Sá Carneiro", "Porto", "Portugal", "Europa", "Europe/Lisbon", new Coordinates(41.2481, -8.6814)), AirportState.OPERATIONAL, List.of(new Runway("17", 3480.0, "N"), new Runway("35", 3480.0, "S"))));
+            airportRepository.save(new Airport(new IATACode("FAO"), new AirportDetails("Faro", "Faro", "Portugal", "Europa", "Europe/Lisbon", new Coordinates(37.0144, -7.9659)), AirportState.OPERATIONAL, List.of(new Runway("10", 2490.0, "E"))));
+            airportRepository.save(new Airport(new IATACode("MAD"), new AirportDetails("Adolfo Suárez Madrid-Barajas", "Madrid", "Espanha", "Europa", "Europe/Madrid", new Coordinates(40.4936, -3.5668)), AirportState.OPERATIONAL, List.of(new Runway("18L", 4350.0, "N"), new Runway("32R", 4100.0, "NW"))));
             System.out.println("WP#2A: Aeroportos LIS, OPO, FAO, MAD injetados.");
         }
 
-        // Manutenção (WP#4A)
+        // Manutenção (WP#4A) - Templates
         if (maintenanceTemplateRepository.count() == 0) {
             AircraftModel modeloBase = aircraftModelRepository.findAll().iterator().next();
 
@@ -174,6 +161,25 @@ public class Bootstrapper implements CommandLineRunner {
             System.out.println("WP#4A: Maintenance Templates injetados.");
         }
 
+        // NOVO: Manutenção (WP#4B) - Registo de Manutenções
+        if (maintenanceRecordRepository.count() == 0) {
+            MaintenanceTemplate template = maintenanceTemplateRepository.findAll().get(0);
+
+            RecordDetails details1 = new RecordDetails("Inspecao de Rotina", LocalDate.now().plusDays(2), 180);
+
+            // AQUI ESTÁ A CORREÇÃO: Com o componente adicionado para respeitar os 4 argumentos que o IDE pede!
+            MaintenanceRecord record1 = new MaintenanceRecord(
+                    "CS-TVB",
+                    template.getId(),
+                    details1,
+                    new MaintenanceComponent("ENGINE")
+            );
+
+            maintenanceRecordRepository.save(record1);
+
+            System.out.println("WP#4B: Maintenance Record (Ongoing) injetado com sucesso!");
+        }
+
         // Rotas (WP#3A) + Voos Agendados (WP#3B)
         if (flightRouteRepository.count() == 0) {
             Airport lis = airportRepository.findById(new IATACode("LIS")).orElseThrow();
@@ -181,29 +187,19 @@ public class Bootstrapper implements CommandLineRunner {
             Airport mad = airportRepository.findById(new IATACode("MAD")).orElseThrow();
             Airport fao = airportRepository.findById(new IATACode("FAO")).orElseThrow();
 
-            // createRoute(origin, destination, distanceKm, minRange, minCapacity, estTimeMinutes)
-            FlightRoute lisOpo = flightRouteRepository.save(
-                    flightRouteFactory.createRoute(lis, opo, 313.0, 1000.0, 100, 60));
-            FlightRoute opoMad = flightRouteRepository.save(
-                    flightRouteFactory.createRoute(opo, mad, 421.0, 1000.0, 100, 75));
-            flightRouteRepository.save(
-                    flightRouteFactory.createRoute(lis, fao, 278.0, 1000.0, 100, 55));
+            FlightRoute lisOpo = flightRouteRepository.save(flightRouteFactory.createRoute(lis, opo, 313.0, 1000.0, 100, 60));
+            FlightRoute opoMad = flightRouteRepository.save(flightRouteFactory.createRoute(opo, mad, 421.0, 1000.0, 100, 75));
+            flightRouteRepository.save(flightRouteFactory.createRoute(lis, fao, 278.0, 1000.0, 100, 55));
             System.out.println("WP#3A: Rotas LIS-OPO, OPO-MAD, LIS-FAO injetadas.");
 
-            // Voos agendados de exemplo (aeronave CS-TVA). Sem rota direta LIS-MAD
-            // para que a US216 (rotas alternativas) devolva LIS -> OPO -> MAD.
             if (scheduledFlightRepository.count() == 0) {
                 String reg = "CS-TVA";
-                scheduledFlightRepository.save(new ScheduledFlight(reg, lisOpo,
-                        new FlightSchedule(LocalDate.now().plusDays(1), LocalTime.of(10, 0))));
-                scheduledFlightRepository.save(new ScheduledFlight(reg, lisOpo,
-                        new FlightSchedule(LocalDate.now().plusDays(2), LocalTime.of(14, 30))));
-                scheduledFlightRepository.save(new ScheduledFlight(reg, opoMad,
-                        new FlightSchedule(LocalDate.now().plusDays(3), LocalTime.of(9, 15))));
+                scheduledFlightRepository.save(new ScheduledFlight(reg, lisOpo, new FlightSchedule(LocalDate.now().plusDays(1), LocalTime.of(10, 0))));
+                scheduledFlightRepository.save(new ScheduledFlight(reg, lisOpo, new FlightSchedule(LocalDate.now().plusDays(2), LocalTime.of(14, 30))));
+                scheduledFlightRepository.save(new ScheduledFlight(reg, opoMad, new FlightSchedule(LocalDate.now().plusDays(3), LocalTime.of(9, 15))));
                 System.out.println("WP#3B: Voos agendados injetados (popularidade: LIS-OPO=2, OPO-MAD=1, LIS-FAO=0).");
             }
         }
-
         System.out.println("✅ Bootstrapping concluído com sucesso!");
     }
 }

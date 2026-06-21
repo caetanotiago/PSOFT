@@ -1,26 +1,16 @@
 package isep.psoft.aisafe.maintenance.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 
 @Embeddable
 public class CompletionNotes {
 
-    @Column(nullable = false)
+    // APAGADOS OS @Column(nullable = false) para a Base de Dados aceitar Manutenções "A Decorrer" (Nulas)
     private LocalDate completionDate;
-
-    @Column(nullable = false)
     private String notes;
-
-    @Column(nullable = false)
     private Double cost;
-
-    @Column(nullable = false)
     private Integer actualDurationMinutes;
-
-    // NOVO: Fotografia das horas de voo na data da manutenção
-    @Column(nullable = false)
     private Double aircraftFlightHoursAtCompletion;
 
     protected CompletionNotes() {}
