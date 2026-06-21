@@ -15,13 +15,12 @@ import java.util.Optional;
 public interface AircraftRepository extends CrudRepository<Aircraft, Long>, JpaSpecificationExecutor<Aircraft> {
 
     List<Aircraft> findAll();
-
+    @Query("SELECT a FROM Aircraft a WHERE a.registrationNumber.number = ?1")
     Optional<Aircraft> findByRegistration_Registration(String registration);
 
     // Query JPQL Otimizada: Soma a duração dos voos por avião. 
-    @Query("SELECT new isep.psoft.aisafe.aircraftmanagement.dto.AircraftOperationalHoursDTO(" +
-           "a.registration.registration, COALESCE(SUM(f.estimatedFlightTime.durationMinutes), 0L)) " +
-           "FROM Aircraft a LEFT JOIN ScheduledFlight f ON f.aircraft = a " +
-           "GROUP BY a.registration.registration")
+    @Query("SELECT new isep.psoft.aisafe.aircraftmanagement.dto.AircraftOperationalHoursDTO(a.registrationNumber.number, CAST(COALESCE(SUM(f.route.estimatedFlightTime.durationMinutes), 0) AS long)) " +
+            "FROM Aircraft a LEFT JOIN ScheduledFlight f ON f.aircraftRegistration = a.registrationNumber.number " +
+            "GROUP BY a.registrationNumber.number")
     Page<AircraftOperationalHoursDTO> findOperationalHoursPerAircraft(Pageable pageable);
 }

@@ -121,7 +121,7 @@ public class Bootstrapper implements CommandLineRunner {
                     modeloBase,
                     new ManufacturingDate(LocalDate.of(2020, 1, 1)),
                     new SeatingCapacity(150),
-                    new AircraftStatus("ACTIVE")
+                    new AircraftStatus("AVAILABLE")
             );
             aircraftRepository.save(aircraft1);
 
@@ -130,7 +130,7 @@ public class Bootstrapper implements CommandLineRunner {
                     modeloBase,
                     new ManufacturingDate(LocalDate.of(2022, 5, 10)),
                     new SeatingCapacity(150),
-                    new AircraftStatus("ACTIVE")
+                    new AircraftStatus("AVAILABLE")
             );
             aircraftRepository.save(aircraft2);
 
