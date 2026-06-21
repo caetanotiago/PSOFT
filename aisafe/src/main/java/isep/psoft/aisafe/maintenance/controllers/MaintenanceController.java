@@ -18,7 +18,7 @@ import isep.psoft.aisafe.maintenance.services.us219.ViewOngoingMaintenanceUseCas
 import isep.psoft.aisafe.maintenance.services.us220.GenerateCostReportUseCase;
 import isep.psoft.aisafe.maintenance.services.us221.ViewAvgTurnaroundTimeUseCase;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,20 +29,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/maintenance-records")
+@RequiredArgsConstructor
 public class MaintenanceController {
 
-    @Autowired private CreateMaintenanceRecordUseCase createRecordUseCase;
-    @Autowired private ViewAircraftMaintenanceRecordsUseCase viewRecordsUseCase;
-    @Autowired private ViewTotalMaintenanceHoursUseCase viewTotalHoursUseCase;
-    @Autowired private CompleteMaintenanceRecordUseCase completeRecordUseCase;
-    @Autowired private ViewMaintenanceRecordByIdUseCase viewByIdUseCase;
-    @Autowired private CategorizeMaintenanceRecordUseCase categorizeUseCase;
-    @Autowired private SearchMaintenanceRecordsUseCase searchUseCase;
-    @Autowired private ViewOngoingMaintenanceUseCase viewOngoingUseCase;
-    @Autowired private GenerateCostReportUseCase generateCostReportUseCase;
+    private final CreateMaintenanceRecordUseCase createRecordUseCase;
+    private final ViewAircraftMaintenanceRecordsUseCase viewRecordsUseCase;
+    private final ViewTotalMaintenanceHoursUseCase viewTotalHoursUseCase;
+    private final CompleteMaintenanceRecordUseCase completeRecordUseCase;
+    private final ViewMaintenanceRecordByIdUseCase viewByIdUseCase;
+    private final CategorizeMaintenanceRecordUseCase categorizeUseCase;
+    private final SearchMaintenanceRecordsUseCase searchUseCase;
+    private final ViewOngoingMaintenanceUseCase viewOngoingUseCase;
+    private final GenerateCostReportUseCase generateCostReportUseCase;
 
     // Injeção do novo Use Case da US221
-    @Autowired private ViewAvgTurnaroundTimeUseCase viewAvgTurnaroundTimeUseCase;
+    private final ViewAvgTurnaroundTimeUseCase viewAvgTurnaroundTimeUseCase;
 
     /**
      * US115A: Create a Maintenance Record

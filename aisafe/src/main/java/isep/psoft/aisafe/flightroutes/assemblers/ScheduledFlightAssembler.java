@@ -5,8 +5,8 @@ import isep.psoft.aisafe.flightroutes.controllers.ScheduledFlightController;
 import isep.psoft.aisafe.flightroutes.domain.ScheduledFlight;
 import isep.psoft.aisafe.flightroutes.dto.ScheduledFlightDTO;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.jspecify.annotations.NonNull;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;

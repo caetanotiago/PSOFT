@@ -3,7 +3,6 @@ package isep.psoft.aisafe.aircraftmanagement.services;
 import isep.psoft.aisafe.aircraftmanagement.domain.Aircraft;
 import isep.psoft.aisafe.aircraftmanagement.domain.AircraftNotFoundException;
 import isep.psoft.aisafe.aircraftmanagement.domain.AircraftStatus;
-import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,6 @@ public class UpdateAircraftStatusServiceImpl implements UpdateAircraftStatusServ
     @Override
     @Transactional
     public Aircraft updateStatus(String registrationNumber, String newStatus, Long version) {
-        RegistrationNumber regNum = new RegistrationNumber(registrationNumber);
-
         // CORRIGIDO: era "new RuntimeException(...)" — agora usa a exceção de domínio
         // já existente no projeto, que o GlobalExceptionHandler mapeia para 404.
         Aircraft aircraft = aircraftRepository.findByRegistration_Registration(registrationNumber)

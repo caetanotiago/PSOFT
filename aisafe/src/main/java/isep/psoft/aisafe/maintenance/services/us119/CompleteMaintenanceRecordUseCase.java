@@ -8,20 +8,19 @@ import isep.psoft.aisafe.maintenance.dto.MaintenanceRecordOutputDto;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceRecordRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 @Service("CompleteMaintenanceRecordUseCase")
+@RequiredArgsConstructor
 public class CompleteMaintenanceRecordUseCase {
 
-    @Autowired
-    private MaintenanceRecordRepository repository;
+    private final MaintenanceRecordRepository repository;
 
-    @Autowired
-    private MaintenanceRecordAssembler assembler;
+    private final MaintenanceRecordAssembler assembler;
 
     @Transactional
     public MaintenanceRecordOutputDto execute(Long recordId, CompleteRecordInputDto dto, String version) {

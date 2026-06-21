@@ -69,7 +69,7 @@ class CreateScheduledFlightServiceTest {
         dto.setTime(LocalTime.of(10, 0));
 
         // Cenário "tudo válido" por omissão; cada teste sobrepõe o que precisa.
-        when(aircraftRepository.findById(any())).thenReturn(Optional.of(aircraft));
+        when(aircraftRepository.findByRegistration_Registration(REG)).thenReturn(Optional.of(aircraft));
         when(flightRouteRepository.findById(ROUTE_ID)).thenReturn(Optional.of(route));
 
         when(aircraft.getModel().getSpecifications().getMaximumRange()).thenReturn(6000.0);
@@ -104,7 +104,7 @@ class CreateScheduledFlightServiceTest {
 
     @Test
     void ensureAircraftNotFoundThrows404() {
-        when(aircraftRepository.findById(any())).thenReturn(Optional.empty());
+        when(aircraftRepository.findByRegistration_Registration(REG)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> service.create(dto));
         verify(scheduledFlightRepository, never()).save(any());

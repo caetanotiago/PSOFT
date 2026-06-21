@@ -9,7 +9,7 @@ import isep.psoft.aisafe.maintenance.domain.TemplateType;
 import isep.psoft.aisafe.maintenance.dto.CreateTemplateDTO;
 import isep.psoft.aisafe.maintenance.dto.TemplateDTO;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,14 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service("CreateMaintenanceTemplateUseCase")
+@RequiredArgsConstructor
 public class CreateMaintenanceTemplateUseCase {
 
-    @Autowired
-    private MaintenanceTemplateRepository templateRepository;
-    @Autowired
-    private AircraftModelRepository aircraftModelRepository;
-    @Autowired
-    private TemplateAssembler assembler;
+    private final MaintenanceTemplateRepository templateRepository;
+    private final AircraftModelRepository aircraftModelRepository;
+    private final TemplateAssembler assembler;
 
     @Transactional
     public TemplateDTO execute(CreateTemplateDTO dto) {

@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class AircraftStatusTest {
     @Test
     void ensureValidStatusIsAccepted() {
-        assertDoesNotThrow(() -> new AircraftStatus("ACTIVE"));
-        assertEquals("ACTIVE", new AircraftStatus("active").getState()); // Testa normalização
+        assertDoesNotThrow(() -> new AircraftStatus("AVAILABLE"));
+        assertEquals("AVAILABLE", new AircraftStatus("available").getState()); // Testa normalização
     }
 
     @Test

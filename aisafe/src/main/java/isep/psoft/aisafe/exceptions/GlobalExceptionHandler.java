@@ -1,5 +1,6 @@
 package isep.psoft.aisafe.exceptions;
 
+import isep.psoft.aisafe.aircraftmanagement.domain.AircraftNotFoundException;
 import isep.psoft.aisafe.airports.domain.AirportNotFoundException;
 import isep.psoft.aisafe.airports.domain.DuplicateFacilityException;
 import isep.psoft.aisafe.airports.domain.DuplicateIATACodeException;
@@ -31,6 +32,14 @@ public class GlobalExceptionHandler {
     // Airport not found by IATA code → 404 Not Found
     @ExceptionHandler(AirportNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleAirportNotFound(AirportNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // Aircraft not found by registration number → 404 Not Found
+    @ExceptionHandler(AircraftNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleAircraftNotFound(AircraftNotFoundException ex) {
         Map<String, String> response = new HashMap<>();
         response.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -117,7 +126,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleRouteRequirementsNotMet(RouteRequirementsNotMetException ex) {
         Map<String, String> response = new HashMap<>();
         response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(response);
     }
 
     @ExceptionHandler(isep.psoft.aisafe.maintenance.domain.MaintenanceRecordNotFoundException.class)

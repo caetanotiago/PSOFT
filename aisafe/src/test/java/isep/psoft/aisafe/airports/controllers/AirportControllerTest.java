@@ -1,9 +1,14 @@
-/*package isep.psoft.aisafe.airports.controllers;
+package isep.psoft.aisafe.airports.controllers;
 
 import isep.psoft.aisafe.airports.domain.*;
 import isep.psoft.aisafe.airports.services.AddCertificationUseCase;
+import isep.psoft.aisafe.airports.services.AddFacilityUseCase;
+import isep.psoft.aisafe.airports.services.AddPhotoUseCase;
+import isep.psoft.aisafe.airports.services.GroupAirportsUseCase;
+import isep.psoft.aisafe.airports.services.ListBusiestAirportsUseCase;
 import isep.psoft.aisafe.airports.services.RegisterAirportUseCase;
 import isep.psoft.aisafe.airports.services.SearchAirportsUseCase;
+import isep.psoft.aisafe.airports.services.UpdateAirportDetailsUseCase;
 import isep.psoft.aisafe.airports.services.UpdateAirportStatusUseCase;
 import isep.psoft.aisafe.airports.services.ViewAirportDetailsUseCase;
 import isep.psoft.aisafe.domain.shared.ModelDesignation;
@@ -41,6 +46,11 @@ class AirportControllerTest {
     @MockitoBean private SearchAirportsUseCase searchAirportsUseCase;
     @MockitoBean private AddCertificationUseCase addCertificationUseCase;
     @MockitoBean private UpdateAirportStatusUseCase updateAirportStatusUseCase;
+    @MockitoBean private AddFacilityUseCase addFacilityUseCase;
+    @MockitoBean private AddPhotoUseCase addPhotoUseCase;
+    @MockitoBean private UpdateAirportDetailsUseCase updateAirportDetailsUseCase;
+    @MockitoBean private ListBusiestAirportsUseCase listBusiestAirportsUseCase;
+    @MockitoBean private GroupAirportsUseCase groupAirportsUseCase;
     @MockitoBean private JwtTokenProvider jwtTokenProvider;
     @MockitoBean private UserDetailsService userDetailsService;
 
@@ -64,7 +74,7 @@ class AirportControllerTest {
     void post_airport_returns_201_with_location() throws Exception {
         when(registerAirportUseCase.registerAirport(
                 anyString(), anyString(), anyString(), anyString(),
-                any(), anyString(), anyDouble(), anyDouble(), anyList()))
+                any(), anyString(), anyDouble(), anyDouble(), anyList(), any(), any()))
                 .thenReturn(lisbon);
 
         mockMvc.perform(post("/airports")
@@ -92,7 +102,7 @@ class AirportControllerTest {
     void post_airport_returns_409_on_duplicate_iata() throws Exception {
         when(registerAirportUseCase.registerAirport(
                 anyString(), anyString(), anyString(), anyString(),
-                any(), anyString(), anyDouble(), anyDouble(), anyList()))
+                any(), anyString(), anyDouble(), anyDouble(), anyList(), any(), any()))
                 .thenThrow(new DuplicateIATACodeException("LIS"));
 
         mockMvc.perform(post("/airports")
@@ -358,4 +368,4 @@ class AirportControllerTest {
         mockMvc.perform(get("/airports").param("city", "Lisbon"))
                 .andExpect(status().isOk());
     }
-}*/
+}

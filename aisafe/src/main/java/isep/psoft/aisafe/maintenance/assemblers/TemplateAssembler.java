@@ -1,6 +1,5 @@
 package isep.psoft.aisafe.maintenance.assemblers;
 
-import isep.psoft.aisafe.aircraftmanagement.domain.AircraftModel;
 import isep.psoft.aisafe.maintenance.controllers.MaintenanceTemplateRestController;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceTemplate;
 import isep.psoft.aisafe.maintenance.dto.TemplateDTO;

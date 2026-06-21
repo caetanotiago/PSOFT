@@ -5,7 +5,7 @@ import isep.psoft.aisafe.maintenance.dto.TemplateDTO;
 import isep.psoft.aisafe.maintenance.services.common.ViewMaintenanceTemplateByIdUseCase;
 import isep.psoft.aisafe.maintenance.services.us115.CreateMaintenanceTemplateUseCase;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +15,12 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/api/maintenance-templates")
+@RequiredArgsConstructor
 public class MaintenanceTemplateRestController {
 
-    @Autowired
-    private CreateMaintenanceTemplateUseCase createUseCase;
+    private final CreateMaintenanceTemplateUseCase createUseCase;
 
-    @Autowired
-    private ViewMaintenanceTemplateByIdUseCase viewByIdUseCase;
+    private final ViewMaintenanceTemplateByIdUseCase viewByIdUseCase;
 
     @PostMapping
     // CORREÇÃO: Passou para BACKOFFICE_OPERATOR para não chocar com o SecurityConfig

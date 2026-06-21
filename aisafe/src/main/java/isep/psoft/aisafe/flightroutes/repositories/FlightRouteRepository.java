@@ -5,11 +5,9 @@ import isep.psoft.aisafe.flightroutes.domain.RouteUsage;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface FlightRouteRepository extends CrudRepository<FlightRoute, String> {
 
     // US114 - Procurar por Origem e Destino

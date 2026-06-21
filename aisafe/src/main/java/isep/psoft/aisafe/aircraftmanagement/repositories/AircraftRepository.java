@@ -1,7 +1,7 @@
 package isep.psoft.aisafe.aircraftmanagement.repositories;
 
-import isep.psoft.aisafe.flightroutes.domain.ScheduledFlight;
 import isep.psoft.aisafe.aircraftmanagement.domain.Aircraft;
+import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
 import isep.psoft.aisafe.aircraftmanagement.dto.AircraftOperationalHoursDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface AircraftRepository extends CrudRepository<Aircraft, Long>, JpaSpecificationExecutor<Aircraft> {
+public interface AircraftRepository extends CrudRepository<Aircraft, RegistrationNumber>, JpaSpecificationExecutor<Aircraft> {
 
     List<Aircraft> findAll();
     @Query("SELECT a FROM Aircraft a WHERE a.registrationNumber.number = ?1")

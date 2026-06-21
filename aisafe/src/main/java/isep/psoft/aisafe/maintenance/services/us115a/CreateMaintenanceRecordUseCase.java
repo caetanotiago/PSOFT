@@ -1,6 +1,5 @@
 package isep.psoft.aisafe.maintenance.services.us115a;
 
-import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
 import isep.psoft.aisafe.maintenance.assemblers.MaintenanceRecordAssembler;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceComponent;
@@ -10,29 +9,24 @@ import isep.psoft.aisafe.maintenance.dto.CreateRecordDTO;
 import isep.psoft.aisafe.maintenance.dto.MaintenanceRecordOutputDto;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceRecordRepository;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceTemplateRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("CreateMaintenanceRecordUseCase")
+@RequiredArgsConstructor
 public class CreateMaintenanceRecordUseCase {
 
-    @Autowired
-    private MaintenanceRecordRepository recordRepository;
+    private final MaintenanceRecordRepository recordRepository;
 
-    @Autowired
-    private MaintenanceTemplateRepository templateRepository;
+    private final MaintenanceTemplateRepository templateRepository;
 
-    @Autowired
-    private AircraftRepository aircraftRepository;
+    private final AircraftRepository aircraftRepository;
 
-    @Autowired
-    private MaintenanceRecordAssembler assembler;
+    private final MaintenanceRecordAssembler assembler;
 
     @Transactional
     public MaintenanceRecordOutputDto execute(CreateRecordDTO dto) {
-
-        RegistrationNumber regNum = new RegistrationNumber(dto.getAircraftRegistration());
 
         if (aircraftRepository.findByRegistration_Registration(dto.getAircraftRegistration()).isEmpty()) {
             throw new IllegalArgumentException("Aircraft with registration " + dto.getAircraftRegistration() + " does not exist.");

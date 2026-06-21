@@ -1,6 +1,5 @@
 package isep.psoft.aisafe.flightroutes.services;
 
-import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
 import isep.psoft.aisafe.flightroutes.domain.ScheduledFlight;
 import isep.psoft.aisafe.flightroutes.repositories.ScheduledFlightRepository;

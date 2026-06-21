@@ -1,9 +1,7 @@
 package isep.psoft.aisafe.flightroutes.services;
 
-import isep.psoft.aisafe.airports.domain.Airport;
 import isep.psoft.aisafe.airports.domain.IATACode;
 import isep.psoft.aisafe.airports.repositories.AirportRepository;
-import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
 import isep.psoft.aisafe.flightroutes.dto.CreateRouteDTO;
 import isep.psoft.aisafe.flightroutes.factories.FlightRouteFactory;
 import isep.psoft.aisafe.flightroutes.repositories.FlightRouteRepository;

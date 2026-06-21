@@ -2,15 +2,15 @@ package isep.psoft.aisafe.maintenance.services.us117;
 
 import isep.psoft.aisafe.maintenance.dto.TotalMaintenanceHoursDto;
 import isep.psoft.aisafe.maintenance.repositories.MaintenanceRecordRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("ViewTotalMaintenanceHoursUseCase")
+@RequiredArgsConstructor
 public class ViewTotalMaintenanceHoursUseCase {
 
-    @Autowired
-    private MaintenanceRecordRepository repository;
+    private final MaintenanceRecordRepository repository;
 
     private static final int MINUTES_PER_HOUR = 60;
 
