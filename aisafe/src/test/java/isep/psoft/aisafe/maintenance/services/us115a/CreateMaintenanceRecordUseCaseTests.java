@@ -1,6 +1,6 @@
 package isep.psoft.aisafe.maintenance.services.us115a;
 
-import isep.psoft.aisafe.aircraftmanagement.domain.RegistrationNumber;
+import isep.psoft.aisafe.aircraftmanagement.domain.Aircraft;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
 import isep.psoft.aisafe.maintenance.assemblers.MaintenanceRecordAssembler;
 import isep.psoft.aisafe.maintenance.domain.MaintenanceRecord;
@@ -15,10 +15,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,12 +43,15 @@ class CreateMaintenanceRecordUseCaseTests {
 
     @Test
     void whenAllDataIsValid_shouldCreateAndSaveRecord() {
-
         CreateRecordDTO dto = new CreateRecordDTO("CS-TWB", 1L, "Annual inspection", LocalDate.now(), 480, "ENGINE");
         MaintenanceRecord savedRecord = mock(MaintenanceRecord.class);
         MaintenanceRecordOutputDto outputDto = mock(MaintenanceRecordOutputDto.class);
 
-        when(aircraftRepository.existsByRegistrationNumber(any(RegistrationNumber.class))).thenReturn(true);
+        // Criamos o avião fictício para o Mock não dar erro
+        Aircraft mockAircraft = mock(Aircraft.class);
+
+        // CORREÇÃO: Usamos o método da matrícula em vez do existsById
+        when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.of(mockAircraft));
         when(templateRepository.existsById(dto.getTemplateId())).thenReturn(true);
         when(recordRepository.save(any(MaintenanceRecord.class))).thenReturn(savedRecord);
         when(assembler.toModel(savedRecord)).thenReturn(outputDto);
@@ -59,10 +64,10 @@ class CreateMaintenanceRecordUseCaseTests {
 
     @Test
     void whenTemplateDoesNotExist_shouldThrowException() {
-
         CreateRecordDTO dto = new CreateRecordDTO("CS-TWB", 99L, "Non-existent template test", LocalDate.now(), 60, "AVIONICS");
-        
-        when(aircraftRepository.existsByRegistrationNumber(any(RegistrationNumber.class))).thenReturn(true);
+        Aircraft mockAircraft = mock(Aircraft.class);
+
+        when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.of(mockAircraft));
         when(templateRepository.existsById(dto.getTemplateId())).thenReturn(false);
 
         assertThatThrownBy(() -> useCase.execute(dto))
@@ -74,10 +79,10 @@ class CreateMaintenanceRecordUseCaseTests {
 
     @Test
     void whenAircraftDoesNotExist_shouldThrowException() {
-
         CreateRecordDTO dto = new CreateRecordDTO("CS-XXX", 1L, "Non-existent aircraft test", LocalDate.now(), 60, "STRUCTURE");
 
-        when(aircraftRepository.existsByRegistrationNumber(any(RegistrationNumber.class))).thenReturn(false);
+        // Simulamos que o avião não existe na BD
+        when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(dto))
                 .isInstanceOf(IllegalArgumentException.class)

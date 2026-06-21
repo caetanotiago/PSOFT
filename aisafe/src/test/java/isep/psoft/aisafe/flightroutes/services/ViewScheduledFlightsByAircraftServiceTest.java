@@ -1,5 +1,6 @@
 package isep.psoft.aisafe.flightroutes.services;
 
+import isep.psoft.aisafe.aircraftmanagement.domain.Aircraft;
 import isep.psoft.aisafe.aircraftmanagement.repositories.AircraftRepository;
 import isep.psoft.aisafe.flightroutes.domain.ScheduledFlight;
 import isep.psoft.aisafe.flightroutes.repositories.ScheduledFlightRepository;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +35,8 @@ class ViewScheduledFlightsByAircraftServiceTest {
 
     @Test
     void ensureViewByAircraftThrows404WhenAircraftMissing() {
-        when(aircraftRepository.existsByRegistrationNumber(any())).thenReturn(false);
+        // CORREÇÃO: Usamos o findByRegistration em vez da pesquisa por ID, e devolvemos Optional vazio (não existe)
+        when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
                 () -> service.viewByAircraft(REG, PageRequest.of(0, 10)));
@@ -42,7 +45,10 @@ class ViewScheduledFlightsByAircraftServiceTest {
 
     @Test
     void ensureViewByAircraftReturnsPageWhenAircraftExists() {
-        when(aircraftRepository.existsByRegistrationNumber(any())).thenReturn(true);
+        // CORREÇÃO: Criamos um avião falso e dizemos que ele foi encontrado na pesquisa
+        Aircraft mockAircraft = mock(Aircraft.class);
+        when(aircraftRepository.findByRegistration_Registration(anyString())).thenReturn(Optional.of(mockAircraft));
+
         Pageable pageable = PageRequest.of(0, 5);
         Page<ScheduledFlight> page = new PageImpl<>(List.of(mock(ScheduledFlight.class)), pageable, 1);
         when(scheduledFlightRepository.findByAircraftRegistration(REG, pageable)).thenReturn(page);
