@@ -1,0 +1,43 @@
+@startuml
+autonumber
+actor "Backoffice Operator" as BO
+
+participant "AircraftModel\nController" as CTRL
+participant "CreateAircraft\nModelService" as SRV
+participant "ModelImage" as IMG
+participant "model : AircraftModel" as ENTITY
+participant "AircraftModel\nRepository" as REPO
+participant "AircraftModel\nAssembler" as ASM
+
+activate BO
+BO -> CTRL : POST /api/aircraft-models\n(body: dto)
+activate CTRL
+
+CTRL -> SRV : createAircraftModel(dto)
+activate SRV
+
+opt if dto.image is present
+    SRV -> IMG** : create(dto.image)
+    note right of IMG: Validates image formatting
+end
+
+SRV -> ENTITY** : create(dto.manufacturer, ..., modelImage)
+note right of ENTITY: Validates business rules \n(e.g. ManufacturerConfig)
+
+SRV -> REPO : save(model)
+activate REPO
+REPO --> SRV : savedModel
+deactivate REPO
+
+SRV --> CTRL : savedModel
+deactivate SRV
+
+CTRL -> ASM : toModel(savedModel)
+activate ASM
+ASM --> CTRL : modelDTO
+deactivate ASM
+
+CTRL --> BO : 201 Created (modelDTO)
+deactivate CTRL
+deactivate BO
+@enduml

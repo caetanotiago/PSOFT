@@ -1,0 +1,42 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant "Aircraft\nController" as CTRL
+participant "ViewAircraftStatus\nService" as SRV
+participant "Aircraft\nRepository" as REPO
+participant "aircraft : Aircraft" as ENTITY
+participant "AircraftStatus" as VO
+participant "AircraftStatusDTO" as DTO
+
+activate ATCC
+ATCC -> CTRL : GET /api/aircrafts/{registration}/status
+activate CTRL
+
+CTRL -> SRV : getAircraftStatus(registration)
+activate SRV
+
+SRV -> REPO : findById(registration)
+activate REPO
+REPO --> SRV : Optional<Aircraft>
+deactivate REPO
+
+SRV -> ENTITY : getStatus()
+activate ENTITY
+ENTITY --> SRV : aircraftStatusVO
+deactivate ENTITY
+
+SRV -> VO : getState()
+activate VO
+VO --> SRV : stateString
+deactivate VO
+
+SRV -> DTO** : create(registration, stateString)
+
+SRV --> CTRL : statusDTO
+deactivate SRV
+
+CTRL --> ATCC : 200 OK (statusDTO)
+deactivate CTRL
+deactivate ATCC
+@enduml

@@ -28,6 +28,12 @@ public interface FlightRouteRepository extends CrudRepository<FlightRoute, Strin
     @Query("SELECT COUNT(r) > 0 FROM FlightRoute r WHERE r.origin.iataCode.code = :origin AND r.destination.iataCode.code = :dest")
     boolean existsByOriginAndDestination(@Param("origin") String origin, @Param("dest") String dest);
 
+    // US203 (WP#1) - rotas ativas cujos requisitos são cumpridos pela aeronave
+    @Query("SELECT r FROM FlightRoute r WHERE r.status.state = 'ACTIVE' " +
+       "AND r.requirements.minRange <= :range " +
+       "AND r.requirements.minCapacity <= :capacity")
+       List<FlightRoute> findCompatibleRoutes(@Param("range") Double range, @Param("capacity") Integer capacity);
+
     // US215 e US216 - apenas rotas ativas (a "Network")
     @Query("SELECT r FROM FlightRoute r WHERE r.status.state = 'ACTIVE'")
     List<FlightRoute> findAllActive();

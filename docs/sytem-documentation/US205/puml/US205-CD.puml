@@ -1,0 +1,38 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class AircraftController {
+  + getAircraftStatus(registration: String): ResponseEntity<AircraftStatusDTO>
+}
+
+class ViewAircraftStatusService {
+  + getAircraftStatus(registration: String): AircraftStatusDTO
+}
+
+interface AircraftRepository <<Repository>> {
+  + findById(registration: String): Optional<Aircraft>
+}
+
+class Aircraft <<Entity>> {
+  + getStatus(): AircraftStatus
+}
+
+class AircraftStatus <<Value Object>> {
+  - state : String
+  + getState(): String
+}
+
+class AircraftStatusDTO <<DTO>> {
+  - registration : String
+  - status : String
+  + AircraftStatusDTO(registration: String, status: String)
+}
+
+AircraftController ..> ViewAircraftStatusService
+AircraftController ..> AircraftStatusDTO
+ViewAircraftStatusService ..> AircraftRepository
+ViewAircraftStatusService ..> Aircraft
+ViewAircraftStatusService ..> AircraftStatusDTO
+Aircraft "1" --> "1" AircraftStatus : status
+
+@enduml

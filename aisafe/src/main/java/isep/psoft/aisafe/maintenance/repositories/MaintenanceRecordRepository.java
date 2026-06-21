@@ -2,12 +2,14 @@ package isep.psoft.aisafe.maintenance.repositories;
 
 import isep.psoft.aisafe.maintenance.domain.MaintenanceRecord;
 import isep.psoft.aisafe.maintenance.dto.CostItemDto;
+import isep.psoft.aisafe.maintenance.dto.TurnaroundItemDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRecord, Long> {
@@ -43,7 +45,6 @@ public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRe
 
     /**
      * US220: Calculate total maintenance costs grouped by Aircraft Registration.
-     * Maps the result directly to CostItemDto.
      */
     @Query("SELECT new isep.psoft.aisafe.maintenance.dto.CostItemDto(m.aircraftRegistration, SUM(m.completionNotes.cost)) " +
             "FROM MaintenanceRecord m " +
@@ -53,7 +54,6 @@ public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRe
 
     /**
      * US220: Calculate total maintenance costs grouped by Aircraft Model.
-     * Uses a cross-aggregate join between MaintenanceRecord and Aircraft entities.
      */
     @Query("SELECT new isep.psoft.aisafe.maintenance.dto.CostItemDto(a.model.designation.modelName, SUM(m.completionNotes.cost)) " +
             "FROM MaintenanceRecord m, Aircraft a " +
@@ -61,4 +61,24 @@ public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRe
             "AND m.completionNotes IS NOT NULL " +
             "GROUP BY a.model.designation.modelName")
     List<CostItemDto> calculateCostsPerModel();
+
+    /**
+     * US221: Calculate average maintenance turnaround time grouped by Aircraft Model.
+     */
+    @Query("SELECT new isep.psoft.aisafe.maintenance.dto.TurnaroundItemDto(a.model.designation.modelName, AVG(m.completionNotes.actualDurationMinutes)) " +
+            "FROM MaintenanceRecord m, Aircraft a " +
+            "WHERE m.aircraftRegistration = a.registrationNumber.number " +
+            "AND m.completionNotes IS NOT NULL " +
+            "GROUP BY a.model.designation.modelName")
+    List<TurnaroundItemDto> findAverageTurnaroundTimePerModel();
+
+    /**
+     * US222: Encontra o último registo de manutenção concluído para um avião e template específicos.
+     * O Spring Data JPA traduz este nome gigante automaticamente para uma query SQL!
+     */
+    Optional<MaintenanceRecord> findTopByAircraftRegistrationAndMaintenanceTemplateIdAndCompletionNotesIsNotNullOrderByCompletionNotes_CompletionDateDesc(
+            String aircraftRegistration,
+            Long templateId
+    );
+
 }

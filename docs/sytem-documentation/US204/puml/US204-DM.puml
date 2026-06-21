@@ -1,0 +1,29 @@
+@startuml
+hide methods
+left to right direction
+skinparam classAttributeIconSize 0
+
+class AircraftModel <<Aggregate Root>> <<Entity>> {}
+class Aircraft <<Aggregate Root>> <<Entity>> {}
+class ScheduledFlight <<Aggregate Root>> <<Entity>> {}
+
+class ModelDesignation <<Value Object>> {
+  - modelName : String
+}
+
+class EstimatedFlightTime <<Value Object>> {
+  - durationMinutes : Integer
+}
+
+AircraftModel "1" --> "1" ModelDesignation : identified by >
+Aircraft "*" --> "1" AircraftModel : belongs to >
+ScheduledFlight "*" --> "1" Aircraft : assigned to >
+ScheduledFlight "1" --> "1" EstimatedFlightTime : has >
+
+note bottom of ScheduledFlight
+  The aggregation query counts these 
+  records or sums their duration, 
+  grouping by AircraftModel.
+end note
+
+@enduml

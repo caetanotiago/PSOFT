@@ -6,6 +6,7 @@ import isep.psoft.aisafe.maintenance.dto.CreateRecordDTO;
 import isep.psoft.aisafe.maintenance.dto.MaintenanceCostReportDto;
 import isep.psoft.aisafe.maintenance.dto.MaintenanceRecordOutputDto;
 import isep.psoft.aisafe.maintenance.dto.TotalMaintenanceHoursDto;
+import isep.psoft.aisafe.maintenance.dto.TurnaroundReportDto;
 import isep.psoft.aisafe.maintenance.services.common.ViewMaintenanceRecordByIdUseCase;
 import isep.psoft.aisafe.maintenance.services.us115a.CreateMaintenanceRecordUseCase;
 import isep.psoft.aisafe.maintenance.services.us116.ViewAircraftMaintenanceRecordsUseCase;
@@ -15,6 +16,7 @@ import isep.psoft.aisafe.maintenance.services.us217.CategorizeMaintenanceRecordU
 import isep.psoft.aisafe.maintenance.services.us218.SearchMaintenanceRecordsUseCase;
 import isep.psoft.aisafe.maintenance.services.us219.ViewOngoingMaintenanceUseCase;
 import isep.psoft.aisafe.maintenance.services.us220.GenerateCostReportUseCase;
+import isep.psoft.aisafe.maintenance.services.us221.ViewAvgTurnaroundTimeUseCase;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +39,10 @@ public class MaintenanceController {
     @Autowired private CategorizeMaintenanceRecordUseCase categorizeUseCase;
     @Autowired private SearchMaintenanceRecordsUseCase searchUseCase;
     @Autowired private ViewOngoingMaintenanceUseCase viewOngoingUseCase;
-
-    // Injeção do novo Use Case da US220
     @Autowired private GenerateCostReportUseCase generateCostReportUseCase;
+
+    // Injeção do novo Use Case da US221
+    @Autowired private ViewAvgTurnaroundTimeUseCase viewAvgTurnaroundTimeUseCase;
 
     /**
      * US115A: Create a Maintenance Record
@@ -139,6 +142,17 @@ public class MaintenanceController {
             @RequestParam(name = "type", required = true) String type) {
 
         MaintenanceCostReportDto report = generateCostReportUseCase.execute(type);
+        return ResponseEntity.ok(report);
+    }
+
+    /**
+     * US221: View average maintenance turnaround time per aircraft type
+     */
+    @GetMapping("/reports/turnaround-time")
+    @PreAuthorize("hasRole('MAINTENANCE_SUPERVISOR')")
+    public ResponseEntity<TurnaroundReportDto> getAverageTurnaroundTime() {
+
+        TurnaroundReportDto report = viewAvgTurnaroundTimeUseCase.execute();
         return ResponseEntity.ok(report);
     }
 

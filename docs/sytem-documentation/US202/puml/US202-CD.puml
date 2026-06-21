@@ -1,0 +1,37 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class AircraftModelController {
+  + createAircraftModel(dto: CreateAircraftModelDTO): ResponseEntity<AircraftModelDTO>
+}
+
+class CreateAircraftModelService {
+  + createAircraftModel(dto: CreateAircraftModelDTO): AircraftModel
+}
+
+interface AircraftModelRepository <<Repository>> {
+  + save(model: AircraftModel): AircraftModel
+}
+
+class AircraftModel <<Entity>> {
+  + AircraftModel(designation: ModelDesignation, specs: ModelSpecifications, image: ModelImage)
+}
+
+class ModelImage <<Value Object>> {
+  - imageUrl : String
+  + ModelImage(url: String)
+}
+
+class AircraftModelAssembler {
+  + toModel(entity: AircraftModel): AircraftModelDTO
+}
+
+AircraftModelController ..> CreateAircraftModelService
+AircraftModelController ..> AircraftModelAssembler
+CreateAircraftModelService ..> AircraftModelRepository
+CreateAircraftModelService ..> AircraftModel
+CreateAircraftModelService ..> ModelImage
+
+AircraftModel "1" --> "0..1" ModelImage : has >
+
+@enduml

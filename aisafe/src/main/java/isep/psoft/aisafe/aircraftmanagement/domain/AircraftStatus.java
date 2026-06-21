@@ -7,16 +7,20 @@ public class AircraftStatus {
 
     private String state;
 
-    protected AircraftStatus() {} // Obrigatório para o JPA
+    protected AircraftStatus() {}
 
     public AircraftStatus(String state) {
         if (state == null || state.trim().isEmpty()) {
-            throw new IllegalArgumentException("Invalid aircraft status. Must be ACTIVE, INACTIVE, or UNDER_MAINTENANCE.");
+            throw new IllegalArgumentException(
+                "Invalid aircraft status. Must be AVAILABLE, IN_FLIGHT, UNDER_MAINTENANCE, or INACTIVE.");
         }
-        
         String normalizedState = state.trim().toUpperCase();
-        if (!normalizedState.equals("ACTIVE") && !normalizedState.equals("INACTIVE") && !normalizedState.equals("UNDER_MAINTENANCE")) {
-            throw new IllegalArgumentException("Invalid aircraft status. Must be ACTIVE, INACTIVE, or UNDER_MAINTENANCE.");
+        if (!normalizedState.equals("AVAILABLE") &&
+            !normalizedState.equals("IN_FLIGHT") &&
+            !normalizedState.equals("UNDER_MAINTENANCE") &&
+            !normalizedState.equals("INACTIVE")) {
+            throw new IllegalArgumentException(
+                "Invalid aircraft status. Must be AVAILABLE, IN_FLIGHT, UNDER_MAINTENANCE, or INACTIVE.");
         }
         this.state = normalizedState;
     }

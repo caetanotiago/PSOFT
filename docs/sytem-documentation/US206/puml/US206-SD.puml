@@ -1,0 +1,41 @@
+@startuml
+autonumber
+actor "ATCC" as ATCC
+
+participant "Aircraft\nController" as CTRL
+participant "CalculateOperational\nHoursService" as SRV
+participant "Aircraft\nRepository" as REPO
+participant "PagedResources\nAssembler" as PAG_ASM
+
+activate ATCC
+ATCC -> CTRL : GET /api/aircrafts/operational-hours
+activate CTRL
+
+CTRL -> SRV : calculateOperationalHours(pageable)
+activate SRV
+
+SRV -> REPO : findOperationalHoursPerAircraft(pageable)
+activate REPO
+
+note right of REPO
+  Executes optimized JPQL:
+  SELECT new DTO(a.reg, SUM(f.duration)) 
+  FROM Aircraft a LEFT JOIN flights
+  GROUP BY a.registration
+end note
+
+REPO --> SRV : Page<AircraftOperationalHoursDTO>
+deactivate REPO
+
+SRV --> CTRL : Page<AircraftOperationalHoursDTO>
+deactivate SRV
+
+CTRL -> PAG_ASM : toModel(Page<DTO>)
+activate PAG_ASM
+PAG_ASM --> CTRL : PagedModel<AircraftOperationalHoursDTO>
+deactivate PAG_ASM
+
+CTRL --> ATCC : 200 OK (PagedModel)
+deactivate CTRL
+deactivate ATCC
+@enduml

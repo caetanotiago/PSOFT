@@ -10,38 +10,37 @@ class CompletionNotesTests {
     @Test
     void shouldThrowExceptionWhenNotesAreNull() {
         // Act & Assert
-        var exception = assertThrows(IllegalArgumentException.class, () -> {
-            new CompletionNotes(null, LocalDate.now());
-        });
-        assertThat(exception.getMessage()).isEqualTo("Completion notes cannot be empty.");
+        var exception = assertThrows(IllegalArgumentException.class, () -> new CompletionNotes(LocalDate.now(), null));
+
+        assertThat(exception.getMessage()).isEqualTo("Completion notes cannot be null or blank.");
     }
 
     @Test
     void shouldThrowExceptionWhenNotesAreBlank() {
+        // Act & Assert
+        var exception = assertThrows(IllegalArgumentException.class, () -> new CompletionNotes(LocalDate.now(), "  "));
 
-        var exception = assertThrows(IllegalArgumentException.class, () -> {
-            new CompletionNotes("  ", LocalDate.now());
-        });
-        assertThat(exception.getMessage()).isEqualTo("Completion notes cannot be empty.");
+        assertThat(exception.getMessage()).isEqualTo("Completion notes cannot be null or blank.");
     }
 
     @Test
     void shouldThrowExceptionWhenCompletionDateIsNull() {
+        // Act & Assert
+        var exception = assertThrows(IllegalArgumentException.class, () -> new CompletionNotes(null, "All tasks completed."));
 
-        var exception = assertThrows(IllegalArgumentException.class, () -> {
-            new CompletionNotes("All tasks completed.", null);
-        });
-        assertThat(exception.getMessage()).isEqualTo("Completion date cannot be null.");
+        assertThat(exception.getMessage()).isEqualTo("The completion date cannot be null.");
     }
 
     @Test
     void shouldCreateCompletionNotesWithValidData() {
-
+        // Arrange
         String notes = "All tasks completed successfully.";
         LocalDate date = LocalDate.now();
 
-        CompletionNotes completionNotes = new CompletionNotes(notes, date);
+        // Act - Ordem corrigida: Primeiro a Data, depois o Texto
+        CompletionNotes completionNotes = new CompletionNotes(date, notes);
 
+        // Assert
         assertThat(completionNotes.getNotes()).isEqualTo(notes);
         assertThat(completionNotes.getCompletionDate()).isEqualTo(date);
     }

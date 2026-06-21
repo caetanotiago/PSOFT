@@ -1,0 +1,25 @@
+@startuml
+hide methods
+left to right direction
+skinparam classAttributeIconSize 0
+
+class Aircraft <<Aggregate Root>> <<Entity>> {}
+
+class RegistrationNumber <<Value Object>> <<ID>> {
+  - registration : String
+}
+
+class AircraftStatus <<Value Object>> {
+  - state : String
+}
+
+Aircraft "1" --> "1" RegistrationNumber : identified by >
+Aircraft "1" --> "1" AircraftStatus : operational state >
+
+note right of AircraftStatus
+  Can take values such as:
+  AVAILABLE, IN_FLIGHT,
+  UNDER_MAINTENANCE, INACTIVE
+end note
+
+@enduml
