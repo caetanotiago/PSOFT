@@ -49,8 +49,8 @@ public class CreateScheduledFlightService {
                             + " does not meet the route requirements (range/capacity).");
         }
 
-        // 409 - aircraft must be available
-        if (!"ACTIVE".equals(aircraft.getStatus().getState())) {
+        // 409 - aircraft must be available (AircraftStatus states: AVAILABLE, IN_FLIGHT, UNDER_MAINTENANCE, INACTIVE)
+        if (!"AVAILABLE".equals(aircraft.getStatus().getState())) {
             throw new IllegalStateException("Aircraft " + dto.getAircraftRegistration()
                     + " is not available (status: " + aircraft.getStatus().getState() + ").");
         }

@@ -2,6 +2,7 @@ package isep.psoft.aisafe.flightroutes.services;
 
 import isep.psoft.aisafe.flightroutes.domain.FlightRoute;
 import isep.psoft.aisafe.flightroutes.repositories.FlightRouteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +25,7 @@ class SearchFlightRoutesServiceTest {
     void ensureGetRouteByIdThrowsExceptionIfNotFound() {
         when(routeRepository.findById("INVALID")).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.getRouteById("INVALID"));
+        assertThrows(EntityNotFoundException.class, () -> service.getRouteById("INVALID"));
     }
 
     @Test

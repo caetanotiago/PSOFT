@@ -3,6 +3,52 @@
     "name": "AISafe — Projeto Completo Corrigido",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "createdRouteId",
+      "value": ""
+    },
+    {
+      "key": "lisOpoRouteId",
+      "value": ""
+    },
+    {
+      "key": "opoMadRouteId",
+      "value": ""
+    },
+    {
+      "key": "faoMadRouteId",
+      "value": ""
+    },
+    {
+      "key": "madBcnRouteId",
+      "value": ""
+    },
+    {
+      "key": "lisMadDirectId",
+      "value": ""
+    },
+    {
+      "key": "demandingRouteId",
+      "value": ""
+    },
+    {
+      "key": "scheduledFlightId",
+      "value": ""
+    },
+    {
+      "key": "netBeforeDeactivate",
+      "value": ""
+    },
+    {
+      "key": "futureDate",
+      "value": ""
+    },
+    {
+      "key": "overlapDate",
+      "value": ""
+    }
+  ],
   "item": [
     {
       "name": "Auth",
@@ -22,7 +68,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
@@ -45,7 +96,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
@@ -68,7 +124,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
@@ -91,7 +152,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
@@ -119,8 +185,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/maintenance-templates",
             "body": {
@@ -133,7 +205,12 @@
           "name": "US115 — View Maintenance Templates",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-templates/1"
           }
         },
@@ -152,8 +229,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/maintenance-records",
             "body": {
@@ -166,7 +249,12 @@
           "name": "US116 — View Maintenance Records of a Specific Aircraft",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/aircraft/CS-TVB"
           }
         },
@@ -174,7 +262,12 @@
           "name": "US117 — View Total Maintenance Hours for the Fleet",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/fleet/maintenance-hours"
           }
         },
@@ -182,7 +275,12 @@
           "name": "Get Maintenance Record by ID",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/{{recordId}}"
           }
         },
@@ -191,9 +289,18 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
-              { "key": "If-Match", "value": "0" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "If-Match",
+                "value": "0"
+              }
             ],
             "url": "{{baseUrl}}/api/maintenance-records/{{recordId}}/component",
             "body": {
@@ -207,9 +314,18 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
-              { "key": "If-Match", "value": "1" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "If-Match",
+                "value": "1"
+              }
             ],
             "url": "{{baseUrl}}/api/maintenance-records/{{recordId}}/complete",
             "body": {
@@ -222,7 +338,12 @@
           "name": "US218 — Search Maintenance Records (Filters)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/search?status=COMPLETED&component=EXTERIOR"
           }
         },
@@ -230,7 +351,12 @@
           "name": "US219 — View Ongoing Maintenance Activities",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/ongoing"
           }
         },
@@ -238,7 +364,12 @@
           "name": "US220 — Generate Costs Report (By Aircraft)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/reports/costs?type=aircraft"
           }
         },
@@ -246,7 +377,12 @@
           "name": "US220 — Generate Costs Report (By Model)",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/reports/costs?type=model"
           }
         },
@@ -254,7 +390,12 @@
           "name": "US221 — View Average Turnaround Time",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/maintenance-records/reports/turnaround-time"
           }
         }
@@ -281,8 +422,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports",
             "body": {
@@ -306,8 +453,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports",
             "body": {
@@ -336,7 +489,12 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/airports/LIS"
           }
         },
@@ -354,7 +512,12 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/airports/XXX"
           }
         },
@@ -394,7 +557,12 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/airports"
           }
         },
@@ -415,8 +583,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/LIS/certifications",
             "body": {
@@ -440,8 +614,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/LIS/certifications",
             "body": {
@@ -466,8 +646,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/OPO/status",
             "body": {
@@ -491,8 +677,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/LIS/status",
             "body": {
@@ -516,8 +708,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/LIS/status",
             "body": {
@@ -543,8 +741,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/LIS/facilities",
             "body": {
@@ -568,8 +772,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/LIS/facilities",
             "body": {
@@ -595,8 +805,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/LIS/photos",
             "body": {
@@ -620,8 +836,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/ZZZ/photos",
             "body": {
@@ -648,8 +870,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/FAO/details",
             "body": {
@@ -673,8 +901,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/airports/FAO/details",
             "body": {
@@ -764,22 +998,1521 @@
       ]
     },
     {
-      "name": "Flight Routes",
+      "name": "Flight Routes & Operations — WP#3A+3B (Ruben 1241847)",
+      "description": "Demonstração completa da minha parte (Flight Routes). Correr de cima para baixo (Collection Runner) sobre uma app acabada de arrancar (H2 in-memory reinicia o estado). Swagger UI = pedidos livres; esta collection = demonstração guiada das funcionalidades, começando por GETs sobre os dados do Bootstrapper e depois POST/PATCH que mudam os resultados ao vivo.",
       "item": [
         {
-          "name": "US110 — Create a Flight Route",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
-            "url": "{{baseUrl}}/api/routes",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"originIata\": \"LIS\",\n  \"destinationIata\": \"OPO\",\n  \"airlineCode\": \"TP\",\n  \"flightNumber\": \"1970\"\n}"
+          "name": "0 · Setup",
+          "item": [
+            {
+              "name": "Login (ATCC)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                      "const token = pm.response.json().token;",
+                      "pm.environment.set('jwtToken', token);",
+                      "pm.collectionVariables.set('jwtToken', token);",
+                      "pm.test('token recebido', () => pm.expect(token).to.be.a('string').and.not.empty);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"username\": \"atcc\", \"password\": \"atcc123\" }"
+                }
+              }
+            },
+            {
+              "name": "Capturar ID — LIS→OPO",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('rota LIS→OPO existe', () => pm.expect(arr.length).to.be.above(0));",
+                      "if (arr.length) pm.collectionVariables.set('lisOpoRouteId', arr[0].id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/search?origin=LIS&dest=OPO"
+              }
+            },
+            {
+              "name": "Capturar ID — OPO→MAD",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('rota OPO→MAD existe', () => pm.expect(arr.length).to.be.above(0));",
+                      "if (arr.length) pm.collectionVariables.set('opoMadRouteId', arr[0].id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/search?origin=OPO&dest=MAD"
+              }
+            },
+            {
+              "name": "Capturar ID — FAO→MAD",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('rota FAO→MAD existe', () => pm.expect(arr.length).to.be.above(0));",
+                      "if (arr.length) pm.collectionVariables.set('faoMadRouteId', arr[0].id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/search?origin=FAO&dest=MAD"
+              }
+            },
+            {
+              "name": "Capturar ID — MAD→BCN (INATIVA)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('rota MAD→BCN existe (mesmo inativa)', () => pm.expect(arr.length).to.be.above(0));",
+                      "if (arr.length) {",
+                      "  pm.collectionVariables.set('madBcnRouteId', arr[0].id);",
+                      "  pm.test('MAD→BCN começa INACTIVE', () => pm.expect(arr[0].status).to.eql('INACTIVE'));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/search?origin=MAD&dest=BCN"
+              }
             }
-          }
+          ]
+        },
+        {
+          "name": "1 · Phase 1 — Flight Routes (WP#3A)",
+          "item": [
+            {
+              "name": "US110 — Criar rota (POST) OPO→FAO",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('US110 cria (201) ou já existe (400)', () => pm.expect([201,400]).to.include(pm.response.code));",
+                      "if (pm.response.code === 201) {",
+                      "  const b = pm.response.json();",
+                      "  pm.collectionVariables.set('createdRouteId', b.id);",
+                      "  pm.test('nasce ACTIVE', () => pm.expect(b.status).to.eql('ACTIVE'));",
+                      "  pm.test('distância calculada > 0', () => pm.expect(b.distance).to.be.above(0));",
+                      "} else {",
+                      "  // re-execução sem reiniciar a app: vai buscar o id existente",
+                      "  pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/routes/search?origin=OPO&dest=FAO', header: { Authorization: 'Bearer ' + pm.variables.get('jwtToken') } }, (e, res) => {",
+                      "    if (!e && res.json().length) pm.collectionVariables.set('createdRouteId', res.json()[0].id);",
+                      "  });",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"originIATA\": \"OPO\",\n  \"destIATA\": \"FAO\",\n  \"estimatedFlightTime\": 50,\n  \"minRange\": 800,\n  \"minCapacity\": 90\n}"
+                }
+              }
+            },
+            {
+              "name": "US113 — Consultar rota por ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const b = pm.response.json();",
+                      "pm.test('id confere', () => pm.expect(b.id).to.eql(pm.collectionVariables.get('createdRouteId')));",
+                      "pm.test('origem OPO', () => pm.expect(b.originIATA).to.eql('OPO'));",
+                      "pm.test('destino FAO', () => pm.expect(b.destIATA).to.eql('FAO'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}"
+              }
+            },
+            {
+              "name": "US114 — Pesquisar rotas (origin=LIS)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('devolve lista', () => pm.expect(arr).to.be.an('array'));",
+                      "pm.test('todas partem de LIS', () => pm.expect(arr.every(r => r.originIATA === 'LIS')).to.be.true);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/search?origin=LIS"
+              }
+            },
+            {
+              "name": "US114 — Pesquisar todas (sem filtros)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('rede tem várias rotas (seed)', () => pm.expect(arr.length).to.be.at.least(5));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/search"
+              }
+            },
+            {
+              "name": "US111 — Histórico (após criação)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('tem pelo menos 1 entrada', () => pm.expect(arr.length).to.be.at.least(1));",
+                      "pm.test('1ª entrada é a criação', () => pm.expect(JSON.stringify(arr[0]).toLowerCase()).to.include('creat'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}/history"
+              }
+            },
+            {
+              "name": "US112 — Atualizar detalhes (PATCH minRange/time)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const b = pm.response.json();",
+                      "pm.test('minRange atualizado p/ 1200', () => pm.expect(b.minRange).to.eql(1200));",
+                      "pm.test('tempo atualizado p/ 65', () => pm.expect(b.estimatedFlightTime).to.eql(65));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"minRange\": 1200,\n  \"estimatedFlightTime\": 65\n}"
+                }
+              }
+            },
+            {
+              "name": "US111 — Histórico DINÂMICO (após update)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('agora há ≥2 entradas', () => pm.expect(arr.length).to.be.at.least(2));",
+                      "const upd = arr.find(h => h.previousMinRange !== undefined || h.previousEstimatedFlightTime !== undefined);",
+                      "pm.test('regista valores PREVIOUS só dos campos alterados', () => pm.expect(upd).to.exist);",
+                      "pm.test('previousMinRange = 800 (valor anterior)', () => pm.expect(upd.previousMinRange).to.eql(800));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}/history"
+              }
+            },
+            {
+              "name": "US112 — Desativar rota (status INACTIVE)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('status = INACTIVE', () => pm.expect(pm.response.json().status).to.eql('INACTIVE'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"INACTIVE\" }"
+                }
+              }
+            },
+            {
+              "name": "US112 — Reativar rota (status ACTIVE)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('status = ACTIVE (reativada)', () => pm.expect(pm.response.json().status).to.eql('ACTIVE'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"ACTIVE\" }"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "2 · Phase 2 — Flight Operations (WP#3B) · baseline",
+          "item": [
+            {
+              "name": "US214 — Rotas ativas por POPULARIDADE",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('devolve lista', () => pm.expect(arr).to.be.an('array').that.is.not.empty);",
+                      "pm.test('traz usageCount', () => pm.expect(arr[0].usageCount).to.not.be.undefined);",
+                      "const counts = arr.map(r => r.usageCount);",
+                      "const sorted = counts.slice().sort((a,b) => b-a);",
+                      "pm.test('ordenado por popularidade (desc)', () => pm.expect(counts).to.eql(sorted));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/active?sortBy=popularity"
+              }
+            },
+            {
+              "name": "US214 — Rotas ativas por DISTÂNCIA",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "const dist = arr.map(r => r.distance);",
+                      "const sorted = dist.slice().sort((a,b) => b-a);",
+                      "pm.test('ordenado por distância (desc)', () => pm.expect(dist).to.eql(sorted));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/active?sortBy=distance"
+              }
+            },
+            {
+              "name": "US215 — Distância total da rede",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const km = pm.response.json().totalDistanceKm;",
+                      "pm.test('totalDistanceKm > 0', () => pm.expect(km).to.be.above(0));",
+                      "pm.test('só conta rotas ATIVAS (MAD→BCN inativa não entra)', () => pm.expect(km).to.be.above(1500));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/network/total-distance"
+              }
+            },
+            {
+              "name": "US216 — Alternativas LIS→MAD (2 itinerários)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('há ≥2 alternativas (via OPO e via FAO)', () => pm.expect(arr.length).to.be.at.least(2));",
+                      "pm.test('todas terminam em MAD', () => pm.expect(arr.every(i => i.legs[i.legs.length-1].destIATA === 'MAD')).to.be.true);",
+                      "const minStops = Math.min.apply(null, arr.map(i => i.numberOfStops));",
+                      "pm.collectionVariables.set('lisMadBaselineMinStops', minStops);",
+                      "pm.test('por agora o melhor tem ≥1 escala (sem rota direta)', () => pm.expect(minStops).to.be.at.least(1));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/alternatives?origin=LIS&dest=MAD"
+              }
+            },
+            {
+              "name": "US216 — Alternativas LIS→BCN (IMPOSSÍVEL)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('lista VAZIA — BCN só tem entrada por rota INATIVA', () => pm.expect(arr.length).to.eql(0));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/alternatives?origin=LIS&dest=BCN"
+              }
+            },
+            {
+              "name": "US213 — Voos agendados de CS-TVA (paginado)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const page = pm.response.json().page;",
+                      "pm.test('CS-TVA tem 3 voos (seed)', () => pm.expect(page.totalElements).to.be.at.least(3));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights?aircraft=CS-TVA"
+              }
+            },
+            {
+              "name": "US213 — Paginação (size=2)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const page = pm.response.json().page;",
+                      "pm.test('tamanho de página = 2', () => pm.expect(page.size).to.eql(2));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights?aircraft=CS-TVA&size=2"
+              }
+            },
+            {
+              "name": "US212 — Criar voo agendado (CS-TVB)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "const d = new Date(); d.setDate(d.getDate() + 10);",
+                      "pm.collectionVariables.set('futureDate', d.toISOString().slice(0,10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                      "const b = pm.response.json();",
+                      "pm.collectionVariables.set('scheduledFlightId', b.id);",
+                      "pm.test('estado por defeito = SCHEDULED', () => pm.expect(String(b.status).toUpperCase()).to.eql('SCHEDULED'));",
+                      "pm.test('aeronave = CS-TVB', () => pm.expect(b.aircraftRegistration).to.eql('CS-TVB'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"aircraftRegistration\": \"CS-TVB\",\n  \"routeID\": \"{{lisOpoRouteId}}\",\n  \"date\": \"{{futureDate}}\",\n  \"time\": \"10:00:00\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Detalhe do voo agendado (by id)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('id confere', () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get('scheduledFlightId')));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights/{{scheduledFlightId}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "3 · Demo Scenario — resultados a mudar ao vivo",
+          "item": [
+            {
+              "name": "① US216 LIS→BCN (antes) → vazio",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('ANTES: impossível (lista vazia)', () => pm.expect(pm.response.json().length).to.eql(0));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/alternatives?origin=LIS&dest=BCN"
+              }
+            },
+            {
+              "name": "② US112 ATIVAR rota MAD→BCN",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('ativada (200) ou já ativa (409)', () => pm.expect([200,409]).to.include(pm.response.code));",
+                      "if (pm.response.code === 200) pm.test('status = ACTIVE', () => pm.expect(pm.response.json().status).to.eql('ACTIVE'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{madBcnRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"ACTIVE\" }"
+                }
+              }
+            },
+            {
+              "name": "③ US216 LIS→BCN (depois) → AGORA possível ✅",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "pm.test('DEPOIS: já há itinerários (ativar tornou possível)', () => pm.expect(arr.length).to.be.above(0));",
+                      "pm.test('todos chegam a BCN', () => pm.expect(arr.every(i => i.legs[i.legs.length-1].destIATA === 'BCN')).to.be.true);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/alternatives?origin=LIS&dest=BCN"
+              }
+            },
+            {
+              "name": "④ US110 Criar rota DIRETA LIS→MAD",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('criada (201) ou já existe (400)', () => pm.expect([201,400]).to.include(pm.response.code));",
+                      "if (pm.response.code === 201) pm.collectionVariables.set('lisMadDirectId', pm.response.json().id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"originIATA\": \"LIS\",\n  \"destIATA\": \"MAD\",\n  \"estimatedFlightTime\": 80,\n  \"minRange\": 1000,\n  \"minCapacity\": 100\n}"
+                }
+              }
+            },
+            {
+              "name": "⑤ US216 LIS→MAD (depois) → agora DIRETA (0 escalas) ✅",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "const minStops = Math.min.apply(null, arr.map(i => i.numberOfStops));",
+                      "const baseline = Number(pm.collectionVariables.get('lisMadBaselineMinStops'));",
+                      "pm.test('surgiu itinerário DIRETO (0 escalas)', () => pm.expect(minStops).to.eql(0));",
+                      "pm.test('mais eficiente que o baseline (menos escalas)', () => pm.expect(minStops).to.be.below(baseline));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/alternatives?origin=LIS&dest=MAD"
+              }
+            },
+            {
+              "name": "⑥ US215 distância (antes de desativar) — captura",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.collectionVariables.set('netBeforeDeactivate', pm.response.json().totalDistanceKm);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/network/total-distance"
+              }
+            },
+            {
+              "name": "⑦ US112 DESATIVAR rota OPO→MAD",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('desativada (200) ou já inativa (409)', () => pm.expect([200,409]).to.include(pm.response.code));",
+                      "if (pm.response.code === 200) pm.test('status = INACTIVE', () => pm.expect(pm.response.json().status).to.eql('INACTIVE'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{opoMadRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"INACTIVE\" }"
+                }
+              }
+            },
+            {
+              "name": "⑧ US215 distância (depois) → DESCEU ✅",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const after = pm.response.json().totalDistanceKm;",
+                      "const before = Number(pm.collectionVariables.get('netBeforeDeactivate'));",
+                      "pm.test('distância da rede DESCEU ao desativar OPO→MAD', () => pm.expect(after).to.be.below(before));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/network/total-distance"
+              }
+            },
+            {
+              "name": "⑨ US216 LIS→MAD (depois de desativar) → sem caminho via OPO",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "const arr = pm.response.json();",
+                      "const usaOPO = arr.some(i => i.legs.some(l => l.originIATA === 'OPO' && l.destIATA === 'MAD'));",
+                      "pm.test('nenhum itinerário usa já o troço OPO→MAD', () => pm.expect(usaOPO).to.be.false);",
+                      "pm.test('a rota direta LIS→MAD continua disponível', () => pm.expect(arr.some(i => i.numberOfStops === 0)).to.be.true);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/alternatives?origin=LIS&dest=MAD"
+              }
+            },
+            {
+              "name": "⑩ US112 REATIVAR OPO→MAD (repor estado)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('reativada (200) ou já ativa (409)', () => pm.expect([200,409]).to.include(pm.response.code));",
+                      "if (pm.response.code === 200) pm.test('status = ACTIVE', () => pm.expect(pm.response.json().status).to.eql('ACTIVE'));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{opoMadRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"ACTIVE\" }"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "4 · Error Handling — deteção de erros",
+          "item": [
+            {
+              "name": "US110 — Falta campo obrigatório (400)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 400 (validação)', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"originIATA\": \"LIS\",\n  \"destIATA\": \"OPO\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US110 — IATA inválido (400)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 400 (IATA tem de ter 3 letras)', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"originIATA\": \"LISBOA\",\n  \"destIATA\": \"OP\",\n  \"estimatedFlightTime\": 60,\n  \"minRange\": 1000,\n  \"minCapacity\": 100\n}"
+                }
+              }
+            },
+            {
+              "name": "US110 — Rota duplicada (400)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 400 (LIS→OPO já existe)', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"originIATA\": \"LIS\",\n  \"destIATA\": \"OPO\",\n  \"estimatedFlightTime\": 60,\n  \"minRange\": 1000,\n  \"minCapacity\": 100\n}"
+                }
+              }
+            },
+            {
+              "name": "US113 — Rota inexistente (404)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/rota-inexistente-123"
+              }
+            },
+            {
+              "name": "US112 — Atualizar rota inexistente (404)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/rota-inexistente-123",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"minRange\": 999 }"
+                }
+              }
+            },
+            {
+              "name": "US112 — Status inválido (400)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 400 (status tem de ser ACTIVE/INACTIVE)', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{lisOpoRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"FROZEN\" }"
+                }
+              }
+            },
+            {
+              "name": "US112 — Desativar (setup p/ conflito)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('desativada (200) ou já inativa (409)', () => pm.expect([200,409]).to.include(pm.response.code));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"INACTIVE\" }"
+                }
+              }
+            },
+            {
+              "name": "US112 — Desativar já-inativa (409)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 409 (já está INACTIVE)', () => pm.response.to.have.status(409));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"INACTIVE\" }"
+                }
+              }
+            },
+            {
+              "name": "US112 — Reativar (cleanup)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('reativada (200) ou já ativa (409)', () => pm.expect([200,409]).to.include(pm.response.code));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/{{createdRouteId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"status\": \"ACTIVE\" }"
+                }
+              }
+            },
+            {
+              "name": "US212 — Aeronave inexistente (404)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "const d = new Date(); d.setDate(d.getDate() + 10);",
+                      "pm.collectionVariables.set('futureDate', d.toISOString().slice(0,10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"aircraftRegistration\": \"XX-000\",\n  \"routeID\": \"{{lisOpoRouteId}}\",\n  \"date\": \"{{futureDate}}\",\n  \"time\": \"11:00:00\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US212 — Rota inexistente (404)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "const d = new Date(); d.setDate(d.getDate() + 10);",
+                      "pm.collectionVariables.set('futureDate', d.toISOString().slice(0,10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"aircraftRegistration\": \"CS-TVB\",\n  \"routeID\": \"rota-inexistente-123\",\n  \"date\": \"{{futureDate}}\",\n  \"time\": \"11:30:00\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US212 — Criar rota EXIGENTE (setup p/ 422)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('criada (201) ou já existe (400)', () => pm.expect([201,400]).to.include(pm.response.code));",
+                      "if (pm.response.code === 201) {",
+                      "  pm.collectionVariables.set('demandingRouteId', pm.response.json().id);",
+                      "} else {",
+                      "  pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/routes/search?origin=MAD&dest=OPO', header: { Authorization: 'Bearer ' + pm.variables.get('jwtToken') } }, (e, res) => {",
+                      "    if (!e && res.json().length) pm.collectionVariables.set('demandingRouteId', res.json()[0].id);",
+                      "  });",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"originIATA\": \"MAD\",\n  \"destIATA\": \"OPO\",\n  \"estimatedFlightTime\": 75,\n  \"minRange\": 99999,\n  \"minCapacity\": 9999\n}"
+                }
+              }
+            },
+            {
+              "name": "US212 — Requisitos não cumpridos (422)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "const d = new Date(); d.setDate(d.getDate() + 12);",
+                      "pm.collectionVariables.set('futureDate', d.toISOString().slice(0,10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 422 (aeronave não cumpre alcance/capacidade)', () => pm.response.to.have.status(422));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"aircraftRegistration\": \"CS-TVB\",\n  \"routeID\": \"{{demandingRouteId}}\",\n  \"date\": \"{{futureDate}}\",\n  \"time\": \"12:00:00\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US212 — Overlap (setup, 201)",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "const d = new Date(); d.setDate(d.getDate() + 40);",
+                      "pm.collectionVariables.set('overlapDate', d.toISOString().slice(0,10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('criado (201) ou já existe deste run (409)', () => pm.expect([201,409]).to.include(pm.response.code));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"aircraftRegistration\": \"CS-TVA\",\n  \"routeID\": \"{{lisOpoRouteId}}\",\n  \"date\": \"{{overlapDate}}\",\n  \"time\": \"15:00:00\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US212 — Overlap conflito (409)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 409 (avião já tem voo nessa data/hora)', () => pm.response.to.have.status(409));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/scheduled-flights",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"aircraftRegistration\": \"CS-TVA\",\n  \"routeID\": \"{{lisOpoRouteId}}\",\n  \"date\": \"{{overlapDate}}\",\n  \"time\": \"15:00:00\"\n}"
+                }
+              }
+            },
+            {
+              "name": "US216 — Aeroporto inexistente (404)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwtToken}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routes/alternatives?origin=ZZZ&dest=MAD"
+              }
+            },
+            {
+              "name": "Segurança — sem token (401/403)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Bloqueado sem JWT (401 ou 403)', () => pm.expect([401,403]).to.include(pm.response.code));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/routes/search"
+              }
+            }
+          ]
         }
       ]
     },
@@ -791,8 +2524,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
             ],
             "url": "{{baseUrl}}/api/aircrafts",
             "body": {
@@ -805,7 +2544,12 @@
           "name": "Get Aircraft by Registration Number",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
             "url": "{{baseUrl}}/api/aircrafts/CS-TVA"
           }
         }
