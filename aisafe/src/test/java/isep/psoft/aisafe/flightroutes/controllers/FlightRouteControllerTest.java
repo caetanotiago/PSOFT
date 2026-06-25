@@ -217,6 +217,7 @@ class FlightRouteControllerTest {
         updated.setChangeDate("2026-06-16T10:05:00");
         updated.setDescription("Route details updated.");
         updated.setPreviousMinCapacity(150);
+        updated.setNewMinCapacity(200);
 
         when(historyService.getRouteHistory("route-123")).thenReturn(List.of());
         when(assembler.toHistoryDTOList(any())).thenReturn(List.of(created, updated));
@@ -224,7 +225,8 @@ class FlightRouteControllerTest {
         mockMvc.perform(get("/api/routes/route-123/history"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].description").value("Route created."))
-                .andExpect(jsonPath("$[1].previousMinCapacity").value(150));
+                .andExpect(jsonPath("$[1].previousMinCapacity").value(150))
+                .andExpect(jsonPath("$[1].newMinCapacity").value(200));
     }
 
     @Test

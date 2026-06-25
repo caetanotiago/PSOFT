@@ -55,8 +55,10 @@ public class FlightRoute {
         this.estimatedFlightTime = estimatedFlightTime;
         this.status = RouteStatus.active(); // Uma rota nasce sempre ativa
 
-        // Regista a criação no histórico (US111)
-        this.historyLog.add(RouteHistory.created());
+        // Regista a criação no histórico (US111) com os valores iniciais como "novos".
+        this.historyLog.add(RouteHistory.created(
+                requirements.getMinRange(), requirements.getMinCapacity(),
+                estimatedFlightTime.getDurationMinutes(), this.status.getState()));
     }
 
     // US112 (Update) — atualização parcial dos detalhes operacionais.
@@ -71,16 +73,24 @@ public class FlightRoute {
         Integer prevMinCapacity = null;
         Integer prevTime = null;
 
+        // Valores novos — só preenchidos para os atributos efetivamente alterados (senão null).
+        Double changedMinRange = null;
+        Integer changedMinCapacity = null;
+        Integer changedTime = null;
+
         if (newMinRange != null && !newMinRange.equals(effMinRange)) {
             prevMinRange = effMinRange;
+            changedMinRange = newMinRange;
             effMinRange = newMinRange;
         }
         if (newMinCapacity != null && !newMinCapacity.equals(effMinCapacity)) {
             prevMinCapacity = effMinCapacity;
+            changedMinCapacity = newMinCapacity;
             effMinCapacity = newMinCapacity;
         }
         if (newTime != null && !newTime.equals(effTime)) {
             prevTime = effTime;
+            changedTime = newTime;
             effTime = newTime;
         }
 
@@ -91,7 +101,9 @@ public class FlightRoute {
 
         this.requirements = new RouteRequirements(effMinRange, effMinCapacity);
         this.estimatedFlightTime = new EstimatedFlightTime(effTime);
-        this.historyLog.add(RouteHistory.detailsUpdated(prevMinRange, prevMinCapacity, prevTime));
+        this.historyLog.add(RouteHistory.detailsUpdated(
+                prevMinRange, prevMinCapacity, prevTime,
+                changedMinRange, changedMinCapacity, changedTime));
     }
 
     // US112 (Activate/Deactivate) — "deactivate a route" = mudar o status para INACTIVE.
@@ -103,13 +115,13 @@ public class FlightRoute {
                 throw new IllegalStateException("Route is already INACTIVE.");
             }
             this.status = RouteStatus.inactive();
-            this.historyLog.add(RouteHistory.statusChanged(current, "Route deactivated."));
+            this.historyLog.add(RouteHistory.statusChanged(current, "INACTIVE", "Route deactivated."));
         } else if ("ACTIVE".equalsIgnoreCase(newState)) {
             if ("ACTIVE".equalsIgnoreCase(current)) {
                 throw new IllegalStateException("Route is already ACTIVE.");
             }
             this.status = RouteStatus.active();
-            this.historyLog.add(RouteHistory.statusChanged(current, "Route activated."));
+            this.historyLog.add(RouteHistory.statusChanged(current, "ACTIVE", "Route activated."));
         } else {
             throw new IllegalArgumentException("Invalid status: " + newState + " (must be ACTIVE or INACTIVE).");
         }

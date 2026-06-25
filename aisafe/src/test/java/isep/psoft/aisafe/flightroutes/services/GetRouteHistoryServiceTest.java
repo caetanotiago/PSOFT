@@ -37,8 +37,10 @@ class GetRouteHistoryServiceTest {
 
         assertEquals(2, history.size());
         assertEquals("Route created.", history.get(0).getDescription());
+        assertEquals("ACTIVE", history.get(0).getNewStatus()); // criação regista o estado inicial
         assertEquals("Route deactivated.", history.get(1).getDescription());
         assertEquals("ACTIVE", history.get(1).getPreviousStatus());
+        assertEquals("INACTIVE", history.get(1).getNewStatus());
     }
 
     @Test

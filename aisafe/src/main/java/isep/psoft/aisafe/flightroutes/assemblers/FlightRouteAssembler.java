@@ -53,6 +53,10 @@ public class FlightRouteAssembler {
         dto.setPreviousMinCapacity(history.getPreviousMinCapacity());
         dto.setPreviousEstimatedFlightTime(history.getPreviousEstimatedFlightTime());
         dto.setPreviousStatus(history.getPreviousStatus());
+        dto.setNewMinRange(history.getNewMinRange());
+        dto.setNewMinCapacity(history.getNewMinCapacity());
+        dto.setNewEstimatedFlightTime(history.getNewEstimatedFlightTime());
+        dto.setNewStatus(history.getNewStatus());
         return dto;
     }
 
